@@ -1,811 +1,1246 @@
 <!DOCTYPE html>
-<html lang="fr" class="dark">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MémoTruck - Le Copilote Intelligent Poids Lourds</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300e5ff'><path d='M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z'/></svg>">
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    
-    <!-- GSAP & ScrollTrigger -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-
-    <style>
-        :root {
-            --bg-color: #07090e;
-            --surface-color: #0f1523;
-            --surface-card: #161e31;
-            --border-color: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #00e5ff;
-            --accent-hover: #00b8d4;
-            --accent-dark: rgba(0, 229, 255, 0.12);
-            --font-heading: 'Space Grotesk', sans-serif;
-            --font-body: 'Inter', sans-serif;
-        }
-
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: var(--font-body);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        h1, h2, h3, h4 {
-            font-family: var(--font-heading);
-            letter-spacing: -0.02em;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        /* Dynamic Background Highway Effect */
-        .highway-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: -1;
-            overflow: hidden;
-            opacity: 0.35;
-        }
-
-        .road-line {
-            position: absolute;
-            background: linear-gradient(180deg, transparent, var(--accent), transparent);
-            width: 2px;
-            height: 200px;
-            animation: moveRoad 3s linear infinite;
-        }
-
-        @keyframes moveRoad {
-            0% { transform: translateY(-200px); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateY(100vh); opacity: 0; }
-        }
-
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            background: rgba(7, 9, 14, 0.85);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.2rem 5%;
-        }
-
-        .logo {
-            font-family: var(--font-heading);
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .logo span {
-            color: var(--accent);
-            text-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent);
-        }
-
-        .btn {
-            background: linear-gradient(135deg, var(--accent), #0088cc);
-            color: #000;
-            padding: 0.75rem 1.6rem;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.3);
-        }
-
-        .btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 30px rgba(0, 229, 255, 0.5);
-        }
-
-        /* Hero Section */
-        header.hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8rem 5% 5rem;
-            position: relative;
-            background: radial-gradient(circle at 50% 30%, rgba(0, 229, 255, 0.12) 0%, transparent 70%);
-        }
-
-        .hero-container {
-            max-width: 1200px;
-            display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
-            gap: 4rem;
-            align-items: center;
-        }
-
-        @media (max-width: 968px) {
-            .hero-container {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-            .hero-buttons {
-                justify-content: center;
-            }
-        }
-
-        .hero h1 {
-            font-size: clamp(2.5rem, 4.5vw, 4rem);
-            font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-        }
-
-        .hero h1 span {
-            color: var(--accent);
-        }
-
-        .hero p {
-            font-size: clamp(1rem, 1.5vw, 1.15rem);
-            color: var(--text-muted);
-            margin-bottom: 2.5rem;
-            line-height: 1.7;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 0.75rem 1.6rem;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-outline:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: var(--accent-dark);
-        }
-
-        /* 3D Mockup Container with Floating Animation */
-        .phone-mockup-wrapper {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            perspective: 1000px;
-        }
-
-        .phone-mockup {
-            width: 300px;
-            height: 610px;
-            background: #000;
-            border-radius: 40px;
-            border: 4px solid #2d3748;
-            padding: 12px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 229, 255, 0.2);
-            position: relative;
-            transform: rotateY(-10deg) rotateX(10deg);
-            animation: floatPhone 6s ease-in-out infinite;
-        }
-
-        @keyframes floatPhone {
-            0%, 100% { transform: translateY(0) rotateY(-10deg) rotateX(10deg); }
-            50% { transform: translateY(-15px) rotateY(-5deg) rotateX(5deg); }
-        }
-
-        .phone-screen {
-            width: 100%;
-            height: 100%;
-            background: var(--surface-color);
-            border-radius: 30px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            padding: 1.25rem;
-            position: relative;
-        }
-
-        .phone-notch {
-            width: 100px;
-            height: 18px;
-            background: #000;
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
-            align-self: center;
-            margin-bottom: 1rem;
-        }
-
-        .app-ui-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.2rem;
-        }
-
-        .app-ui-title {
-            font-family: var(--font-heading);
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .app-badge {
-            background: var(--accent-dark);
-            color: var(--accent);
-            font-size: 0.75rem;
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .app-card-mock {
-            background: var(--surface-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 0.9rem;
-            margin-bottom: 0.75rem;
-            border-left: 3px solid var(--accent);
-        }
-
-        .app-card-mock h5 {
-            font-size: 0.85rem;
-            margin-bottom: 0.2rem;
-        }
-
-        .app-card-mock p {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin: 0;
-        }
-
-        /* Sections General */
-        section {
-            padding: 6rem 5%;
-            max-width: 1300px;
-            margin: 0 auto;
-        }
-
-        .section-header {
-            text-align: center;
-            max-width: 750px;
-            margin: 0 auto 3.5rem;
-        }
-
-        .section-header h2 {
-            font-size: clamp(2rem, 3.5vw, 2.75rem);
-            margin-bottom: 1rem;
-        }
-
-        .section-header p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-        }
-
-        /* Features / Solutions Grid */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 2rem;
-        }
-
-        .feature-card {
-            background-color: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 2.5rem;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .feature-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px -15px rgba(0, 229, 255, 0.15);
-        }
-
-        .feature-card:hover::before {
-            opacity: 1;
-        }
-
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
-            background-color: var(--accent-dark);
-            color: var(--accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.75rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .feature-card h3 {
-            font-size: 1.35rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .feature-card p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
-        /* Ecosystem Section */
-        .ecosystem-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 30px;
-            padding: 4rem;
-        }
-
-        @media (max-width: 968px) {
-            .ecosystem-container {
-                grid-template-columns: 1fr;
-                padding: 2rem;
-            }
-        }
-
-        .ecosystem-text h2 {
-            font-size: 2.25rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .ecosystem-text p {
-            color: var(--text-muted);
-            margin-bottom: 1.5rem;
-            line-height: 1.7;
-        }
-
-        .check-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-        }
-
-        .check-list li {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            font-weight: 500;
-        }
-
-        .check-list svg {
-            color: var(--accent);
-            flex-shrink: 0;
-            background: var(--accent-dark);
-            padding: 4px;
-            border-radius: 50%;
-        }
-
-        .ecosystem-visual {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 2.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .visual-box {
-            background: var(--surface-card);
-            padding: 1.25rem 1.5rem;
-            border-radius: 14px;
-            border-left: 4px solid var(--accent);
-            transition: transform 0.3s ease;
-        }
-
-        .visual-box:hover {
-            transform: translateX(5px);
-        }
-
-        .visual-box h4 {
-            font-size: 1.05rem;
-            margin-bottom: 0.3rem;
-        }
-
-        .visual-box p {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin: 0;
-        }
-
-        /* Contact / Trial Section */
-        .contact-section {
-            background: radial-gradient(circle at 50% 80%, rgba(0, 229, 255, 0.08) 0%, transparent 70%);
-            border-top: 1px solid var(--border-color);
-        }
-
-        .contact-wrapper {
-            max-width: 750px;
-            margin: 0 auto;
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 30px;
-            padding: 3.5rem;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-        }
-
-        .contact-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .form-group label {
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-
-        .form-group input, .form-group textarea {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1rem;
-            color: var(--text-main);
-            font-family: var(--font-body);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 130px;
-        }
-
-        /* Footer */
-        footer {
-            background: var(--bg-color);
-            border-top: 1px solid var(--border-color);
-            padding: 3rem 5%;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        footer .logo {
-            justify-content: center;
-            margin-bottom: 1rem;
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            .ecosystem-container {
-                padding: 1.5rem;
-            }
-            .contact-wrapper {
-                padding: 1.5rem;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MémoTruck | La gestion intelligente des flottes de transport</title>
+
+<meta name="description" content="MémoTruck centralise les documents, l'entretien, les chauffeurs et le suivi complet de votre parc poids lourd dans une seule application SaaS.">
+
+<link rel="icon" href="data:image/svg+xml,
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+<rect width='100' height='100' rx='20' fill='%2300d9ff'/>
+<text x='50' y='65' text-anchor='middle' font-size='55' fill='black' font-family='Arial'>MT</text>
+</svg>">
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+
+<style>
+
+:root{
+    --bg:#05070b;
+    --bg-soft:#0b1018;
+    --card:#101722;
+    --text:#f5f7fb;
+    --muted:#9aa7b8;
+    --brand:#00d9ff;
+    --brand-dark:#0098b8;
+    --brand-light:#6eeaff;
+    --border:rgba(255,255,255,.08);
+}
+
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+
+body{
+    background:
+    radial-gradient(circle at top right,rgba(0,217,255,.15),transparent 35%),
+    var(--bg);
+    color:var(--text);
+    font-family:Inter,sans-serif;
+    overflow-x:hidden;
+}
+
+
+h1,h2,h3{
+    font-family:"Space Grotesk",sans-serif;
+}
+
+
+a{
+    text-decoration:none;
+    color:inherit;
+}
+
+
+.container{
+    width:min(1200px,90%);
+    margin:auto;
+}
+
+
+section{
+    padding:100px 0;
+    opacity:0;
+    transform:translateY(30px);
+}
+
+
+.section-title{
+    max-width:700px;
+    margin-bottom:50px;
+}
+
+
+.section-title span{
+    color:var(--brand);
+    font-weight:600;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    font-size:.85rem;
+}
+
+
+.section-title h2{
+    font-size:clamp(2rem,4vw,3.2rem);
+    margin:15px 0;
+}
+
+
+.section-title p{
+    color:var(--muted);
+    line-height:1.7;
+}
+
+
+/* HEADER */
+
+
+header{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    z-index:100;
+    backdrop-filter:blur(15px);
+    background:rgba(5,7,11,.65);
+    border-bottom:1px solid var(--border);
+}
+
+
+.nav{
+    height:80px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-size:1.5rem;
+    font-weight:700;
+}
+
+
+.logo-box{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    background:linear-gradient(135deg,var(--brand),var(--brand-dark));
+    display:grid;
+    place-items:center;
+    color:#001014;
+    font-weight:900;
+}
+
+
+.menu{
+    display:flex;
+    gap:30px;
+    color:var(--muted);
+}
+
+
+.menu a:hover{
+    color:var(--brand);
+}
+
+
+.btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:15px 30px;
+    border-radius:12px;
+    background:var(--brand);
+    color:#001014;
+    font-weight:700;
+    transition:.3s;
+}
+
+
+.btn:hover{
+    background:var(--brand-light);
+    transform:translateY(-3px);
+}
+
+
+.btn-outline{
+    background:transparent;
+    color:white;
+    border:1px solid var(--border);
+}
+
+
+
+/* HERO */
+
+
+.hero{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    padding-top:120px;
+}
+
+
+.hero-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:60px;
+    align-items:center;
+}
+
+
+.hero h1{
+    font-size:clamp(3rem,6vw,5rem);
+    line-height:1;
+    margin-bottom:25px;
+}
+
+
+.hero h1 strong{
+    color:var(--brand);
+}
+
+
+.hero p{
+    font-size:1.2rem;
+    color:var(--muted);
+    line-height:1.7;
+    max-width:600px;
+}
+
+
+.hero-buttons{
+    display:flex;
+    gap:20px;
+    margin-top:40px;
+}
+
+
+.dashboard{
+    background:linear-gradient(145deg,#111923,#080c12);
+    border:1px solid var(--border);
+    border-radius:25px;
+    padding:25px;
+    box-shadow:0 0 80px rgba(0,217,255,.15);
+}
+
+
+.dashboard-top{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:20px;
+}
+
+
+.circle{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:var(--brand);
+}
+
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+}
+
+
+.stat{
+    background:var(--card);
+    padding:20px;
+    border-radius:18px;
+}
+
+
+.stat h3{
+    color:var(--brand);
+    font-size:2rem;
+}
+
+
+.stat p{
+    font-size:.9rem;
+}
+
+
+
+@media(max-width:900px){
+
+.menu{
+    display:none;
+}
+
+.hero-grid{
+    grid-template-columns:1fr;
+}
+
+.hero{
+    text-align:center;
+}
+
+.hero-buttons{
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+}
+
+</style>
 </head>
+
+
 <body>
 
-    <!-- Highway Background Animation -->
-    <div class="highway-bg">
-        <div class="road-line" style="left: 10%; animation-delay: 0s;"></div>
-        <div class="road-line" style="left: 30%; animation-delay: 1.2s;"></div>
-        <div class="road-line" style="left: 70%; animation-delay: 0.5s;"></div>
-        <div class="road-line" style="left: 90%; animation-delay: 2s;"></div>
-    </div>
 
-    <!-- Navigation -->
-    <nav>
-        <a href="#" class="logo">Mémo<span>Truck</span></a>
-        <ul class="nav-links">
-            <li><a href="#features">Fonctionnalités</a></li>
-            <li><a href="#ecosystem">Écosystème</a></li>
-            <li><a href="#contact">Essai Gratuit</a></li>
-        </ul>
-        <a href="#contact" class="btn">Demander un essai</a>
-    </nav>
+<header>
+<div class="container nav">
 
-    <!-- Hero Section -->
-    <header class="hero">
-        <div class="hero-container">
-            <div class="hero-content">
-                <h1>Le copilote numérique intelligent pour <span>chauffeurs et exploitants</span></h1>
-                <p>Interconnectez votre flotte en direct. Zéro oubli d'échéance réglementaire, suivi de consommation précis au kilomètre et centralisation des interventions de maintenance.</p>
-                <div class="hero-buttons">
-                    <a href="#contact" class="btn">Commencer l'essai gratuit</a>
-                    <a href="#features" class="btn-outline">Découvrir les fonctionnalités</a>
-                </div>
-            </div>
-            
-            <!-- 3D Floating Phone Preview -->
-            <div class="phone-mockup-wrapper">
-                <div class="phone-mockup">
-                    <div class="phone-screen">
-                        <div class="phone-notch"></div>
-                        <div class="app-ui-header">
-                            <span class="app-ui-title">MémoTruck v2</span>
-                            <span class="app-badge">LIVE SYNC</span>
-                        </div>
-                        <div class="app-card-mock">
-                            <h5>🚨 Prochaine Échéance</h5>
-                            <p>Contrôle technique tracteur : J-3 (Conforme)</p>
-                        </div>
-                        <div class="app-card-mock">
-                            <h5>⛽ Consommation Mois</h5>
-                            <p>Moyenne : 28.4L / 100km (-1.2L)</p>
-                        </div>
-                        <div class="app-card-mock">
-                            <h5>🛞 Suivi Pneumatique</h5>
-                            <p>Essieu moteur : 45 000 km (Usure 22%)</p>
-                        </div>
-                        <div class="app-card-mock">
-                            <h5>🛠️ Dernière Vidange</h5>
-                            <p>Effectuée le 14/06/2026 à 342 000 km</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
+<div class="logo">
+<div class="logo-box">MT</div>
+MémoTruck
+</div>
 
-    <!-- Features Section -->
-    <section id="features">
-        <div class="section-header">
-            <h2>Une application pensée par des pros, pour les pros</h2>
-            <p>Tout ce dont vous avez besoin pour sécuriser vos tournées et simplifier la gestion de parc au quotidien.</p>
-        </div>
 
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🚨</div>
-                <h3>Zéro Dépassement d'Échéance</h3>
-                <p>Oubliez le stress des contrôles techniques, des dates de cartes conducteurs ou des visites médicales. Notifications push instantanées et alertes cron quotidiennes sur tous les appareils.</p>
-            </div>
+<nav class="menu">
+<a href="#solution">Solution</a>
+<a href="#fonctionnalites">Fonctionnalités</a>
+<a href="#tarifs">Tarifs</a>
+<a href="#contact">Contact</a>
+</nav>
 
-            <div class="feature-card">
-                <div class="feature-icon">⛽</div>
-                <h3>Suivi de Consommation Précis</h3>
-                <p>Saisie quotidienne des kilométrages et des consommations moyennes. MémoTruck calcule automatiquement le litrage utilisé et consolide vos données par mois et par année.</p>
-            </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">🛞</div>
-                <h3>Jauge Pneumatique Intelligente</h3>
-                <p>Suivi ultra-précis de l'usure des pneus par essieu et par date de pose. Synchronisation automatique avec les kilomètres journaliers (marge d'erreur inférieure à 0,5 %).</p>
-            </div>
+<a href="#contact" class="btn">
+Demander une démo
+</a>
 
-            <div class="feature-card">
-                <div class="feature-icon">🛠️</div>
-                <h3>Historique des Interventions</h3>
-                <p>Retrouvez en un instant la date de la dernière vidange, l'historique des pannes, des crevaisons ou des réparations de votre tracteur sur toutes les années en arrière.</p>
-            </div>
+</div>
+</header>
 
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <h3>Dashboard Personnalisable</h3>
-                <p>Un écran d'accueil sur-mesure pour chaque chauffeur. Créez vos propres cartes de suivi pour les équipements spécifiques : extincteurs, groupes frigo, remorques, et plus encore.</p>
-            </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">🏢</div>
-                <h3>Panel Admin Exploitation</h3>
-                <p>Les bureaux disposent d'une vue globale en temps réel sur l'ensemble des alertes et des véhicules pour un pilotage fluide et sans friction.</p>
-            </div>
-        </div>
-    </section>
 
-    <!-- Ecosystem Section -->
-    <section id="ecosystem">
-        <div class="ecosystem-container">
-            <div class="ecosystem-text">
-                <h2>Une synchronisation bilatérale instantanée</h2>
-                <p>Le lien permanent entre la route et le bureau. Chaque modification effectuée par l'exploitant se met à jour immédiatement sur l'application du chauffeur, et vice-versa.</p>
-                <ul class="check-list">
-                    <li>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span>Communication directe Chauffeur &harr; Entreprise</span>
-                    </li>
-                    <li>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span>Sécurité juridique et réglementaire totale</span>
-                    </li>
-                    <li>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span>Disponibilité multi-supports et tablettes de bord</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="ecosystem-visual">
-                <div class="visual-box">
-                    <h4>Mise à jour en direct</h4>
-                    <p>Modification de date sur tracteur validée instantanément sur le terminal embarqué.</p>
-                </div>
-                <div class="visual-box">
-                    <h4>Alertes permanentes Cron</h4>
-                    <p>Rappels automatisés chaque jour de la semaine pour éliminer tout risque d'oubli.</p>
-                </div>
-                <div class="visual-box">
-                    <h4>Zéro Papier, Zéro Friction</h4>
-                    <p>Centralisation administrative complète et archivage automatique des données de parc.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+<main>
 
-    <!-- Contact / Trial Section -->
-    <section id="contact" class="contact-section">
-        <div class="section-header">
-            <h2>Demandez votre essai gratuit</h2>
-            <p>Découvrez comment MémoTruck peut transformer la gestion de votre flotte et simplifier le quotidien de vos chauffeurs.</p>
-        </div>
 
-        <div class="contact-wrapper">
-            <form class="contact-form" onsubmit="handleSubmit(event)">
-                <div class="form-group">
-                    <label for="name">Nom complet ou Entreprise</label>
-                    <input type="text" id="name" required placeholder="Jean Dupont / Transports Dupont">
-                </div>
-                <div class="form-group">
-                    <label for="email">Adresse Email professionnelle</label>
-                    <input type="email" id="email" required placeholder="contact@transportspupont.fr">
-                </div>
-                <div class="form-group">
-                    <label for="phone">Numéro de téléphone</label>
-                    <input type="tel" id="phone" placeholder="06 12 34 56 78">
-                </div>
-                <div class="form-group">
-                    <label for="message">Votre message / Taille de la flotte</label>
-                    <textarea id="message" placeholder="Parlez-nous de votre flotte et de vos besoins spécifiques..."></textarea>
-                </div>
-                <button type="submit" class="btn">Envoyer ma demande d'essai</button>
-            </form>
-        </div>
-    </section>
+<section class="hero">
 
-    <!-- Footer -->
-    <footer>
-        <div class="logo">Mémo<span>Truck</span></div>
-        <p>&copy; 2026 MémoTruck. Tous droits réservés. L'application interconnectée de suivi de véhicules poids lourds.</p>
-    </footer>
+<div class="container hero-grid">
 
-    <!-- GSAP Animations Script -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            gsap.registerPlugin(ScrollTrigger);
 
-            // Hero animation on load
-            gsap.from(".hero-content > *, .phone-mockup-wrapper", {
-                opacity: 0,
-                y: 40,
-                duration: 0.9,
-                stagger: 0.2,
-                ease: "power3.out"
-            });
+<div class="hero-content">
 
-            // Generic section fade-in animation
-            const sections = document.querySelectorAll("section");
-            sections.forEach((section) => {
-                const header = section.querySelector(".section-header");
-                const gridItems = section.querySelectorAll(".feature-card, .ecosystem-container > div, .contact-wrapper");
+<h1>
+Votre flotte.
+Vos chauffeurs.
+Tous vos documents.
+<br>
+<strong>Une seule plateforme.</strong>
+</h1>
 
-                if (header) {
-                    gsap.from(header, {
-                        scrollTrigger: {
-                            trigger: header,
-                            start: "top 85%",
-                            toggleActions: "play none none none"
-                        },
-                        opacity: 0,
-                        y: 30,
-                        duration: 0.6,
-                        ease: "power2.out"
-                    });
-                }
 
-                if (gridItems.length > 0) {
-                    gsap.from(gridItems, {
-                        scrollTrigger: {
-                            trigger: section,
-                            start: "top 80%",
-                            toggleActions: "play none none none"
-                        },
-                        opacity: 0,
-                        y: 40,
-                        duration: 0.7,
-                        stagger: 0.12,
-                        ease: "power2.out"
-                    });
-                }
-            });
-        });
+<p>
+MémoTruck accompagne les entreprises de transport en centralisant les échéances réglementaires, l'entretien des véhicules, les données chauffeurs et le suivi complet du parc poids lourd.
+</p>
 
-        function handleSubmit(event) {
-            event.preventDefault();
-            alert("Merci pour votre demande. Notre équipe vous contactera dans les plus brefs délais pour organiser votre essai gratuit de MémoTruck.");
-            event.target.reset();
-        }
-    </script>
+
+<div class="hero-buttons">
+
+<a href="#contact" class="btn">
+Découvrir MémoTruck
+</a>
+
+<a href="#fonctionnalites" class="btn btn-outline">
+Voir les fonctionnalités
+</a>
+
+</div>
+
+</div>
+
+
+
+<div class="dashboard">
+
+<div class="dashboard-top">
+<h3>Tableau de bord flotte</h3>
+<div class="circle"></div>
+</div>
+
+
+<div class="stats">
+
+<div class="stat">
+<h3>124</h3>
+<p>Documents suivis</p>
+</div>
+
+<div class="stat">
+<h3>36</h3>
+<p>Véhicules connectés</p>
+</div>
+
+<div class="stat">
+<h3>98%</h3>
+<p>Conformité flotte</p>
+</div>
+
+<div class="stat">
+<h3>24/7</h3>
+<p>Accès aux données</p>
+</div>
+
+</div>
+
+
+</div>
+
+
+</div>
+
+</section>
+<section id="solution">
+
+<div class="container">
+
+<div class="section-title">
+<span>La solution</span>
+<h2>Le copilote numérique des entreprises de transport</h2>
+<p>
+MémoTruck transforme la gestion quotidienne d'une flotte en une expérience simple, fiable et centralisée. Fini les classeurs, les fichiers dispersés et les échéances oubliées.
+</p>
+</div>
+
+
+<div class="feature-grid">
+
+
+<div class="feature-card">
+<h3>📄 Documents centralisés</h3>
+<p>
+Contrôlez les dates importantes de vos véhicules : contrôles techniques, assurances, cartes grises, formations, visites réglementaires et documents administratifs.
+</p>
+</div>
+
+
+<div class="feature-card">
+<h3>🚛 Vision complète du parc</h3>
+<p>
+Visualisez l'état de chaque camion depuis une interface unique : kilométrage, disponibilité, entretien prévu et historique.
+</p>
+</div>
+
+
+<div class="feature-card">
+<h3>👨‍✈️ Gestion des chauffeurs</h3>
+<p>
+Associez chaque conducteur à ses documents personnels, qualifications et informations essentielles.
+</p>
+</div>
+
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<section id="fonctionnalites">
+
+
+<div class="container">
+
+<div class="section-title">
+<span>Fonctionnalités</span>
+<h2>Une plateforme pensée pour la réalité du transport</h2>
+<p>
+Chaque outil a été conçu pour répondre aux besoins des exploitants, responsables de flotte et dirigeants.
+</p>
+</div>
+
+
+<div class="cards">
+
+
+<div class="card">
+<div class="icon">⏱</div>
+<h3>Alertes d'échéances</h3>
+<p>
+Recevez les rappels avant qu'une date limite soit dépassée. Anticipez au lieu de subir.
+</p>
+</div>
+
+
+<div class="card">
+<div class="icon">🔧</div>
+<h3>Suivi entretien</h3>
+<p>
+Planifiez les interventions, gardez l'historique des réparations et améliorez la disponibilité de vos véhicules.
+</p>
+</div>
+
+
+<div class="card">
+<div class="icon">⛽</div>
+<h3>Analyse consommation</h3>
+<p>
+Suivez la consommation carburant et identifiez rapidement les anomalies.
+</p>
+</div>
+
+
+<div class="card">
+<div class="icon">🛞</div>
+<h3>Gestion pneumatiques</h3>
+<p>
+Gardez une vision claire de vos pneus : montage, remplacement, usure et coûts.
+</p>
+</div>
+
+
+<div class="card">
+<div class="icon">📊</div>
+<h3>Statistiques flotte</h3>
+<p>
+Transformez vos données en décisions grâce aux indicateurs clés.
+</p>
+</div>
+
+
+<div class="card">
+<div class="icon">📱</div>
+<h3>Accessible partout</h3>
+<p>
+Vos informations restent disponibles au bureau comme sur le terrain.
+</p>
+</div>
+
+
+</div>
+
+
+</div>
+
+</section>
+
+
+
+
+<section>
+
+
+<div class="container split">
+
+
+<div>
+
+<span class="tag">Sécurité</span>
+
+<h2>
+Ne laissez plus une échéance mettre votre entreprise en danger.
+</h2>
+
+<p>
+Un document oublié peut avoir des conséquences lourdes : immobilisation d'un véhicule, sanctions administratives ou complications en cas d'accident.
+</p>
+
+<p>
+MémoTruck vous aide à garder une flotte conforme et maîtrisée grâce à une surveillance permanente.
+</p>
+
+</div>
+
+
+<div class="panel">
+
+<div>
+<h3>Contrôle technique</h3>
+<p>Suivi automatique des prochaines échéances</p>
+</div>
+
+
+<div>
+<h3>Assurances</h3>
+<p>Documents toujours accessibles</p>
+</div>
+
+
+<div>
+<h3>Entretiens</h3>
+<p>Historique complet véhicule</p>
+</div>
+
+
+</div>
+
+
+</div>
+
+</section>
+
+
+
+
+
+<section>
+
+
+<div class="container">
+
+
+<div class="section-title">
+
+<span>Pour les professionnels</span>
+
+<h2>
+Une interface unique pour toute votre entreprise
+</h2>
+
+</div>
+
+
+
+<div class="timeline">
+
+
+<div>
+<h3>01 — Exploitants</h3>
+<p>
+Gardez une vision globale de votre activité et prenez de meilleures décisions.
+</p>
+</div>
+
+
+<div>
+<h3>02 — Responsables de flotte</h3>
+<p>
+Gérez les véhicules, entretiens et coûts sans perdre de temps.
+</p>
+</div>
+
+
+<div>
+<h3>03 — Chauffeurs</h3>
+<p>
+Accédez facilement aux informations nécessaires depuis le terrain.
+</p>
+</div>
+
+
+</div>
+
+
+
+</div>
+
+</section>
+
+
+
+
+
+<section id="tarifs">
+
+
+<div class="container">
+
+
+<div class="section-title">
+
+<span>Tarifs</span>
+
+<h2>
+Une solution adaptée à la taille de votre flotte
+</h2>
+
+<p>
+Un abonnement simple par véhicule, avec des tarifs dégressifs pour accompagner votre croissance.
+</p>
+
+</div>
+
+
+<div class="price">
+
+
+<h3>MémoTruck Pro</h3>
+
+<div class="amount">
+À partir de 18€ <small>/ camion / mois</small>
+</div>
+
+
+<ul>
+<li>✓ Gestion documentaire complète</li>
+<li>✓ Suivi véhicules</li>
+<li>✓ Gestion chauffeurs</li>
+<li>✓ Maintenance</li>
+<li>✓ Statistiques flotte</li>
+<li>✓ Support professionnel</li>
+</ul>
+
+
+<a href="#contact" class="btn">
+Demander une démonstration
+</a>
+
+
+</div>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+<section>
+
+
+<div class="container">
+
+
+<div class="section-title">
+
+<span>Témoignages</span>
+
+<h2>
+Une gestion plus simple du transport quotidien
+</h2>
+
+</div>
+
+
+<div class="cards">
+
+
+<div class="card">
+<p>
+"Avant MémoTruck, nous devions chercher nos documents partout. Maintenant tout est accessible immédiatement."
+</p>
+<h3>— Transporteur régional</h3>
+</div>
+
+
+<div class="card">
+<p>
+"Le suivi des échéances nous permet d'anticiper et d'éviter les mauvaises surprises."
+</p>
+<h3>— Responsable flotte</h3>
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+<section>
+
+
+<div class="container faq">
+
+
+<div class="section-title">
+
+<span>FAQ</span>
+
+<h2>
+Questions fréquentes
+</h2>
+
+</div>
+
+
+<details>
+<summary>À qui s'adresse MémoTruck ?</summary>
+<p>
+Aux entreprises de transport, artisans transporteurs, PME et gestionnaires de flotte.
+</p>
+</details>
+
+
+<details>
+<summary>Faut-il installer du matériel dans les camions ?</summary>
+<p>
+Non. MémoTruck fonctionne comme une plateforme de gestion accessible depuis vos appareils.
+</p>
+</details>
+
+
+<details>
+<summary>Puis-je gérer plusieurs véhicules ?</summary>
+<p>
+Oui, la solution est conçue pour évoluer avec votre flotte.
+</p>
+</details>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+<section id="contact">
+
+
+<div class="container contact">
+
+
+<h2>
+Passez à une gestion intelligente de votre flotte
+</h2>
+
+
+<p>
+Demandez une démonstration et découvrez comment MémoTruck peut simplifier votre quotidien.
+</p>
+
+
+<form>
+
+<input placeholder="Nom de votre entreprise">
+
+<input placeholder="Email professionnel">
+
+<input placeholder="Nombre de véhicules">
+
+
+<textarea placeholder="Votre message"></textarea>
+
+
+<button class="btn">
+Être recontacté
+</button>
+
+
+</form>
+
+
+</div>
+
+
+</section>
+
+
+</main>
+<style>
+
+/* ELEMENTS COMPLEMENTAIRES */
+
+.feature-grid,
+.cards{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:25px;
+}
+
+
+.feature-card,
+.card,
+.panel,
+.price,
+details{
+    background:
+    linear-gradient(145deg,
+    rgba(255,255,255,.06),
+    rgba(255,255,255,.02));
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:30px;
+    transition:.3s;
+}
+
+
+.feature-card:hover,
+.card:hover,
+.price:hover{
+    transform:translateY(-8px);
+    border-color:rgba(0,217,255,.5);
+    box-shadow:0 20px 50px rgba(0,217,255,.12);
+}
+
+
+.feature-card h3,
+.card h3{
+    margin-bottom:15px;
+    font-size:1.3rem;
+}
+
+
+.feature-card p,
+.card p,
+.panel p,
+.timeline p{
+    color:var(--muted);
+    line-height:1.7;
+}
+
+
+.icon{
+    width:50px;
+    height:50px;
+    border-radius:15px;
+    display:grid;
+    place-items:center;
+    background:rgba(0,217,255,.12);
+    margin-bottom:20px;
+    font-size:1.5rem;
+}
+
+
+.split{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:60px;
+    align-items:center;
+}
+
+
+.split h2{
+    font-size:clamp(2rem,4vw,3rem);
+    margin:20px 0;
+}
+
+
+.split p{
+    margin:20px 0;
+}
+
+
+.tag{
+    color:var(--brand);
+    text-transform:uppercase;
+    letter-spacing:2px;
+    font-weight:600;
+}
+
+
+.panel{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+
+.panel div{
+    padding:20px;
+    border-radius:15px;
+    background:rgba(0,0,0,.2);
+}
+
+
+.timeline{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:25px;
+}
+
+
+.timeline div{
+    border-left:2px solid var(--brand);
+    padding-left:25px;
+}
+
+
+.price{
+    max-width:450px;
+    margin:auto;
+    text-align:center;
+}
+
+
+.price h3{
+    font-size:2rem;
+}
+
+
+.amount{
+    font-size:2.5rem;
+    color:var(--brand);
+    font-weight:700;
+    margin:25px 0;
+}
+
+
+.amount small{
+    font-size:1rem;
+    color:var(--muted);
+}
+
+
+.price ul{
+    list-style:none;
+    text-align:left;
+    margin:30px 0;
+}
+
+
+.price li{
+    padding:12px 0;
+    color:var(--muted);
+}
+
+
+.faq{
+    max-width:900px;
+}
+
+
+details{
+    margin-bottom:15px;
+}
+
+
+summary{
+    cursor:pointer;
+    font-weight:600;
+    font-size:1.1rem;
+}
+
+
+details p{
+    margin-top:20px;
+    color:var(--muted);
+}
+
+
+.contact{
+    text-align:center;
+    max-width:800px;
+}
+
+
+.contact h2{
+    font-size:clamp(2.5rem,5vw,4rem);
+}
+
+
+.contact p{
+    color:var(--muted);
+    margin:25px 0 40px;
+}
+
+
+form{
+    display:grid;
+    gap:15px;
+}
+
+
+input,
+textarea{
+    width:100%;
+    padding:18px;
+    background:#0b1119;
+    border:1px solid var(--border);
+    border-radius:14px;
+    color:white;
+    font-family:inherit;
+}
+
+
+textarea{
+    min-height:150px;
+    resize:none;
+}
+
+
+button{
+    border:none;
+    cursor:pointer;
+}
+
+
+/* RESPONSIVE */
+
+
+@media(max-width:1000px){
+
+.feature-grid,
+.cards,
+.timeline{
+    grid-template-columns:repeat(2,1fr);
+}
+
+
+.split{
+    grid-template-columns:1fr;
+}
+
+
+}
+
+
+
+@media(max-width:600px){
+
+section{
+    padding:70px 0;
+}
+
+
+.container{
+    width:92%;
+}
+
+
+.feature-grid,
+.cards,
+.timeline{
+    grid-template-columns:1fr;
+}
+
+
+.hero h1{
+    font-size:2.8rem;
+}
+
+
+.hero p{
+    font-size:1rem;
+}
+
+
+.dashboard{
+    padding:18px;
+}
+
+
+.stats{
+    grid-template-columns:1fr;
+}
+
+
+}
+
+</style>
+
+
+
+<script>
+
+gsap.registerPlugin(ScrollTrigger);
+
+
+/* HERO */
+
+gsap.from(".hero-content > *",{
+    opacity:0,
+    y:30,
+    duration:.8,
+    stagger:.15,
+    ease:"power3.out"
+});
+
+
+gsap.from(".dashboard",{
+    opacity:0,
+    y:40,
+    duration:1,
+    delay:.3,
+    ease:"power3.out"
+});
+
+
+
+/* SECTIONS */
+
+gsap.utils.toArray("section:not(.hero)").forEach(section=>{
+
+
+gsap.to(section,{
+    scrollTrigger:{
+        trigger:section,
+        start:"top 85%",
+        once:true
+    },
+    opacity:1,
+    y:0,
+    duration:.6,
+    ease:"power2.out"
+});
+
+
+});
+
+
+
+/* CARDS CASCADE */
+
+
+gsap.utils.toArray(".cards,.feature-grid,.timeline").forEach(grid=>{
+
+
+gsap.from(grid.children,{
+    scrollTrigger:{
+        trigger:grid,
+        start:"top 85%",
+        once:true
+    },
+    opacity:0,
+    y:30,
+    duration:.6,
+    stagger:.1,
+    ease:"power2.out"
+});
+
+
+});
+
+
+
+/* FORM SIMPLE DEMO */
+
+
+document.querySelector("form").addEventListener("submit",function(e){
+
+e.preventDefault();
+
+alert("Merci pour votre demande. L'équipe MémoTruck vous recontactera rapidement.");
+
+});
+
+
+</script>
+
+
+
 </body>
 </html>
