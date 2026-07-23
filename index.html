@@ -46,11 +46,10 @@ a{text-decoration:none;color:inherit}
 
 /* ════ NAV ════ */
 nav{
-  position:fixed;top:0;left:0;right:0;z-index:999;
+  position:relative;top:auto;left:auto;right:auto;z-index:10;
   height:64px;padding:0 48px;
   display:flex;align-items:center;justify-content:space-between;
-  background:rgba(7,17,28,0.88);
-  backdrop-filter:blur(20px);
+  background:transparent;
   border-bottom:1px solid var(--bord);
 }
 .n-logo{display:flex;align-items:center;gap:10px}
@@ -83,10 +82,10 @@ nav{
 /* ════ HERO ════ */
 #hero{
   position:relative;
-  min-height:100vh;
+  min-height:calc(100vh - 64px);
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  padding:80px 24px 0;
+  padding:40px 24px 0;
   text-align:center;
   overflow:hidden;
 }
@@ -390,7 +389,20 @@ section{padding:100px 24px;position:relative}
 .acc-btn.solid:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,194,255,.4)}
 .acc-btn.out{border:1.5px solid var(--bord2);color:var(--cyan)}
 .acc-btn.out:hover{background:rgba(0,194,255,.07)}
-.acc-note{font-size:12px;color:var(--muted);margin-top:16px}
+.acc-note{font-size:12px;color:var(--muted);margin-top:12px}
+.acc-credentials{
+  margin-top:14px;
+  padding:12px 16px;
+  background:rgba(0,194,255,0.06);
+  border:1px solid rgba(0,194,255,0.15);
+  border-radius:12px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.acc-cred-row{
+  font-size:13px;color:var(--text2);
+  display:flex;align-items:center;gap:8px;
+}
+.acc-cred-row strong{color:#c8e4f0;font-weight:600;}
 
 /* ════ CTA ════ */
 #cta{
@@ -843,13 +855,10 @@ footer{
     <div class="hero-badge"><div class="hero-badge-dot"></div>Interconnecté · Temps réel</div>
     <h1 class="hero-h1">Votre flotte ne peut plus<br/><span class="grad">se permettre l'oubli.</span></h1>
     <p class="hero-sub">
-      MémoTruck connecte <strong>chauffeurs et bureaux</strong> en temps réel.
-      CT, limiteur, carte gazole, chrono ... — aucune échéance n'expire inaperçue.
+      MémoTruck connecte <strong>chauffeurs et chefs de parc</strong> en temps réel.
+      CT, limiteur, carte gazole, chrono — aucune échéance n'expire inaperçue.
     </p>
-    <div class="hero-btns">
-      <a href="#access" class="btn-primary">🚛 Accéder à l'app</a>
-      <a href="#features" class="btn-outline">Voir les fonctionnalités →</a>
-    </div>
+
   </div>
 
   <!-- Canvas WebGL Three.js -->
@@ -914,18 +923,18 @@ footer{
         <p class="sec-sub">En cas d'accident avec un CT expiré ou un limiteur non renouvelé, les conséquences sont catastrophiques — pour le chauffeur et pour l'entreprise.</p>
         <ul class="prob-list">
           <li><span class="lic">📋</span><div><strong>Documents gérés uniquement au bureau</strong>Le chauffeur — premier concerné — n'est jamais informé à temps.</div></li>
-          <li><span class="lic">📅</span><div><strong>Tableurs et Post-it obsolètes , logiciels compliqué</strong>Les dates se perdent dans des fichiers Excel à moitié tenus.</div></li>
+          <li><span class="lic">📅</span><div><strong>Tableurs et Post-it obsolètes , logiciel compliqué</strong>Les dates se perdent dans des fichiers Excel à moitié tenus.</div></li>
           <li><span class="lic">⛽</span><div><strong>Aucun suivi de consommation fiable</strong>Sans données réelles, impossible de détecter une dérive.</div></li>
         </ul>
       </div>
       <div class="reveal" style="transition-delay:.15s">
-        <div class="tag-green">✅ La solution , MémoTruck !</div>
+        <div class="tag-green">✅ La solution MémoTruck</div>
         <h2 class="sec-title">Chauffeur et bureau, enfin sur la même longueur d'onde.</h2>
         <p class="sec-sub">MémoTruck place le chauffeur au cœur du dispositif. Il consulte, saisit, et reçoit des alertes. Le chef de parc supervise tout en temps réel.</p>
         <ul class="sol-list">
-          <li><span class="lic">🔔</span><div><strong>Alertes push avant l'expiration</strong>CT, assurance, chrono, carte conducteur et plus encore — surveillés automatiquement.</div></li>
+          <li><span class="lic">🔔</span><div><strong>Alertes push avant l'expiration</strong>CT, assurance, chrono, carte conducteur etc ... — surveillés automatiquement.</div></li>
           <li><span class="lic">🔄</span><div><strong>Synchronisation bidirectionnelle en live</strong>Une mise à jour bureau se reflète instantanément sur l'app chauffeur.</div></li>
-          <li><span class="lic">📊</span><div><strong>Suivi L/100 et pneus sur km réels</strong>Chaque plein saisi affine les données de consommation et d'usure pneumatique.</div></li>
+          <li><span class="lic">📊</span><div><strong>Suivi L/100 et pneus sur km réels</strong>Chaque plein saisi affine les données de consommation et d'usure.</div></li>
         </ul>
       </div>
     </div>
@@ -943,7 +952,7 @@ footer{
       <p class="sec-sub">Conçu pour les entreprises de transport — des indépendants aux grandes flottes.</p>
     </div>
     <div class="feat-grid">
-      <div class="feat-card reveal"><div class="feat-icon">⚠️</div><div class="feat-title">Alertes & Échéances</div><div class="feat-desc">CT, assurance, chronotachygraphe, limiteur, carte conducteur, ADR, FCO, visite médicale — 11 types de documents surveillés avec alertes progressives avant expiration.</div><span class="feat-pill">11 docs · Push</span></div>
+      <div class="feat-card reveal"><div class="feat-icon">⚠️</div><div class="feat-title">Alertes & Échéances</div><div class="feat-desc">CT, assurance, chronotachygraphe, limiteur, carte conducteur, ADR, FCO, visite médicale — Un nombre ilimité de documents surveillés avec alertes progressives avant expiration.</div><span class="feat-pill">11 docs · Push</span></div>
       <div class="feat-card reveal" style="transition-delay:.1s"><div class="feat-icon">⛽</div><div class="feat-title">Suivi consommation</div><div class="feat-desc">L/100 km calculé automatiquement à chaque plein. Tendances mensuelles, comparatif chauffeurs, export PDF. La réalité de votre flotte, en chiffres.</div><span class="feat-pill">L/100 auto-calculé</span></div>
       <div class="feat-card reveal" style="transition-delay:.2s"><div class="feat-icon">🛞</div><div class="feat-title">Suivi pneumatiques</div><div class="feat-desc">Jauge kilométrique basée sur les km réels saisis. Avant, arrière, essieux remorque — chaque pneu suivi jusqu'au remplacement.</div><span class="feat-pill">Par essieu · Km réels</span></div>
       <div class="feat-card reveal"><div class="feat-icon">🔧</div><div class="feat-title">Historique interventions</div><div class="feat-desc">Entretien, panne, crevaison, accident — enregistrez depuis le terrain en quelques secondes. Historique complet consultable et exportable.</div><span class="feat-pill">Terrain · Export PDF</span></div>
@@ -1025,15 +1034,23 @@ footer{
         <div class="acc-tag driver">🧑‍✈️ Chauffeur</div>
         <div class="acc-title">Application mobile</div>
         <div class="acc-desc">Votre tableau de bord, vos alertes, vos documents et la saisie de vos pleins — Android natif ou PWA iOS installable.</div>
-        <a href="#" class="acc-btn solid">📱 Ouvrir l'app (PWA)</a>
+        <a href="https://memotruck-app-dev.vercel.app/" target="_blank" class="acc-btn solid">📱 Tester l'application chauffeur</a>
+        <div class="acc-credentials">
+          <div class="acc-cred-row">📧 <strong>testchauffeur@memotruck.fr</strong></div>
+          <div class="acc-cred-row">🔓 Aucun mot de passe requis</div>
+        </div>
         <div class="acc-note">iPhone & Android · Installable · Disponible hors connexion</div>
       </div>
       <div class="access-card primary reveal" style="transition-delay:.15s">
         <div class="acc-tag admin">🖥️ Chef de parc</div>
         <div class="acc-title">Panel d'administration</div>
         <div class="acc-desc">Gérez votre flotte complète depuis un panel web : véhicules, chauffeurs, échéances, consommations, interventions.</div>
-        <a href="#" class="acc-btn solid">⚙️ Accéder au panel admin</a>
-        <div class="acc-note">Accès sur invitation · Connexion sécurisée · Tous navigateurs</div>
+        <a href="https://memo-truck-web-admin.vercel.app/" target="_blank" class="acc-btn solid">⚙️ Tester le panel admin</a>
+        <div class="acc-credentials">
+          <div class="acc-cred-row">📧 <strong>chef@memotruck.fr</strong></div>
+          <div class="acc-cred-row">🔑 <strong>Admin123!</strong></div>
+        </div>
+        <div class="acc-note">· Connexion sécurisée · Tous navigateurs</div>
       </div>
     </div>
   </div>
@@ -1048,10 +1065,10 @@ footer{
     <h2 class="cta-title reveal">Votre flotte mérite<br/>mieux qu'un tableur.</h2>
     <p class="cta-sub reveal" style="transition-delay:.1s">MémoTruck est disponible maintenant pour les entreprises de transport. Demandez votre accès.</p>
     <div class="cta-btns reveal" style="transition-delay:.2s">
-      <a href="mailto:contact@memotruck.fr" class="btn-primary">📩 Demander l'accès</a>
+      <a href="mailto:contact@memotruck.fr" class="btn-primary">📩 Demander un devis</a>
       <a href="#features" class="btn-outline">Revoir les fonctionnalités</a>
     </div>
-    <p class="cta-note reveal" style="transition-delay:.3s">Accès sur invitation · <a href="mailto:contact@memotruck.fr">contact@memotruck.fr</a></p>
+    <p class="cta-note reveal" style="transition-delay:.3s">contact@memotruck.fr</p>
   </div>
 </section>
 
@@ -1077,11 +1094,7 @@ footer{
   document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
 })();
 
-// ── NAV SCROLL ──
-window.addEventListener('scroll', function(){
-  document.getElementById('nav').style.background =
-    window.scrollY > 40 ? 'rgba(7,17,28,0.97)' : 'rgba(7,17,28,0.88)';
-}, {passive:true});
+// ── NAV SCROLL (désactivé) ──
 
 // ── SMOOTH SCROLL ──
 document.querySelectorAll('a[href^="#"]').forEach(function(a){
