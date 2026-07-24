@@ -9,6 +9,66 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
+/* ════ FOOTER LÉGAL ════ */
+.foot-legal{
+  display:flex;gap:12px;align-items:center;justify-content:center;
+  flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--muted);
+}
+.foot-legal a{color:var(--muted);transition:color .2s}
+.foot-legal a:hover{color:var(--cyan)}
+.foot-legal span{color:var(--bord2)}
+
+/* ════ MODALES LÉGALES ════ */
+.legal-modal{
+  display:none;position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:2001;
+  width:min(720px,92vw);max-height:82vh;overflow-y:auto;
+  background:var(--bg2);border:1px solid var(--bord2);
+  border-radius:16px;padding:40px 44px;
+  box-shadow:0 24px 60px rgba(0,0,0,.6);
+  scrollbar-width:thin;scrollbar-color:var(--cyan) transparent;
+}
+.legal-modal::-webkit-scrollbar{width:4px}
+.legal-modal::-webkit-scrollbar-thumb{background:var(--cyan);border-radius:2px}
+.legal-modal h2{
+  font-family:var(--head);font-size:22px;font-weight:700;
+  color:#fff;margin-bottom:4px;padding-right:32px;
+}
+.modal-date{font-size:12px;color:var(--muted);margin-bottom:28px}
+.legal-modal h3{
+  font-family:var(--head);font-size:14px;font-weight:700;
+  color:var(--cyan);margin:24px 0 8px;text-transform:uppercase;
+  letter-spacing:.8px;
+}
+.legal-modal p,.legal-modal ul{
+  font-size:14px;color:#b4ccd8;line-height:1.75;margin-bottom:10px;
+}
+.legal-modal ul{padding-left:20px}
+.legal-modal ul li{margin-bottom:5px}
+.legal-modal a{color:var(--cyan);text-decoration:underline}
+.modal-close{
+  position:absolute;top:18px;right:20px;
+  background:none;border:none;color:var(--muted);
+  font-size:18px;cursor:pointer;line-height:1;
+  transition:color .2s;
+}
+.modal-close:hover{color:#fff}
+.legal-table{
+  width:100%;border-collapse:collapse;font-size:13px;
+  margin:8px 0 14px;
+}
+.legal-table th,.legal-table td{
+  padding:9px 12px;border:1px solid var(--bord);text-align:left;
+  color:#b4ccd8;
+}
+.legal-table th{
+  background:var(--surf);color:var(--cyan);
+  font-family:var(--head);font-size:12px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.6px;
+}
+.legal-table tr:nth-child(even) td{background:rgba(0,0,0,.15)}
+
 /* ════ RESET ════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;font-size:16px}
@@ -1082,7 +1142,227 @@ footer{
     <a href="mailto:contact@memotruck.fr">Contact</a>
   </div>
   <div class="foot-copy">© 2026 MémoTruck · Fait pour les transporteurs.</div>
+  <div class="foot-legal">
+    <a href="#" onclick="openModal('cgu');return false;">CGU</a>
+    <span>·</span>
+    <a href="#" onclick="openModal('cgv');return false;">CGV</a>
+    <span>·</span>
+    <a href="#" onclick="openModal('mentions');return false;">Mentions légales</a>
+    <span>·</span>
+    <a href="#" onclick="openModal('rgpd');return false;">Politique de confidentialité</a>
+  </div>
 </footer>
+
+<!-- ════ MODALES LÉGALES ════ -->
+<div id="modal-overlay" onclick="closeModal()" style="display:none;position:fixed;inset:0;background:rgba(7,17,28,.85);z-index:2000;backdrop-filter:blur(6px);"></div>
+
+<!-- ── CGU ── -->
+<div id="modal-cgu" class="legal-modal" style="display:none;">
+  <button class="modal-close" onclick="closeModal()">✕</button>
+  <h2>Conditions Générales d'Utilisation</h2>
+  <p class="modal-date">Dernière mise à jour : juillet 2026</p>
+
+  <h3>1. Objet</h3>
+  <p>Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation de l'application MémoTruck, disponible sous forme d'application Android et de Progressive Web App (PWA) iOS, ainsi que du panneau d'administration associé (ci-après « le Service »).</p>
+  <p>En accédant au Service, l'utilisateur accepte sans réserve les présentes CGU.</p>
+
+  <h3>2. Description du Service</h3>
+  <p>MémoTruck est une solution de gestion de flotte destinée aux entreprises de transport routier et à tout exploitant de véhicules professionnels. Le Service permet notamment :</p>
+  <ul>
+    <li>Le suivi des dates d'expiration des documents réglementaires (contrôle technique, assurance, chrono­tachygraphe, carte conducteur, limiteur de vitesse, etc.)</li>
+    <li>L'envoi de notifications push avant expiration</li>
+    <li>Le suivi de la consommation de carburant et de l'usure des pneumatiques</li>
+    <li>La synchronisation en temps réel entre le panneau d'administration (chef de parc) et l'application chauffeur</li>
+    <li>La gestion documentaire via scanner intégré</li>
+  </ul>
+
+  <h3>3. Accès au Service</h3>
+  <p>L'accès au Service est réservé aux entreprises et professionnels ayant souscrit un abonnement valide. Chaque utilisateur (chauffeur ou administrateur) accède au Service via des identifiants personnels non transférables.</p>
+  <p>L'utilisateur est responsable de la confidentialité de ses identifiants et de toute activité réalisée depuis son compte.</p>
+
+  <h3>4. Obligations de l'utilisateur</h3>
+  <p>L'utilisateur s'engage à :</p>
+  <ul>
+    <li>Utiliser le Service conformément à sa destination et aux présentes CGU</li>
+    <li>Ne pas tenter de contourner les mesures de sécurité du Service</li>
+    <li>Renseigner des informations exactes et à jour</li>
+    <li>Ne pas utiliser le Service à des fins illicites ou préjudiciables à des tiers</li>
+    <li>Signaler tout dysfonctionnement ou faille de sécurité constatée</li>
+  </ul>
+
+  <h3>5. Disponibilité et maintenance</h3>
+  <p>MémoTruck s'efforce d'assurer la disponibilité du Service 24h/24 et 7j/7. Des interruptions peuvent toutefois intervenir pour maintenance, mise à jour ou en cas de force majeure. MémoTruck ne saurait être tenu responsable des interruptions de service indépendantes de sa volonté.</p>
+
+  <h3>6. Propriété intellectuelle</h3>
+  <p>L'ensemble des éléments constituant le Service (logo, interface, code source, base de données, fonctionnalités) est la propriété exclusive de MémoTruck. Toute reproduction, modification ou exploitation non autorisée est interdite.</p>
+
+  <h3>7. Limitation de responsabilité</h3>
+  <p>MémoTruck est un outil d'aide à la gestion. Il ne se substitue pas aux obligations légales de l'entreprise de transport. MémoTruck ne saurait être tenu responsable des conséquences d'un défaut de conformité réglementaire non détecté via le Service.</p>
+
+  <h3>8. Modification des CGU</h3>
+  <p>MémoTruck se réserve le droit de modifier les présentes CGU à tout moment. Les utilisateurs seront informés de toute modification substantielle. La poursuite de l'utilisation du Service après notification vaut acceptation des nouvelles CGU.</p>
+
+  <h3>9. Droit applicable</h3>
+  <p>Les présentes CGU sont soumises au droit français. Tout litige relatif à leur interprétation ou exécution relève de la compétence exclusive des tribunaux français.</p>
+</div>
+
+<!-- ── CGV ── -->
+<div id="modal-cgv" class="legal-modal" style="display:none;">
+  <button class="modal-close" onclick="closeModal()">✕</button>
+  <h2>Conditions Générales de Vente</h2>
+  <p class="modal-date">Dernière mise à jour : juillet 2026</p>
+
+  <h3>1. Champ d'application</h3>
+  <p>Les présentes Conditions Générales de Vente (CGV) s'appliquent à toute souscription d'un abonnement MémoTruck par un professionnel (personne morale ou physique agissant dans le cadre de son activité professionnelle).</p>
+
+  <h3>2. Offres et tarifs</h3>
+  <p>MémoTruck propose les abonnements mensuels suivants (prix HT, TVA applicable selon la législation en vigueur) :</p>
+  <table class="legal-table">
+    <thead><tr><th>Formule</th><th>Véhicules inclus</th><th>Tarif mensuel HT</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Starter</strong></td><td>Jusqu'à 5 véhicules moteurs</td><td>79 €</td></tr>
+      <tr><td><strong>PME</strong></td><td>Jusqu'à 15 véhicules moteurs</td><td>129 €</td></tr>
+      <tr><td><strong>Pro</strong></td><td>Jusqu'à 35 véhicules moteurs</td><td>219 €</td></tr>
+      <tr><td><strong>Entreprise</strong></td><td>Illimité</td><td>Sur devis</td></tr>
+    </tbody>
+  </table>
+  <p>Les remorques ne sont pas comptabilisées dans le nombre de véhicules. Les tarifs peuvent être révisés ; les clients abonnés sont prévenus au moins 30 jours à l'avance.</p>
+
+  <h3>3. Souscription et activation</h3>
+  <p>La souscription est effectuée en ligne via le formulaire d'inscription MémoTruck. L'abonnement est activé après validation du paiement et validation du compte par l'équipe MémoTruck. Un e-mail de confirmation est adressé au contact renseigné lors de l'inscription.</p>
+
+  <h3>4. Durée et renouvellement</h3>
+  <p>Les abonnements sont souscrits par période mensuelle et se renouvellent tacitement chaque mois à date anniversaire. Le client peut résilier à tout moment depuis son espace administrateur ou par e-mail à <a href="mailto:contact@memotruck.fr">contact@memotruck.fr</a>, avec effet à la fin de la période mensuelle en cours.</p>
+
+  <h3>5. Modalités de paiement</h3>
+  <p>Le paiement est réalisé par prélèvement automatique mensuel ou par virement bancaire selon les modalités communiquées lors de la souscription. En cas d'impayé, l'accès au Service peut être suspendu après mise en demeure restée sans effet pendant 72 heures.</p>
+
+  <h3>6. Période d'essai</h3>
+  <p>MémoTruck peut, à sa discrétion, proposer une période d'essai gratuite. À l'issue de cette période, l'abonnement choisi est activé et facturé, sauf résiliation avant expiration de l'essai.</p>
+
+  <h3>7. Droit de rétractation</h3>
+  <p>Conformément à l'article L.221-28 du Code de la consommation, le droit de rétractation ne s'applique pas aux contrats de fourniture de services pleinement exécutés avant la fin du délai de rétractation et dont l'exécution a commencé avec l'accord préalable exprès du professionnel.</p>
+
+  <h3>8. Remboursement</h3>
+  <p>Sauf défaut avéré imputable à MémoTruck, les sommes réglées ne donnent pas lieu à remboursement en cas de résiliation en cours de période mensuelle.</p>
+
+  <h3>9. Évolution des offres</h3>
+  <p>MémoTruck se réserve le droit de faire évoluer ses offres, ses fonctionnalités et ses tarifs. Tout changement défavorable est notifié au client au moins 30 jours à l'avance, lui permettant de résilier sans frais avant entrée en vigueur.</p>
+
+  <h3>10. Droit applicable et litiges</h3>
+  <p>Les présentes CGV sont soumises au droit français. En cas de litige, les parties s'efforceront de trouver une solution amiable. À défaut, le litige relèvera de la compétence des juridictions françaises compétentes.</p>
+</div>
+
+<!-- ── MENTIONS LÉGALES ── -->
+<div id="modal-mentions" class="legal-modal" style="display:none;">
+  <button class="modal-close" onclick="closeModal()">✕</button>
+  <h2>Mentions Légales</h2>
+  <p class="modal-date">Dernière mise à jour : juillet 2026</p>
+
+  <h3>Éditeur du Service</h3>
+  <p><strong>MémoTruck</strong><br>
+  Entreprise individuelle / Société [forme juridique à compléter]<br>
+  Siège social : [Adresse à compléter]<br>
+  N° SIRET : [à compléter lors de l'immatriculation]<br>
+  E-mail : <a href="mailto:contact@memotruck.fr">contact@memotruck.fr</a></p>
+
+  <h3>Directeur de la publication</h3>
+  <p>[Nom du responsable légal — à compléter]</p>
+
+  <h3>Hébergement</h3>
+  <p><strong>Vercel Inc.</strong><br>
+  340 Pine Street, Suite 701, San Francisco, CA 94104 — États-Unis<br>
+  <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a></p>
+
+  <p><strong>Supabase Inc.</strong> (base de données)<br>
+  970 Toa Payoh North, #07-04, Singapore 318992<br>
+  <a href="https://supabase.com" target="_blank" rel="noopener">supabase.com</a></p>
+
+  <h3>Propriété intellectuelle</h3>
+  <p>L'ensemble du contenu de ce site (textes, visuels, logo, interface applicative, code) est protégé par le droit de la propriété intellectuelle et est la propriété exclusive de MémoTruck, sauf mentions contraires. Toute reproduction ou représentation, totale ou partielle, sans autorisation préalable écrite est interdite.</p>
+
+  <h3>Crédits</h3>
+  <p>Développement : MémoTruck<br>
+  Polices : Google Fonts (Space Grotesk, Inter)<br>
+  Infrastructure : Vercel, Supabase</p>
+
+  <h3>Contact</h3>
+  <p>Pour toute question relative au présent site : <a href="mailto:contact@memotruck.fr">contact@memotruck.fr</a></p>
+</div>
+
+<!-- ── RGPD ── -->
+<div id="modal-rgpd" class="legal-modal" style="display:none;">
+  <button class="modal-close" onclick="closeModal()">✕</button>
+  <h2>Politique de Confidentialité</h2>
+  <p class="modal-date">Dernière mise à jour : juillet 2026</p>
+
+  <h3>1. Responsable du traitement</h3>
+  <p>MémoTruck est responsable du traitement des données personnelles collectées via son Service. Contact : <a href="mailto:contact@memotruck.fr">contact@memotruck.fr</a></p>
+
+  <h3>2. Données collectées</h3>
+  <p>Dans le cadre de l'utilisation du Service, MémoTruck collecte les catégories de données suivantes :</p>
+  <ul>
+    <li><strong>Données d'identification</strong> : nom, prénom, adresse e-mail, numéro de plaque d'immatriculation du véhicule affecté</li>
+    <li><strong>Données professionnelles</strong> : entreprise, poste (chauffeur / chef de parc), numéro de carte conducteur</li>
+    <li><strong>Données d'utilisation</strong> : saisies de consommation carburant, kilométrages, dates documentaires, photos de documents scannés</li>
+    <li><strong>Données techniques</strong> : logs de connexion, type de terminal, version du Service</li>
+  </ul>
+
+  <h3>3. Finalités et bases légales</h3>
+  <table class="legal-table">
+    <thead><tr><th>Finalité</th><th>Base légale</th></tr></thead>
+    <tbody>
+      <tr><td>Fourniture et gestion du Service</td><td>Exécution du contrat</td></tr>
+      <tr><td>Alertes et notifications réglementaires</td><td>Exécution du contrat</td></tr>
+      <tr><td>Amélioration du Service</td><td>Intérêt légitime</td></tr>
+      <tr><td>Facturation et comptabilité</td><td>Obligation légale</td></tr>
+      <tr><td>Communication commerciale (opt-in)</td><td>Consentement</td></tr>
+    </tbody>
+  </table>
+
+  <h3>4. Destinataires des données</h3>
+  <p>Les données sont accessibles aux personnes habilitées de MémoTruck ainsi qu'aux sous-traitants suivants :</p>
+  <ul>
+    <li><strong>Supabase</strong> — hébergement de la base de données (serveurs en Europe ou aux États-Unis avec garanties adéquates)</li>
+    <li><strong>Vercel</strong> — hébergement de l'application</li>
+    <li><strong>Firebase / Google</strong> — envoi de notifications push</li>
+  </ul>
+  <p>Les données ne sont pas vendues ni cédées à des tiers à des fins commerciales.</p>
+
+  <h3>5. Transferts hors UE</h3>
+  <p>Certains sous-traitants peuvent traiter des données hors de l'Union Européenne. Ces transferts sont encadrés par des clauses contractuelles types approuvées par la Commission européenne ou des mécanismes équivalents.</p>
+
+  <h3>6. Durée de conservation</h3>
+  <ul>
+    <li>Données de compte actif : pendant toute la durée de l'abonnement</li>
+    <li>Données après résiliation : 3 ans à des fins de preuve (prescription légale), puis suppression</li>
+    <li>Documents scannés : 5 ans (durée légale de conservation des documents de transport)</li>
+    <li>Logs techniques : 12 mois</li>
+  </ul>
+
+  <h3>7. Vos droits</h3>
+  <p>Conformément au RGPD (Règlement UE 2016/679) et à la loi Informatique et Libertés, vous disposez des droits suivants :</p>
+  <ul>
+    <li><strong>Accès</strong> — obtenir une copie de vos données</li>
+    <li><strong>Rectification</strong> — corriger des données inexactes</li>
+    <li><strong>Effacement</strong> — demander la suppression de vos données</li>
+    <li><strong>Limitation</strong> — restreindre le traitement de vos données</li>
+    <li><strong>Portabilité</strong> — recevoir vos données dans un format structuré</li>
+    <li><strong>Opposition</strong> — vous opposer à un traitement basé sur l'intérêt légitime</li>
+    <li><strong>Retrait du consentement</strong> — à tout moment pour les traitements basés sur votre consentement</li>
+  </ul>
+  <p>Pour exercer vos droits : <a href="mailto:contact@memotruck.fr">contact@memotruck.fr</a><br>
+  Vous disposez également du droit de déposer une réclamation auprès de la <strong>CNIL</strong> (<a href="https://www.cnil.fr" target="_blank" rel="noopener">cnil.fr</a>).</p>
+
+  <h3>8. Sécurité</h3>
+  <p>MémoTruck met en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données : chiffrement des communications (HTTPS/TLS), authentification sécurisée via JWT, cloisonnement des données par entreprise, accès restreint aux données sensibles.</p>
+
+  <h3>9. Cookies et traceurs</h3>
+  <p>Le site vitrine MémoTruck n'utilise pas de cookies publicitaires. Des cookies techniques strictement nécessaires au fonctionnement peuvent être déposés. L'application MémoTruck utilise le stockage local (IndexedDB) exclusivement pour le fonctionnement hors-ligne de l'application.</p>
+
+  <h3>10. Modifications</h3>
+  <p>La présente politique peut être mise à jour. La date de dernière modification figure en haut de ce document. En cas de changement substantiel, les utilisateurs en seront informés par notification dans l'application ou par e-mail.</p>
+</div>
 
 <!-- ════ SCRIPTS ════ -->
 <script>
@@ -1099,9 +1379,28 @@ footer{
 // ── SMOOTH SCROLL ──
 document.querySelectorAll('a[href^="#"]').forEach(function(a){
   a.addEventListener('click', function(e){
-    var t = document.querySelector(a.getAttribute('href'));
+    var href = a.getAttribute('href');
+    if(!href || href === '#') return;
+    var t = document.querySelector(href);
     if(t){ e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); }
   });
+});
+
+// ── MODALES LÉGALES ──
+function openModal(id){
+  document.getElementById('modal-overlay').style.display='block';
+  document.getElementById('modal-'+id).style.display='block';
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('modal-overlay').style.display='none';
+  ['cgu','cgv','mentions','rgpd'].forEach(function(id){
+    document.getElementById('modal-'+id).style.display='none';
+  });
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape') closeModal();
 });
 
 // ── BURGER ──
