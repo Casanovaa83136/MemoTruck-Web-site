@@ -879,8 +879,143 @@ footer{
 }
 
 </style>
+<style>
+/* ══════════════════════════════════════════════════════════
+   ✦ FX — animations, micro-interactions & ambient effects
+   ══════════════════════════════════════════════════════════ */
+
+::selection{background:rgba(0,194,255,.32);color:#fff}
+
+/* Custom scrollbar */
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--cyan),#0a4d66);border-radius:100px;border:2px solid var(--bg)}
+html{scrollbar-width:thin;scrollbar-color:var(--cyan) var(--bg)}
+
+/* Scroll progress bar */
+#scroll-progress{
+  position:fixed;top:0;left:0;height:3px;width:0%;
+  background:linear-gradient(90deg,var(--cyan),var(--green),var(--cyan));
+  background-size:200% 100%;animation:bar-shimmer 3s linear infinite;
+  z-index:3000;box-shadow:0 0 14px rgba(0,194,255,.7);
+  transition:width .1s linear;
+}
+@keyframes bar-shimmer{to{background-position:-200% 0}}
+
+/* Ambient aurora blobs */
+.aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.aurora span{position:absolute;border-radius:50%;filter:blur(100px);opacity:.18;animation:aurora-drift 24s ease-in-out infinite}
+.aurora span:nth-child(1){width:560px;height:560px;background:var(--cyan);top:-14%;left:-10%}
+.aurora span:nth-child(2){width:480px;height:480px;background:var(--green);bottom:0;right:-12%;animation-delay:-8s}
+.aurora span:nth-child(3){width:420px;height:420px;background:var(--cyan2);top:38%;left:55%;animation-delay:-16s}
+@keyframes aurora-drift{
+  0%,100%{transform:translate(0,0) scale(1)}
+  33%{transform:translate(50px,-35px) scale(1.15)}
+  66%{transform:translate(-35px,30px) scale(.92)}
+}
+
+/* Hero cursor spotlight */
+#hero .spotlight{
+  position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;
+  background:radial-gradient(420px circle at var(--sx,50%) var(--sy,30%),rgba(0,194,255,.14),transparent 70%);
+  transition:opacity .4s ease;
+}
+#hero:hover .spotlight{opacity:1}
+@media(pointer:coarse){ #hero .spotlight{display:none} }
+
+/* Nav on scroll */
+nav{transition:background .35s ease,border-color .35s ease,box-shadow .35s ease,height .35s ease,backdrop-filter .35s ease}
+nav.scrolled{background:rgba(7,17,28,.7);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-color:var(--bord2);box-shadow:0 10px 30px rgba(0,0,0,.35);height:56px}
+.n-links a{position:relative}
+.n-links a::after{
+  content:'';position:absolute;left:14px;right:14px;bottom:3px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,var(--cyan),var(--green));
+  transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.22,1,.36,1);
+}
+.n-links a:hover::after{transform:scaleX(1)}
+.n-logo{transition:transform .3s cubic-bezier(.34,1.56,.64,1);display:flex}
+.n-logo:hover{transform:scale(1.04)}
+
+/* Hero entrance */
+.hero-badge,h1.hero-h1,.hero-sub{animation:hero-in .9s cubic-bezier(.22,1,.36,1) both}
+.hero-badge{animation-delay:.05s}
+h1.hero-h1{animation-delay:.18s}
+.hero-sub{animation-delay:.34s}
+@keyframes hero-in{
+  from{opacity:0;transform:translateY(24px);filter:blur(6px)}
+  to{opacity:1;transform:translateY(0);filter:blur(0)}
+}
+h1.hero-h1 .grad{
+  background:linear-gradient(90deg,#fff 15%,var(--cyan) 40%,var(--green) 55%,var(--cyan) 75%,#fff 100%);
+  background-size:250% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:grad-shift 7s linear infinite;
+}
+@keyframes grad-shift{to{background-position:-250% center}}
+.hero-grid{animation:grid-drift 32s linear infinite}
+@keyframes grid-drift{from{background-position:0 0}to{background-position:120px 120px}}
+#hero-phone-wrap{animation:hero-in 1s cubic-bezier(.22,1,.36,1) .5s both}
+
+/* Richer scroll reveal */
+.reveal{
+  opacity:0;transform:translateY(34px);filter:blur(4px);
+  transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1),filter .8s cubic-bezier(.22,1,.36,1);
+}
+.reveal.on{opacity:1;transform:translateY(0);filter:blur(0)}
+
+/* Card tilt + spotlight */
+.feat-card,.how-card,.access-card{transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease}
+.feat-card::after,.how-card::after,.access-card::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%),rgba(0,194,255,.16),transparent 65%);
+  opacity:0;transition:opacity .3s ease;
+}
+.feat-card:hover::after,.how-card:hover::after,.access-card:hover::after{opacity:1}
+.feat-icon{transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+.feat-card:hover .feat-icon{transform:translateY(-4px) scale(1.14) rotate(-6deg)}
+
+/* Buttons: shimmer + magnetic-ready + ripple host */
+.btn-primary,.btn-outline,.btn-solid-sm,.btn-ghost-sm,.acc-btn{
+  position:relative;overflow:hidden;will-change:transform;
+}
+.btn-primary,.acc-btn.solid{
+  background-image:linear-gradient(100deg,var(--cyan) 0%,var(--cyan2) 45%,var(--cyan) 100%);
+  background-size:220% auto;transition:transform .25s cubic-bezier(.22,1,.36,1),box-shadow .25s ease,background-position .5s ease;
+}
+.btn-primary:hover,.acc-btn.solid:hover{background-position:100% center}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.5);transform:scale(0);animation:ripple-anim .6s ease-out;pointer-events:none}
+.acc-btn.solid .ripple,.btn-solid-sm .ripple,.btn-primary .ripple{background:rgba(7,17,28,.35)}
+@keyframes ripple-anim{to{transform:scale(2.8);opacity:0}}
+
+/* Stats */
+.stat-cell{transition:background .25s ease,transform .25s ease}
+.stat-cell:hover{transform:translateY(-3px)}
+.stat-num{transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.stat-cell:hover .stat-num{transform:scale(1.08)}
+
+/* Divider draw-in */
+hr.divider{position:relative;overflow:hidden}
+hr.divider::before{
+  content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--cyan),var(--green),transparent);
+  transform:scaleX(0);transform-origin:center;transition:transform 1.2s cubic-bezier(.22,1,.36,1);
+}
+hr.divider.on::before{transform:scaleX(1)}
+
+/* Access primary card: shimmering top line */
+.access-card.primary::before{background-size:200% auto;animation:topline-shimmer 3s linear infinite}
+@keyframes topline-shimmer{to{background-position:-200% 0}}
+
+/* sc-card gets same reveal treatment automatically via .reveal if present */
+
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+  html{scroll-behavior:auto !important}
+}
+</style>
 </head>
 <body>
+<div id="scroll-progress"></div>
+<div class="aurora"><span></span><span></span><span></span></div>
 
 <!-- ════ NAV ════ -->
 <nav id="nav">
@@ -910,6 +1045,7 @@ footer{
 
 <!-- ════ HERO ════ -->
 <section id="hero">
+  <div class="spotlight"></div>
   <div class="hero-grid"></div>
   <div class="hero-halo"></div>
   <div class="hero-content" id="hero-content">
@@ -1411,6 +1547,108 @@ document.getElementById('burger').addEventListener('click', function(){
   ul.style.cssText = open ? '' :
     'display:flex;flex-direction:column;position:fixed;top:64px;left:0;right:0;background:rgba(7,17,28,0.98);padding:20px 24px 28px;gap:4px;border-bottom:1px solid rgba(0,194,255,.12);backdrop-filter:blur(20px);z-index:998';
 });
+
+// ── SCROLL PROGRESS + NAV SHRINK ──
+(function(){
+  var navEl = document.getElementById('nav');
+  var progressEl = document.getElementById('scroll-progress');
+  function onScroll(){
+    var st = window.scrollY || document.documentElement.scrollTop;
+    navEl.classList.toggle('scrolled', st > 20);
+    var h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    progressEl.style.width = (h > 0 ? (st / h * 100) : 0) + '%';
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+
+// ── HERO SPOTLIGHT ──
+(function(){
+  var heroEl = document.getElementById('hero');
+  if(!heroEl) return;
+  heroEl.addEventListener('mousemove', function(e){
+    var r = heroEl.getBoundingClientRect();
+    heroEl.style.setProperty('--sx', ((e.clientX - r.left) / r.width * 100) + '%');
+    heroEl.style.setProperty('--sy', ((e.clientY - r.top) / r.height * 100) + '%');
+  });
+})();
+
+// ── CARD TILT + SPOTLIGHT ──
+document.querySelectorAll('.feat-card,.how-card,.access-card').forEach(function(card){
+  card.addEventListener('mousemove', function(e){
+    var r = card.getBoundingClientRect();
+    var x = e.clientX - r.left, y = e.clientY - r.top;
+    card.style.setProperty('--mx', (x / r.width * 100) + '%');
+    card.style.setProperty('--my', (y / r.height * 100) + '%');
+    var rx = ((y / r.height) - 0.5) * -8;
+    var ry = ((x / r.width) - 0.5) * 8;
+    card.style.transform = 'perspective(900px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) translateY(-4px)';
+  });
+  card.addEventListener('mouseleave', function(){
+    card.style.transform = '';
+    card.style.removeProperty('--mx');
+    card.style.removeProperty('--my');
+  });
+});
+
+// ── MAGNETIC BUTTONS ──
+document.querySelectorAll('.btn-primary,.acc-btn').forEach(function(btn){
+  btn.addEventListener('mousemove', function(e){
+    var r = btn.getBoundingClientRect();
+    var x = e.clientX - r.left - r.width / 2;
+    var y = e.clientY - r.top - r.height / 2;
+    btn.style.transform = 'translate(' + (x * 0.18) + 'px,' + (y * 0.32 - 2) + 'px)';
+  });
+  btn.addEventListener('mouseleave', function(){ btn.style.transform = ''; });
+});
+
+// ── BUTTON RIPPLE ──
+document.querySelectorAll('.btn-primary,.btn-outline,.btn-solid-sm,.btn-ghost-sm,.acc-btn').forEach(function(btn){
+  btn.addEventListener('click', function(e){
+    var r = btn.getBoundingClientRect();
+    var ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    var size = Math.max(r.width, r.height);
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = (e.clientX - r.left - size / 2) + 'px';
+    ripple.style.top = (e.clientY - r.top - size / 2) + 'px';
+    btn.appendChild(ripple);
+    setTimeout(function(){ ripple.remove(); }, 650);
+  });
+});
+
+// ── STAT COUNTERS ──
+document.querySelectorAll('.stat-num').forEach(function(el){
+  var html = el.innerHTML;
+  var m = html.match(/^(\d+)/);
+  if(!m) return;
+  var target = parseInt(m[1], 10);
+  var rest = html.slice(m[1].length);
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(!entry.isIntersecting) return;
+      obs.unobserve(el);
+      var start = null, dur = 1000;
+      function step(ts){
+        if(!start) start = ts;
+        var p = Math.min((ts - start) / dur, 1);
+        var eased = 1 - Math.pow(1 - p, 3);
+        el.innerHTML = Math.round(eased * target) + rest;
+        if(p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }, {threshold:0.4});
+  obs.observe(el);
+});
+
+// ── DIVIDER DRAW-IN ──
+(function(){
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('on'); });
+  }, {threshold:0.5});
+  document.querySelectorAll('hr.divider').forEach(function(el){ io.observe(el); });
+})();
 </script>
 
 
