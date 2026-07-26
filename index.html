@@ -465,6 +465,95 @@ section{padding:100px 24px;position:relative}
 }
 .acc-cred-row strong{color:#c8e4f0;font-weight:600;}
 
+/* ════ PRICING ════ */
+#pricing{background:var(--bg2);overflow:hidden}
+.price-head{text-align:center;margin-bottom:40px}
+.price-head .sec-sub{margin:0 auto}
+.price-toggle{
+  display:inline-flex;align-items:center;gap:0;
+  background:var(--surf);border:1px solid var(--bord2);
+  border-radius:100px;padding:4px;margin:8px auto 52px;
+  position:relative;cursor:pointer;user-select:none;
+}
+.price-toggle-opt{
+  position:relative;z-index:1;padding:9px 22px;border-radius:100px;
+  font-size:13px;font-weight:600;color:var(--muted);
+  transition:color .3s ease;display:flex;align-items:center;gap:8px;
+}
+.price-toggle.is-annual .price-toggle-opt.m{color:var(--muted)}
+.price-toggle:not(.is-annual) .price-toggle-opt.m{color:#07111c}
+.price-toggle.is-annual .price-toggle-opt.a{color:#07111c}
+.price-toggle:not(.is-annual) .price-toggle-opt.a{color:var(--muted)}
+.price-toggle-save{
+  background:rgba(34,197,94,.16);color:var(--green);
+  font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;
+}
+.price-toggle-knob{
+  position:absolute;top:4px;left:4px;bottom:4px;width:calc(50% - 4px);
+  background:linear-gradient(135deg,var(--cyan),var(--cyan2));
+  border-radius:100px;transition:transform .35s cubic-bezier(.22,1,.36,1);
+  box-shadow:0 4px 16px rgba(0,194,255,.35);
+}
+.price-toggle.is-annual .price-toggle-knob{transform:translateX(100%)}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch}
+.price-card{
+  background:var(--surf);border:1px solid var(--bord);
+  border-radius:22px;padding:38px 32px;
+  display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+  transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease;
+}
+.price-card::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(135deg,rgba(0,194,255,.06) 0%,transparent 55%);
+  opacity:0;transition:opacity .3s;
+}
+.price-card:hover::before{opacity:1}
+.price-card.featured{
+  border-color:rgba(0,194,255,.4);
+  background:linear-gradient(180deg,rgba(0,194,255,.06),var(--surf) 40%);
+  box-shadow:0 0 60px rgba(0,194,255,.12);
+}
+.price-card.featured::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--cyan),var(--green),var(--cyan));
+  background-size:200% auto;animation:topline-shimmer 3s linear infinite;
+}
+.price-badge{
+  position:absolute;top:22px;right:-32px;transform:rotate(40deg);
+  background:linear-gradient(90deg,var(--cyan),var(--green));
+  color:#07111c;font-size:11px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;padding:5px 40px;
+}
+.price-icon{
+  width:48px;height:48px;border-radius:13px;
+  background:rgba(0,194,255,.1);border:1px solid rgba(0,194,255,.18);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;margin-bottom:20px;
+}
+.price-name{font-family:var(--head);font-size:20px;font-weight:700;color:#fff;margin-bottom:6px}
+.price-desc{font-size:13.5px;color:var(--muted);line-height:1.6;min-height:42px}
+.price-amount-row{display:flex;align-items:baseline;gap:4px;margin:22px 0 4px}
+.price-amount{font-family:var(--head);font-size:44px;font-weight:700;letter-spacing:-1.5px;color:#fff}
+.price-amount.quote{font-size:28px}
+.price-currency{font-size:20px;font-weight:700;color:var(--cyan)}
+.price-period{font-size:13px;color:var(--muted)}
+.price-perveh{font-size:12px;color:var(--muted);margin-bottom:24px}
+.price-feats{list-style:none;display:flex;flex-direction:column;gap:11px;margin:8px 0 28px;flex-grow:1}
+.price-feats li{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:#c8e4f0;line-height:1.5}
+.price-feats li .chk{color:var(--green);flex-shrink:0;font-weight:700}
+.price-cta{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 24px;border-radius:100px;width:100%;
+  font-size:14px;font-weight:700;font-family:var(--head);
+  transition:transform .2s,box-shadow .2s;
+}
+.price-cta.solid{background:var(--cyan);color:#07111c}
+.price-cta.solid:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,194,255,.4)}
+.price-cta.out{border:1.5px solid var(--bord2);color:var(--cyan)}
+.price-cta.out:hover{background:rgba(0,194,255,.07)}
+.price-foot{text-align:center;margin-top:34px;font-size:13px;color:var(--muted)}
+
 /* ════ CTA ════ */
 #cta{
   background:var(--bg);text-align:center;
@@ -516,6 +605,8 @@ footer{
   #hero-canvas{height:360px}
   .prob-grid,.how-grid,.access-grid{grid-template-columns:1fr;gap:24px}
   .feat-grid{grid-template-columns:1fr 1fr}
+  .pricing-grid{grid-template-columns:1fr;gap:20px}
+  .price-card.featured{transform:none}
   .stat-row{grid-template-columns:1fr 1fr}
   section{padding:72px 20px}
   footer{padding:24px 20px}
@@ -963,15 +1054,47 @@ h1.hero-h1 .grad{
 .reveal.on{opacity:1;transform:translateY(0);filter:blur(0)}
 
 /* Card tilt + spotlight */
-.feat-card,.how-card,.access-card{transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease}
-.feat-card::after,.how-card::after,.access-card::after{
+.feat-card,.how-card,.access-card,.price-card{transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease}
+.feat-card::after,.how-card::after,.access-card::after,.price-card::after{
   content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%),rgba(0,194,255,.16),transparent 65%);
   opacity:0;transition:opacity .3s ease;
 }
-.feat-card:hover::after,.how-card:hover::after,.access-card:hover::after{opacity:1}
-.feat-icon{transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
-.feat-card:hover .feat-icon{transform:translateY(-4px) scale(1.14) rotate(-6deg)}
+.feat-card:hover::after,.how-card:hover::after,.access-card:hover::after,.price-card:hover::after{opacity:1}
+.feat-icon,.price-icon{transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+.feat-card:hover .feat-icon,.price-card:hover .price-icon{transform:translateY(-4px) scale(1.14) rotate(-6deg)}
+
+/* Pricing card: extra lift for featured plan */
+.price-card.featured{transform:translateY(-8px) scale(1.02)}
+
+/* Hero 3D parallax stage (mouse-driven tilt on phone mockup) */
+#hero-3d-stage{
+  transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.22,1,.36,1);
+  will-change:transform;
+}
+
+/* Floating glass chips around the hero phone */
+.hero-chip{
+  position:absolute;z-index:2;pointer-events:none;
+  display:flex;align-items:center;gap:8px;
+  background:rgba(18,32,48,.72);border:1px solid rgba(0,194,255,.28);
+  border-radius:14px;padding:10px 16px;
+  font-size:13px;font-weight:600;color:#e2f0f8;white-space:nowrap;
+  box-shadow:0 20px 40px rgba(0,0,0,.45);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  transform-style:preserve-3d;
+  animation:chip-float 6s ease-in-out infinite;
+}
+.hero-chip b{color:var(--cyan)}
+.hero-chip-1{top:12%;left:-4%;animation-delay:0s}
+.hero-chip-2{top:54%;right:-8%;animation-delay:1.4s}
+.hero-chip-3{bottom:8%;left:0;animation-delay:2.8s}
+@keyframes chip-float{
+  0%,100%{transform:translateY(0) rotateX(6deg) rotateY(-10deg)}
+  50%{transform:translateY(-14px) rotateX(-4deg) rotateY(8deg)}
+}
+@media(max-width:960px){.hero-chip{display:none}}
 
 /* Buttons: shimmer + magnetic-ready + ripple host */
 .btn-primary,.btn-outline,.btn-solid-sm,.btn-ghost-sm,.acc-btn{
@@ -1028,6 +1151,7 @@ hr.divider.on::before{transform:scaleX(1)}
     <li><a href="#features">Fonctionnalités</a></li>
     <li><a href="#how">Comment ça marche</a></li>
     <li><a href="#screenshots">Aperçu</a></li>
+    <li><a href="#pricing">Tarifs</a></li>
     <li><a href="#access">Accès</a></li>
   </ul>
   <div class="n-btns">
@@ -1058,8 +1182,12 @@ hr.divider.on::before{transform:scaleX(1)}
 
   </div>
 
-  <!-- Canvas WebGL Three.js -->
+  <!-- Hero 3D mockup + floating stat chips -->
+  <div id="hero-3d-stage">
   <div id="hero-phone-wrap">
+    <div class="hero-chip hero-chip-1" aria-hidden="true">🔔 <b>CT</b> expire dans 5j</div>
+    <div class="hero-chip hero-chip-2" aria-hidden="true">⛽ <b>28.4</b> L/100km</div>
+    <div class="hero-chip hero-chip-3" aria-hidden="true">🛞 Pneus <b>82%</b></div>
   <div id="phone-2d"><div class="ph2-particles"><div class="ph2-particle" style="left:18%;bottom:12%;animation-duration:3.2s;animation-delay:0s;"></div><div class="ph2-particle" style="left:76%;bottom:22%;animation-duration:4.1s;animation-delay:0.9s;"></div><div class="ph2-particle" style="left:48%;bottom:6%;animation-duration:3.7s;animation-delay:1.8s;"></div><div class="ph2-particle" style="left:10%;bottom:48%;animation-duration:5.0s;animation-delay:0.5s;"></div><div class="ph2-particle" style="left:84%;bottom:38%;animation-duration:4.6s;animation-delay:1.4s;"></div><div class="ph2-particle" style="left:32%;bottom:28%;animation-duration:3.9s;animation-delay:2.2s;"></div></div>
 <div class="ph2-body">
   <!-- Tranche droite -->
@@ -1095,6 +1223,7 @@ hr.divider.on::before{transform:scaleX(1)}
 </div>
 <div class="ph2-shadow"></div></div>
 </div>
+  </div>
 
   <div class="hero-scroll-hint">
     <svg width="14" height="22" viewBox="0 0 14 22" fill="none">
@@ -1222,6 +1351,71 @@ hr.divider.on::before{transform:scaleX(1)}
 
 <hr class="divider"/>
 
+<!-- ════ PRICING ════ -->
+<section id="pricing">
+  <div class="ctn">
+    <div class="price-head reveal">
+      <div class="eyebrow">Tarifs</div>
+      <h2 class="sec-title">Un tarif simple,<br/>pour chaque flotte.</h2>
+      <p class="sec-sub">Sans engagement, sans mauvaise surprise. Changez de formule à tout moment.</p>
+    </div>
+    <div class="price-toggle reveal" id="price-toggle" role="button" tabindex="0" aria-checked="false">
+      <div class="price-toggle-knob"></div>
+      <div class="price-toggle-opt m">Mensuel</div>
+      <div class="price-toggle-opt a">Annuel <span class="price-toggle-save">-20%</span></div>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card reveal">
+        <div class="price-icon">🚚</div>
+        <div class="price-name">Solo</div>
+        <div class="price-desc">Pour les chauffeurs indépendants et artisans routiers.</div>
+        <div class="price-amount-row"><span class="price-amount">0</span><span class="price-currency">€</span></div>
+        <div class="price-perveh">Gratuit à vie · 1 véhicule</div>
+        <ul class="price-feats">
+          <li><span class="chk">✓</span>Alertes CT, assurance &amp; limiteur</li>
+          <li><span class="chk">✓</span>Suivi consommation de base</li>
+          <li><span class="chk">✓</span>Application mobile iOS &amp; Android</li>
+          <li><span class="chk">✓</span>Support par email</li>
+        </ul>
+        <a href="#access" class="price-cta out">Commencer gratuitement</a>
+      </div>
+      <div class="price-card featured reveal" style="transition-delay:.1s">
+        <div class="price-badge">Populaire</div>
+        <div class="price-icon">🚛</div>
+        <div class="price-name">Flotte</div>
+        <div class="price-desc">Pour les chefs de parc qui gèrent plusieurs véhicules.</div>
+        <div class="price-amount-row"><span class="price-amount" data-monthly="19" data-annual="15">19</span><span class="price-currency">€</span><span class="price-period">/mois</span></div>
+        <div class="price-perveh">Par véhicule · véhicules illimités</div>
+        <ul class="price-feats">
+          <li><span class="chk">✓</span>Panel chef de parc complet</li>
+          <li><span class="chk">✓</span>Synchronisation temps réel chauffeur ↔ bureau</li>
+          <li><span class="chk">✓</span>Suivi pneus, interventions &amp; documents</li>
+          <li><span class="chk">✓</span>Exports &amp; rapports PDF</li>
+          <li><span class="chk">✓</span>Support prioritaire</li>
+        </ul>
+        <a href="#access" class="price-cta solid">Essayer le panel admin</a>
+      </div>
+      <div class="price-card reveal" style="transition-delay:.2s">
+        <div class="price-icon">🏢</div>
+        <div class="price-name">Entreprise</div>
+        <div class="price-desc">Pour les grandes flottes et groupes de transport.</div>
+        <div class="price-amount-row"><span class="price-amount quote">Sur devis</span></div>
+        <div class="price-perveh">Tarif adapté à votre flotte</div>
+        <ul class="price-feats">
+          <li><span class="chk">✓</span>Tout Flotte, en illimité</li>
+          <li><span class="chk">✓</span>API &amp; intégrations sur mesure</li>
+          <li><span class="chk">✓</span>SSO &amp; gestion fine des accès</li>
+          <li><span class="chk">✓</span>Accompagnement &amp; SLA dédiés</li>
+        </ul>
+        <a href="mailto:contact@memotruck.fr" class="price-cta out">Demander un devis</a>
+      </div>
+    </div>
+    <p class="price-foot reveal" style="transition-delay:.25s">💳 Aucune carte bancaire requise pour démarrer · Annulez à tout moment</p>
+  </div>
+</section>
+
+<hr class="divider"/>
+
 <!-- ════ ACCESS ════ -->
 <section id="access">
   <div class="ctn">
@@ -1275,6 +1469,7 @@ hr.divider.on::before{transform:scaleX(1)}
   <div class="foot-links">
     <a href="#features">Fonctionnalités</a>
     <a href="#how">Comment ça marche</a>
+    <a href="#pricing">Tarifs</a>
     <a href="#access">Accès</a>
     <a href="mailto:contact@memotruck.fr">Contact</a>
   </div>
@@ -1562,19 +1757,49 @@ document.getElementById('burger').addEventListener('click', function(){
   onScroll();
 })();
 
-// ── HERO SPOTLIGHT ──
+// ── HERO SPOTLIGHT + 3D PARALLAX ──
 (function(){
   var heroEl = document.getElementById('hero');
   if(!heroEl) return;
+  var stage = document.getElementById('hero-3d-stage');
   heroEl.addEventListener('mousemove', function(e){
     var r = heroEl.getBoundingClientRect();
     heroEl.style.setProperty('--sx', ((e.clientX - r.left) / r.width * 100) + '%');
     heroEl.style.setProperty('--sy', ((e.clientY - r.top) / r.height * 100) + '%');
+    if(!stage) return;
+    var nx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+    var ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
+    stage.style.transform = 'perspective(1400px) rotateY(' + (nx * 8) + 'deg) rotateX(' + (-ny * 8) + 'deg)';
+  });
+  heroEl.addEventListener('mouseleave', function(){
+    if(stage) stage.style.transform = '';
+  });
+})();
+
+// ── PRICING TOGGLE (mensuel / annuel) ──
+(function(){
+  var toggle = document.getElementById('price-toggle');
+  if(!toggle) return;
+  var amounts = document.querySelectorAll('.price-amount[data-monthly]');
+  var periods = document.querySelectorAll('.price-period');
+  function setBilling(annual){
+    toggle.classList.toggle('is-annual', annual);
+    toggle.setAttribute('aria-checked', annual ? 'true' : 'false');
+    amounts.forEach(function(el){
+      el.textContent = annual ? el.dataset.annual : el.dataset.monthly;
+    });
+    periods.forEach(function(el){
+      el.textContent = annual ? '/mois, facturé annuellement' : '/mois';
+    });
+  }
+  toggle.addEventListener('click', function(){ setBilling(!toggle.classList.contains('is-annual')); });
+  toggle.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); setBilling(!toggle.classList.contains('is-annual')); }
   });
 })();
 
 // ── CARD TILT + SPOTLIGHT ──
-document.querySelectorAll('.feat-card,.how-card,.access-card').forEach(function(card){
+document.querySelectorAll('.feat-card,.how-card,.access-card,.price-card').forEach(function(card){
   card.addEventListener('mousemove', function(e){
     var r = card.getBoundingClientRect();
     var x = e.clientX - r.left, y = e.clientY - r.top;
