@@ -275,21 +275,9 @@ section{padding:100px 24px;position:relative}
   position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;
   background:radial-gradient(ellipse 60% 50% at 50% 45%,rgba(255,255,255,.9),rgba(0,194,255,.5) 45%,transparent 75%);
 }
-.cinema-piece{position:absolute;top:50%;left:50%;will-change:transform,opacity}
-.piece-back{
-  width:236px;height:496px;margin:-248px 0 0 -118px;
-  border-radius:46px;
-  background:linear-gradient(160deg,#2a3d52 0%,#16283a 50%,#0b1a28 100%);
-  box-shadow:0 40px 80px rgba(0,0,0,.6);
+#cinema-canvas{
+  display:block;width:min(92vw,900px);height:min(82vh,900px);
 }
-.piece-rail-l,.piece-rail-r{
-  width:10px;height:420px;margin:-210px 0 0;
-  border-radius:6px;
-  background:linear-gradient(180deg,#3a5268,#1c2e40 40%,#0d1e2e 70%,#2a3e52);
-  box-shadow:0 20px 40px rgba(0,0,0,.5);
-}
-.piece-rail-l{margin-left:-134px}
-.piece-rail-r{margin-left:124px}
 .cinema-chip{
   position:absolute;top:50%;left:50%;z-index:2;
   display:flex;align-items:center;gap:8px;
@@ -303,17 +291,13 @@ section{padding:100px 24px;position:relative}
 .cinema-chip b{color:var(--cyan)}
 @media(max-width:720px){
   .cinema-wrap{height:220vh}
-  .piece-back{width:180px;height:378px;margin:-189px 0 0 -90px}
-  .piece-rail-l,.piece-rail-r{height:320px;margin-top:-160px}
-  .piece-rail-l{margin-left:-102px}
-  .piece-rail-r{margin-left:92px}
   .cinema-chip{font-size:11.5px;padding:8px 12px}
 }
 @media(prefers-reduced-motion:reduce){
   .cinema-wrap{height:auto}
   .cinema-stage{position:relative;height:auto;padding:100px 24px}
   .cinema-caption{position:static;opacity:1;margin-top:36px}
-  .piece-back,.piece-rail-l,.piece-rail-r,.cinema-chip,.cinema-flash{display:none}
+  #cinema-canvas,.cinema-chip,.cinema-flash{display:none}
 }
 
 /* ════ PROBLEM / SOLUTION ════ */
@@ -1240,6 +1224,9 @@ hr.divider.on::before{transform:scaleX(1)}
   html{scroll-behavior:auto !important}
 }
 </style>
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three/three.module.min.js" } }
+</script>
 </head>
 <body>
 <div id="scroll-progress"></div>
@@ -1361,10 +1348,8 @@ hr.divider.on::before{transform:scaleX(1)}
   <div class="cinema-stage" id="cinema-stage">
     <div class="cinema-bg"></div>
     <div class="cinema-phone-group" id="cinema-phone-group">
-      <div class="cinema-piece piece-back" id="piece-back"></div>
-      <div class="cinema-piece piece-rail-l" id="piece-rail-l"></div>
-      <div class="cinema-piece piece-rail-r" id="piece-rail-r"></div>
-      <div class="ph2-body">
+      <canvas id="cinema-canvas" aria-hidden="true"></canvas>
+      <div class="ph2-body" id="cinema-fallback-phone">
         <div class="ph2-edge-r"></div>
         <div class="ph2-edge-b"></div>
         <div class="ph2-btn-pwr"></div>
@@ -2091,10 +2076,6 @@ document.querySelectorAll('.stat-num').forEach(function(el){
   if(!section || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   var stage = document.getElementById('cinema-stage');
-  var group = document.getElementById('cinema-phone-group');
-  var back = document.getElementById('piece-back');
-  var railL = document.getElementById('piece-rail-l');
-  var railR = document.getElementById('piece-rail-r');
   var flash = document.getElementById('cinema-flash');
   var caption = document.getElementById('cinema-caption');
   var chips = [
@@ -2110,6 +2091,7 @@ document.querySelectorAll('.stat-num').forEach(function(el){
   function phase(p, start, len){ return smooth((p - start) / len); }
 
   var ticking = false;
+  var state3d = { introRotY: 0, introRotX: 0, intro: 0, explode: 0, dive: 0 };
 
   function render(){
     ticking = false;
@@ -2124,19 +2106,12 @@ document.querySelectorAll('.stat-num').forEach(function(el){
     var dive = phase(p, 0.55, 0.30);
     var fadeOut = phase(p, 0.85, 0.15);
 
-    var rotY = lerp(24, 0, intro);
-    var rotX = lerp(11, 0, intro);
-    var scale = lerp(0.8, 1, intro) * lerp(1, 2.5, dive);
-    group.style.transform = 'scale(' + scale.toFixed(3) + ') rotateY(' + rotY.toFixed(2) + 'deg) rotateX(' + rotX.toFixed(2) + 'deg)';
-
-    railL.style.transform = 'translateX(' + (-explode * 150 * travel).toFixed(1) + 'px) rotateY(' + (-explode * 26).toFixed(1) + 'deg)';
-    railR.style.transform = 'translateX(' + (explode * 150 * travel).toFixed(1) + 'px) rotateY(' + (explode * 26).toFixed(1) + 'deg)';
-    var railFade = 1 - dive;
-    railL.style.opacity = (explode * railFade).toFixed(2);
-    railR.style.opacity = (explode * railFade).toFixed(2);
-
-    back.style.transform = 'translateY(' + (explode * 40).toFixed(1) + 'px) translateZ(-160px) scale(' + (1 - explode * 0.12).toFixed(3) + ')';
-    back.style.opacity = (explode * (1 - dive) * 0.85).toFixed(2);
+    state3d.introRotY = lerp(24, 0, intro);
+    state3d.introRotX = lerp(11, 0, intro);
+    state3d.intro = intro;
+    state3d.explode = explode;
+    state3d.dive = dive;
+    if(window.__cinema3dUpdate) window.__cinema3dUpdate(state3d);
 
     var chipPeak = clamp(explode * 1.4 - dive * 1.6, 0, 1);
     chips.forEach(function(c, i){
@@ -2161,6 +2136,140 @@ document.querySelectorAll('.stat-num').forEach(function(el){
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
   render();
+})();
+</script>
+
+<!-- ════ CINEMA 3D (vrai modèle glTF, chargé à la demande) ════ -->
+<script type="module">
+(function(){
+  var section = document.getElementById('cinema');
+  var canvas = document.getElementById('cinema-canvas');
+  var fallback = document.getElementById('cinema-fallback-phone');
+  if(!section || !canvas || !fallback) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var started = false;
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting && !started){
+        started = true;
+        io.disconnect();
+        start();
+      }
+    });
+  }, { rootMargin: '600px 0px 600px 0px' });
+  io.observe(section);
+
+  function loadScreenTexture(THREE){
+    return new Promise(function(resolve){
+      new THREE.TextureLoader().load('./assets/images/app-screen.jpg', function(tex){
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.flipY = false;
+        resolve(tex);
+      }, undefined, function(){ resolve(null); });
+    });
+  }
+
+  async function start(){
+    try {
+      var THREE = await import('three');
+      var mod = await import('./assets/vendor/three/loaders/GLTFLoader.js');
+      var GLTFLoader = mod.GLTFLoader;
+
+      var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+      var camera = new THREE.PerspectiveCamera(32, 1, 0.01, 100);
+      var scene = new THREE.Scene();
+      scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+      var keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
+      keyLight.position.set(2, 4, 3);
+      scene.add(keyLight);
+      var rimLight = new THREE.DirectionalLight(0x66d9ff, 1.6);
+      rimLight.position.set(-3, -1, -2);
+      scene.add(rimLight);
+
+      function resize(){
+        var w = canvas.clientWidth, h = canvas.clientHeight;
+        if(!w || !h) return;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+      window.addEventListener('resize', resize);
+
+      var screenGroup, bodyGroup, cameraGroup, baseCamZ = 1;
+      var loader = new GLTFLoader();
+      var tex = await loadScreenTexture(THREE);
+
+      loader.load('./assets/models/gp5.glb', function(gltf){
+        var root = gltf.scene;
+
+        var toRemove = [];
+        root.traverse(function(o){ if(o.name && o.name.toLowerCase().indexOf('plane') !== -1) toRemove.push(o); });
+        toRemove.forEach(function(o){ o.parent && o.parent.remove(o); });
+
+        var box = new THREE.Box3().setFromObject(root);
+        var center = new THREE.Vector3(); box.getCenter(center);
+        var size = new THREE.Vector3(); box.getSize(size);
+        root.position.sub(center);
+        root.rotation.y = Math.PI;
+        scene.add(root);
+
+        screenGroup = new THREE.Group();
+        bodyGroup = new THREE.Group();
+        cameraGroup = new THREE.Group();
+        root.add(bodyGroup, screenGroup, cameraGroup);
+
+        var toMove = [];
+        root.traverse(function(o){
+          if(!o.isMesh) return;
+          var n = o.name.toLowerCase();
+          if(n.indexOf('screen') !== -1){
+            if(tex) o.material = new THREE.MeshBasicMaterial({ map: tex });
+            toMove.push([o, screenGroup]);
+          } else if(n.indexOf('front_cam_glass') !== -1){
+            toMove.push([o, screenGroup]);
+          } else if(n.indexOf('camera') !== -1 || n.indexOf('sphere') !== -1){
+            toMove.push([o, cameraGroup]);
+          } else {
+            toMove.push([o, bodyGroup]);
+          }
+        });
+        toMove.forEach(function(pair){ pair[1].attach(pair[0]); });
+
+        var maxDim = Math.max(size.x, size.y, size.z);
+        baseCamZ = maxDim * 1.65;
+        camera.position.set(0, 0, baseCamZ);
+        camera.lookAt(0, 0, 0);
+
+        resize();
+        fallback.style.display = 'none';
+        renderer.render(scene, camera);
+
+        window.__cinema3dUpdate = function(state){
+          scene.rotation.y = THREE.MathUtils.degToRad(state.introRotY);
+          scene.rotation.x = THREE.MathUtils.degToRad(state.introRotX);
+          scene.scale.setScalar(0.85 + 0.15 * state.intro);
+
+          // root is rotated 180° on Y, so local -Z points toward the camera (world +Z)
+          screenGroup.position.z = -state.explode * maxDim * 0.22;
+          bodyGroup.position.z = state.explode * maxDim * 0.14;
+          cameraGroup.position.z = state.explode * maxDim * 0.34;
+
+          camera.position.z = baseCamZ - state.dive * (baseCamZ * 0.85);
+          camera.lookAt(0, 0, 0);
+
+          resize();
+          renderer.render(scene, camera);
+        };
+      }, undefined, function(err){
+        console.warn('MémoTruck: modèle 3D introuvable, repli CSS conservé.', err);
+      });
+    } catch(err){
+      console.warn('MémoTruck: initialisation 3D impossible, repli CSS conservé.', err);
+    }
+  }
 })();
 </script>
 
