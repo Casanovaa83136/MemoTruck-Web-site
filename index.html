@@ -245,6 +245,77 @@ section{padding:100px 24px;position:relative}
 .sec-sub{font-size:17px;color:var(--muted);line-height:1.7;max-width:520px}
 .divider{height:1px;background:linear-gradient(90deg,transparent,var(--bord2),transparent);border:none}
 
+/* ════ CINEMATIC REVEAL ════ */
+.cinema-wrap{height:300vh;position:relative;background:var(--bg)}
+.cinema-stage{
+  position:sticky;top:0;height:100vh;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  perspective:1600px;pointer-events:none;
+}
+.cinema-bg{
+  position:absolute;inset:0;z-index:0;
+  background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(0,194,255,.10) 0%,transparent 70%),var(--bg);
+}
+.cinema-phone-group{
+  position:relative;z-index:1;
+  transform-style:preserve-3d;
+  will-change:transform;
+}
+.cinema-caption{
+  position:absolute;left:0;right:0;bottom:9%;z-index:2;
+  text-align:center;pointer-events:none;
+  will-change:transform,opacity;opacity:0;
+}
+.cinema-caption .eyebrow{justify-content:center;display:flex}
+.cinema-caption h2{
+  font-family:var(--head);font-size:clamp(1.6rem,3.4vw,2.6rem);
+  font-weight:700;letter-spacing:-1px;color:#fff;max-width:640px;margin:0 auto;
+}
+.cinema-flash{
+  position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse 60% 50% at 50% 45%,rgba(255,255,255,.9),rgba(0,194,255,.5) 45%,transparent 75%);
+}
+.cinema-piece{position:absolute;top:50%;left:50%;will-change:transform,opacity}
+.piece-back{
+  width:236px;height:496px;margin:-248px 0 0 -118px;
+  border-radius:46px;
+  background:linear-gradient(160deg,#2a3d52 0%,#16283a 50%,#0b1a28 100%);
+  box-shadow:0 40px 80px rgba(0,0,0,.6);
+}
+.piece-rail-l,.piece-rail-r{
+  width:10px;height:420px;margin:-210px 0 0;
+  border-radius:6px;
+  background:linear-gradient(180deg,#3a5268,#1c2e40 40%,#0d1e2e 70%,#2a3e52);
+  box-shadow:0 20px 40px rgba(0,0,0,.5);
+}
+.piece-rail-l{margin-left:-134px}
+.piece-rail-r{margin-left:124px}
+.cinema-chip{
+  position:absolute;top:50%;left:50%;z-index:2;
+  display:flex;align-items:center;gap:8px;
+  background:rgba(18,32,48,.78);border:1px solid rgba(0,194,255,.3);
+  border-radius:14px;padding:10px 16px;white-space:nowrap;
+  font-size:13px;font-weight:600;color:#e2f0f8;
+  box-shadow:0 20px 40px rgba(0,0,0,.45);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  opacity:0;will-change:transform,opacity;
+}
+.cinema-chip b{color:var(--cyan)}
+@media(max-width:720px){
+  .cinema-wrap{height:220vh}
+  .piece-back{width:180px;height:378px;margin:-189px 0 0 -90px}
+  .piece-rail-l,.piece-rail-r{height:320px;margin-top:-160px}
+  .piece-rail-l{margin-left:-102px}
+  .piece-rail-r{margin-left:92px}
+  .cinema-chip{font-size:11.5px;padding:8px 12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .cinema-wrap{height:auto}
+  .cinema-stage{position:relative;height:auto;padding:100px 24px}
+  .cinema-caption{position:static;opacity:1;margin-top:36px}
+  .piece-back,.piece-rail-l,.piece-rail-r,.cinema-chip,.cinema-flash{display:none}
+}
+
 /* ════ PROBLEM / SOLUTION ════ */
 #problem{background:var(--bg2)}
 .prob-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
@@ -709,11 +780,11 @@ footer{
   box-shadow: 0 4px 12px rgba(0,0,0,0.6);
 }
 
-/* Zone écran */
+/* Zone écran — bezels fins façon iPhone Air */
 .ph2-screen-wrap {
   position: absolute;
-  top: 12px; left: 10px; right: 10px; bottom: 12px;
-  border-radius: 36px;
+  top: 7px; left: 6px; right: 6px; bottom: 7px;
+  border-radius: 40px;
   overflow: hidden;
   background: #020a14;
 }
@@ -812,33 +883,31 @@ footer{
   z-index: 5;
 }
 
-/* Notch */
+/* Dynamic Island — flottante, détachée du bord façon iPhone Air */
 .ph2-notch {
   position: absolute;
-  top: 12px; left: 50%;
+  top: 14px; left: 50%;
   transform: translateX(-50%);
-  width: 90px; height: 24px;
-  background: #020a14;
-  border-radius: 0 0 14px 14px;
+  width: 84px; height: 26px;
+  background: #000;
+  border-radius: 100px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.04);
   z-index: 10;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 6px;
+  padding-right: 10px;
 }
 
 .ph2-cam {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #0a2030, #020810);
-  border: 1px solid rgba(0,194,255,0.25);
-  box-shadow: 0 0 4px rgba(0,194,255,0.15), inset 0 0 3px rgba(0,0,0,0.8);
+  width: 7px; height: 7px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #14324a, #020810);
+  border: 1px solid rgba(0,194,255,0.3);
+  box-shadow: 0 0 4px rgba(0,194,255,0.2), inset 0 0 3px rgba(0,0,0,0.8);
 }
 
-.ph2-speaker {
-  width: 30px; height: 4px; border-radius: 2px;
-  background: linear-gradient(90deg, #0a1828, #0d2030, #0a1828);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
-}
+.ph2-speaker { display: none; }
 
 /* Bouton power droite */
 .ph2-btn-pwr {
@@ -1129,6 +1198,42 @@ hr.divider.on::before{transform:scaleX(1)}
 
 /* sc-card gets same reveal treatment automatically via .reveal if present */
 
+/* ════ CHAPTER NAV (scrollspy latéral façon rapport annuel) ════ */
+.chapter-nav{
+  position:fixed;top:50%;right:26px;transform:translateY(-50%);
+  z-index:500;display:flex;flex-direction:column;align-items:center;gap:16px;
+}
+.chapter-nav::before{
+  content:'';position:absolute;top:-4px;bottom:-4px;left:50%;transform:translateX(-50%);
+  width:1px;background:linear-gradient(180deg,transparent,var(--bord2) 15%,var(--bord2) 85%,transparent);
+  z-index:-1;
+}
+.chapter-dot{
+  position:relative;width:8px;height:8px;border-radius:50%;
+  background:var(--bg2);border:1.5px solid var(--bord2);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1),background .3s ease,border-color .3s ease,box-shadow .3s ease;
+}
+.chapter-dot::after{
+  content:attr(data-label);
+  position:absolute;right:20px;top:50%;transform:translateY(-50%);
+  font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap;
+  background:var(--surf);border:1px solid var(--bord);border-radius:100px;padding:5px 12px;
+  opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;
+  transform:translateY(-50%) translateX(6px);
+}
+.chapter-dot:hover::after{opacity:1;transform:translateY(-50%) translateX(0)}
+.chapter-dot:hover{border-color:var(--cyan);transform:scale(1.3)}
+.chapter-dot.active{
+  background:var(--cyan);border-color:var(--cyan);transform:scale(1.35);
+  box-shadow:0 0 12px rgba(0,194,255,.6);
+}
+.chapter-dot.active::after{color:var(--cyan)}
+@media(max-width:960px){.chapter-nav{display:none}}
+
+/* Parallax layers */
+.parallax-layer{will-change:transform}
+.aurora{will-change:transform}
+
 /* Reduced motion */
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
@@ -1139,6 +1244,18 @@ hr.divider.on::before{transform:scaleX(1)}
 <body>
 <div id="scroll-progress"></div>
 <div class="aurora"><span></span><span></span><span></span></div>
+
+<!-- ════ CHAPTER NAV (scrollspy latéral) ════ -->
+<nav class="chapter-nav" id="chapter-nav" aria-label="Navigation par section">
+  <a href="#hero" class="chapter-dot" data-label="Accueil"></a>
+  <a href="#cinema" class="chapter-dot" data-label="Découverte"></a>
+  <a href="#problem" class="chapter-dot" data-label="Problème"></a>
+  <a href="#features" class="chapter-dot" data-label="Fonctionnalités"></a>
+  <a href="#how" class="chapter-dot" data-label="Comment ça marche"></a>
+  <a href="#screenshots" class="chapter-dot" data-label="Aperçu"></a>
+  <a href="#pricing" class="chapter-dot" data-label="Tarifs"></a>
+  <a href="#access" class="chapter-dot" data-label="Accès"></a>
+</nav>
 
 <!-- ════ NAV ════ -->
 <nav id="nav">
@@ -1170,8 +1287,8 @@ hr.divider.on::before{transform:scaleX(1)}
 <!-- ════ HERO ════ -->
 <section id="hero">
   <div class="spotlight"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-halo"></div>
+  <div class="hero-grid parallax-layer" data-speed="0.12"></div>
+  <div class="hero-halo parallax-layer" data-speed="0.22"></div>
   <div class="hero-content" id="hero-content">
     <div class="hero-badge"><div class="hero-badge-dot"></div>Interconnecté · Temps réel</div>
     <h1 class="hero-h1">Votre flotte ne peut plus<br/><span class="grad">se permettre l'oubli.</span></h1>
@@ -1236,6 +1353,51 @@ hr.divider.on::before{transform:scaleX(1)}
 <style>
 @keyframes scrolldot{0%,100%{transform:translateY(0);opacity:1}50%{transform:translateY(3px);opacity:.4}}
 </style>
+
+<hr class="divider"/>
+
+<!-- ════ CINEMATIC REVEAL ════ -->
+<section id="cinema" class="cinema-wrap">
+  <div class="cinema-stage" id="cinema-stage">
+    <div class="cinema-bg"></div>
+    <div class="cinema-phone-group" id="cinema-phone-group">
+      <div class="cinema-piece piece-back" id="piece-back"></div>
+      <div class="cinema-piece piece-rail-l" id="piece-rail-l"></div>
+      <div class="cinema-piece piece-rail-r" id="piece-rail-r"></div>
+      <div class="ph2-body">
+        <div class="ph2-edge-r"></div>
+        <div class="ph2-edge-b"></div>
+        <div class="ph2-btn-pwr"></div>
+        <div class="ph2-btn-vol1"></div>
+        <div class="ph2-btn-vol2"></div>
+        <div class="ph2-port"></div>
+        <div class="ph2-mic-l"></div>
+        <div class="ph2-mic-r"></div>
+        <div class="ph2-screen-wrap">
+          <div class="ph2-notch"><div class="ph2-cam"></div></div>
+          <div class="ph2-screen" style="justify-content:flex-start;padding-top:52px;gap:10px">
+            <div style="font-family:var(--head);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.3px">Mémo<em style="color:var(--cyan);font-style:normal">Truck</em></div>
+            <div style="width:100%;padding:0 16px;display:flex;flex-direction:column;gap:8px;margin-top:6px">
+              <div style="display:flex;align-items:center;gap:8px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:8px 10px;font-size:10.5px;color:#f4b4b4;font-weight:600">⚠️ CT — expire dans 5j</div>
+              <div style="display:flex;align-items:center;gap:8px;background:rgba(0,194,255,.1);border:1px solid rgba(0,194,255,.22);border-radius:10px;padding:8px 10px;font-size:10.5px;color:#c8e4f0;font-weight:600">⛽ Conso — 28.4 L/100km</div>
+              <div style="display:flex;align-items:center;gap:8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.22);border-radius:10px;padding:8px 10px;font-size:10.5px;color:#c8e4f0;font-weight:600">🛞 Pneus — 82%</div>
+            </div>
+          </div>
+          <div class="ph2-glare"></div>
+        </div>
+      </div>
+      <div class="cinema-chip" id="cinema-chip-1">🔔 Alertes <b>CT &amp; limiteur</b></div>
+      <div class="cinema-chip" id="cinema-chip-2">⛽ <b>Consommation</b> en temps réel</div>
+      <div class="cinema-chip" id="cinema-chip-3">🛞 Suivi <b>pneumatiques</b></div>
+      <div class="cinema-chip" id="cinema-chip-4">🖥️ Panel <b>chef de parc</b></div>
+    </div>
+    <div class="cinema-flash" id="cinema-flash"></div>
+    <div class="cinema-caption" id="cinema-caption">
+      <div class="eyebrow">L'app qui voit tout</div>
+      <h2>Chaque échéance, dans la poche<br/>de vos chauffeurs.</h2>
+    </div>
+  </div>
+</section>
 
 <hr class="divider"/>
 
@@ -1873,6 +2035,132 @@ document.querySelectorAll('.stat-num').forEach(function(el){
     entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('on'); });
   }, {threshold:0.5});
   document.querySelectorAll('hr.divider').forEach(function(el){ io.observe(el); });
+})();
+
+// ── CHAPTER NAV SCROLLSPY ──
+(function(){
+  var nav = document.getElementById('chapter-nav');
+  if(!nav) return;
+  var links = Array.prototype.slice.call(nav.querySelectorAll('.chapter-dot'));
+  var map = {};
+  links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+  var sections = Object.keys(map).map(function(id){ return document.getElementById(id); }).filter(Boolean);
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      links.forEach(function(a){ a.classList.remove('active'); });
+      var a = map[e.target.id];
+      if(a) a.classList.add('active');
+    });
+  }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+  sections.forEach(function(s){ io.observe(s); });
+})();
+
+// ── PARALLAX BACKGROUND LAYERS ──
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var layers = Array.prototype.slice.call(document.querySelectorAll('.parallax-layer'));
+  var aurora = document.querySelector('.aurora');
+  if(!layers.length && !aurora) return;
+  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+  var ticking = false;
+  function render(){
+    ticking = false;
+    var vh = window.innerHeight;
+    layers.forEach(function(el){
+      var speed = parseFloat(el.getAttribute('data-speed')) || 0.2;
+      var r = el.getBoundingClientRect();
+      var centerOffset = (r.top + r.height / 2) - vh / 2;
+      el.style.transform = 'translateY(' + (-centerOffset * speed).toFixed(1) + 'px)';
+    });
+    if(aurora){
+      aurora.style.transform = 'translateY(' + clamp(-window.scrollY * 0.04, -140, 140).toFixed(1) + 'px)';
+    }
+  }
+  function onScroll(){
+    if(!ticking){ ticking = true; requestAnimationFrame(render); }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  render();
+})();
+
+// ── CINEMATIC SCROLL REVEAL (téléphone qui explose + zoom caméra) ──
+(function(){
+  var section = document.getElementById('cinema');
+  if(!section || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var stage = document.getElementById('cinema-stage');
+  var group = document.getElementById('cinema-phone-group');
+  var back = document.getElementById('piece-back');
+  var railL = document.getElementById('piece-rail-l');
+  var railR = document.getElementById('piece-rail-r');
+  var flash = document.getElementById('cinema-flash');
+  var caption = document.getElementById('cinema-caption');
+  var chips = [
+    { el: document.getElementById('cinema-chip-1'), dx: -260, dy: -110 },
+    { el: document.getElementById('cinema-chip-2'), dx: 250, dy: -60 },
+    { el: document.getElementById('cinema-chip-3'), dx: -230, dy: 130 },
+    { el: document.getElementById('cinema-chip-4'), dx: 240, dy: 150 }
+  ];
+
+  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+  function lerp(a, b, t){ return a + (b - a) * t; }
+  function smooth(t){ t = clamp(t, 0, 1); return t * t * (3 - 2 * t); }
+  function phase(p, start, len){ return smooth((p - start) / len); }
+
+  var ticking = false;
+
+  function render(){
+    ticking = false;
+    var rect = section.getBoundingClientRect();
+    var total = rect.height - window.innerHeight;
+    if(total <= 0) return;
+    var p = clamp(-rect.top / total, 0, 1);
+    var travel = clamp(rect.width / 1440, 0.42, 1);
+
+    var intro = phase(p, 0, 0.15);
+    var explode = phase(p, 0.15, 0.40);
+    var dive = phase(p, 0.55, 0.30);
+    var fadeOut = phase(p, 0.85, 0.15);
+
+    var rotY = lerp(24, 0, intro);
+    var rotX = lerp(11, 0, intro);
+    var scale = lerp(0.8, 1, intro) * lerp(1, 2.5, dive);
+    group.style.transform = 'scale(' + scale.toFixed(3) + ') rotateY(' + rotY.toFixed(2) + 'deg) rotateX(' + rotX.toFixed(2) + 'deg)';
+
+    railL.style.transform = 'translateX(' + (-explode * 150 * travel).toFixed(1) + 'px) rotateY(' + (-explode * 26).toFixed(1) + 'deg)';
+    railR.style.transform = 'translateX(' + (explode * 150 * travel).toFixed(1) + 'px) rotateY(' + (explode * 26).toFixed(1) + 'deg)';
+    var railFade = 1 - dive;
+    railL.style.opacity = (explode * railFade).toFixed(2);
+    railR.style.opacity = (explode * railFade).toFixed(2);
+
+    back.style.transform = 'translateY(' + (explode * 40).toFixed(1) + 'px) translateZ(-160px) scale(' + (1 - explode * 0.12).toFixed(3) + ')';
+    back.style.opacity = (explode * (1 - dive) * 0.85).toFixed(2);
+
+    var chipPeak = clamp(explode * 1.4 - dive * 1.6, 0, 1);
+    chips.forEach(function(c, i){
+      var d = clamp(chipPeak - i * 0.06, 0, 1);
+      if(!c.el) return;
+      c.el.style.opacity = d.toFixed(2);
+      c.el.style.transform = 'translate(' + (c.dx * d * travel).toFixed(1) + 'px,' + (c.dy * d).toFixed(1) + 'px)';
+    });
+
+    var flashPeak = smooth(clamp((dive - 0.4) / 0.6, 0, 1)) * (1 - fadeOut);
+    flash.style.opacity = flashPeak.toFixed(2);
+
+    caption.style.opacity = (explode * (1 - dive)).toFixed(2);
+    caption.style.transform = 'translateY(' + lerp(24, 0, explode) + 'px)';
+
+    stage.style.opacity = (1 - fadeOut).toFixed(2);
+  }
+
+  function onScroll(){
+    if(!ticking){ ticking = true; requestAnimationFrame(render); }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  render();
 })();
 </script>
 
