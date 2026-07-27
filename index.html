@@ -1198,6 +1198,42 @@ hr.divider.on::before{transform:scaleX(1)}
 
 /* sc-card gets same reveal treatment automatically via .reveal if present */
 
+/* ════ CHAPTER NAV (scrollspy latéral façon rapport annuel) ════ */
+.chapter-nav{
+  position:fixed;top:50%;right:26px;transform:translateY(-50%);
+  z-index:500;display:flex;flex-direction:column;align-items:center;gap:16px;
+}
+.chapter-nav::before{
+  content:'';position:absolute;top:-4px;bottom:-4px;left:50%;transform:translateX(-50%);
+  width:1px;background:linear-gradient(180deg,transparent,var(--bord2) 15%,var(--bord2) 85%,transparent);
+  z-index:-1;
+}
+.chapter-dot{
+  position:relative;width:8px;height:8px;border-radius:50%;
+  background:var(--bg2);border:1.5px solid var(--bord2);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1),background .3s ease,border-color .3s ease,box-shadow .3s ease;
+}
+.chapter-dot::after{
+  content:attr(data-label);
+  position:absolute;right:20px;top:50%;transform:translateY(-50%);
+  font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap;
+  background:var(--surf);border:1px solid var(--bord);border-radius:100px;padding:5px 12px;
+  opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;
+  transform:translateY(-50%) translateX(6px);
+}
+.chapter-dot:hover::after{opacity:1;transform:translateY(-50%) translateX(0)}
+.chapter-dot:hover{border-color:var(--cyan);transform:scale(1.3)}
+.chapter-dot.active{
+  background:var(--cyan);border-color:var(--cyan);transform:scale(1.35);
+  box-shadow:0 0 12px rgba(0,194,255,.6);
+}
+.chapter-dot.active::after{color:var(--cyan)}
+@media(max-width:960px){.chapter-nav{display:none}}
+
+/* Parallax layers */
+.parallax-layer{will-change:transform}
+.aurora{will-change:transform}
+
 /* Reduced motion */
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
@@ -1208,6 +1244,18 @@ hr.divider.on::before{transform:scaleX(1)}
 <body>
 <div id="scroll-progress"></div>
 <div class="aurora"><span></span><span></span><span></span></div>
+
+<!-- ════ CHAPTER NAV (scrollspy latéral) ════ -->
+<nav class="chapter-nav" id="chapter-nav" aria-label="Navigation par section">
+  <a href="#hero" class="chapter-dot" data-label="Accueil"></a>
+  <a href="#cinema" class="chapter-dot" data-label="Découverte"></a>
+  <a href="#problem" class="chapter-dot" data-label="Problème"></a>
+  <a href="#features" class="chapter-dot" data-label="Fonctionnalités"></a>
+  <a href="#how" class="chapter-dot" data-label="Comment ça marche"></a>
+  <a href="#screenshots" class="chapter-dot" data-label="Aperçu"></a>
+  <a href="#pricing" class="chapter-dot" data-label="Tarifs"></a>
+  <a href="#access" class="chapter-dot" data-label="Accès"></a>
+</nav>
 
 <!-- ════ NAV ════ -->
 <nav id="nav">
@@ -1239,8 +1287,8 @@ hr.divider.on::before{transform:scaleX(1)}
 <!-- ════ HERO ════ -->
 <section id="hero">
   <div class="spotlight"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-halo"></div>
+  <div class="hero-grid parallax-layer" data-speed="0.12"></div>
+  <div class="hero-halo parallax-layer" data-speed="0.22"></div>
   <div class="hero-content" id="hero-content">
     <div class="hero-badge"><div class="hero-badge-dot"></div>Interconnecté · Temps réel</div>
     <h1 class="hero-h1">Votre flotte ne peut plus<br/><span class="grad">se permettre l'oubli.</span></h1>
@@ -1987,6 +2035,54 @@ document.querySelectorAll('.stat-num').forEach(function(el){
     entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('on'); });
   }, {threshold:0.5});
   document.querySelectorAll('hr.divider').forEach(function(el){ io.observe(el); });
+})();
+
+// ── CHAPTER NAV SCROLLSPY ──
+(function(){
+  var nav = document.getElementById('chapter-nav');
+  if(!nav) return;
+  var links = Array.prototype.slice.call(nav.querySelectorAll('.chapter-dot'));
+  var map = {};
+  links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+  var sections = Object.keys(map).map(function(id){ return document.getElementById(id); }).filter(Boolean);
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      links.forEach(function(a){ a.classList.remove('active'); });
+      var a = map[e.target.id];
+      if(a) a.classList.add('active');
+    });
+  }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+  sections.forEach(function(s){ io.observe(s); });
+})();
+
+// ── PARALLAX BACKGROUND LAYERS ──
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var layers = Array.prototype.slice.call(document.querySelectorAll('.parallax-layer'));
+  var aurora = document.querySelector('.aurora');
+  if(!layers.length && !aurora) return;
+  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+  var ticking = false;
+  function render(){
+    ticking = false;
+    var vh = window.innerHeight;
+    layers.forEach(function(el){
+      var speed = parseFloat(el.getAttribute('data-speed')) || 0.2;
+      var r = el.getBoundingClientRect();
+      var centerOffset = (r.top + r.height / 2) - vh / 2;
+      el.style.transform = 'translateY(' + (-centerOffset * speed).toFixed(1) + 'px)';
+    });
+    if(aurora){
+      aurora.style.transform = 'translateY(' + clamp(-window.scrollY * 0.04, -140, 140).toFixed(1) + 'px)';
+    }
+  }
+  function onScroll(){
+    if(!ticking){ ticking = true; requestAnimationFrame(render); }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  render();
 })();
 
 // ── CINEMATIC SCROLL REVEAL (téléphone qui explose + zoom caméra) ──
