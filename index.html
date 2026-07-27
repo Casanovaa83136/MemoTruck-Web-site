@@ -2209,11 +2209,11 @@ document.querySelectorAll('.stat-num').forEach(function(el){
         root.traverse(function(o){ if(o.name && o.name.toLowerCase().indexOf('plane') !== -1) toRemove.push(o); });
         toRemove.forEach(function(o){ o.parent && o.parent.remove(o); });
 
+        root.rotation.y = Math.PI;
         var box = new THREE.Box3().setFromObject(root);
         var center = new THREE.Vector3(); box.getCenter(center);
         var size = new THREE.Vector3(); box.getSize(size);
         root.position.sub(center);
-        root.rotation.y = Math.PI;
         scene.add(root);
 
         screenGroup = new THREE.Group();
