@@ -514,15 +514,8 @@ footer { border-top: 1px solid var(--border); background: var(--bg); }
 @media (min-width: 640px) { .footer-bottom .container { flex-direction: row; } }
 .footer-bottom .fait { font-family: var(--mono); letter-spacing: 0.15em; text-transform: uppercase; }
 
-/* ════ REDUCED MOTION ════ */
-@media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    .reveal { transition: none; opacity: 1; transform: none; }
-    #navbar, .hero-kicker, .hero-lede, .hero-actions, .hero-stats, .hero-visual-inner,
-    .hero-title .line span { animation: none !important; opacity: 1 !important; transform: none !important; }
-    .marquee-track, .radar-dot::before, .scanline, .grain-overlay, .hero-chip, .success-icon, .aurora { animation: none !important; }
-    .reveal.on .alert-row, .reveal.on .doc-row { animation: none !important; opacity: 1; transform: none; }
-}
+/* Animations are intentionally always-on for every visitor, regardless of the
+   prefers-reduced-motion preference — a deliberate choice for this site. */
 </style>
 </head>
 <body>
@@ -879,7 +872,6 @@ footer { border-top: 1px solid var(--border); background: var(--bg); }
 (function () {
   var statsEl = document.getElementById('hero-stats');
   if (!statsEl) return;
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var values = statsEl.querySelectorAll('.value[data-count]');
 
   function formatValue(el, val) {
@@ -896,7 +888,7 @@ footer { border-top: 1px solid var(--border); background: var(--bg); }
 
   function animateValue(el) {
     var target = parseFloat(el.dataset.count);
-    if (reduced || !target) { formatValue(el, target || 0); return; }
+    if (!target) { formatValue(el, target || 0); return; }
     var start = performance.now();
     var duration = 1400;
     function tick(now) {
@@ -921,8 +913,6 @@ footer { border-top: 1px solid var(--border); background: var(--bg); }
 (function () {
   var bg = document.getElementById('hero-bg');
   var hero = document.getElementById('hero');
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduced) return;
   window.addEventListener('scroll', function () {
     var rect = hero.getBoundingClientRect();
     var progress = Math.min(Math.max(-rect.top / rect.height, 0), 1);
@@ -935,8 +925,7 @@ footer { border-top: 1px solid var(--border); background: var(--bg); }
 (function () {
   var hero = document.getElementById('hero');
   var visual = document.getElementById('hero-visual');
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduced || !visual) return;
+  if (!visual) return;
   hero.addEventListener('mousemove', function (e) {
     var r = hero.getBoundingClientRect();
     var mx = (e.clientX - r.left) / r.width - 0.5;
