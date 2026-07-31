@@ -143,6 +143,17 @@ img { max-width: 100%; display: block; }
 .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 0 32px rgba(6,182,212,0.6); }
 @media (min-width: 768px) { .nav-links { display: flex; } }
 
+.btn-primary, .btn-cta, .btn-submit {
+    position: relative; overflow: hidden;
+}
+.btn-primary::after, .btn-cta::after, .btn-submit::after {
+    content: ''; position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.55), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.7s ease;
+}
+.btn-primary:hover::after, .btn-cta:hover::after, .btn-submit:hover::after { left: 130%; }
+
 /* ════ HERO ════ */
 #hero {
     position: relative;
@@ -161,6 +172,19 @@ img { max-width: 100%; display: block; }
     background: radial-gradient(ellipse at top left, rgba(30,58,138,0.35), transparent 55%);
 }
 .hero-fade { position:absolute; inset-inline:0; bottom:0; height: 16rem; background: linear-gradient(to top, var(--bg), transparent); }
+
+.hero-aurora { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.aurora {
+    position: absolute; border-radius: 50%; filter: blur(90px);
+    opacity: 0.35; mix-blend-mode: screen;
+    animation: aurora-float 14s ease-in-out infinite;
+}
+.aurora.a1 { width: 420px; height: 420px; background: radial-gradient(circle, #22d3ee, transparent 70%); top: -80px; left: -60px; }
+.aurora.a2 { width: 480px; height: 480px; background: radial-gradient(circle, #3b82f6, transparent 70%); bottom: -140px; right: -100px; animation-delay: -6s; }
+@keyframes aurora-float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, -20px) scale(1.08); }
+}
 
 .scanline {
     position: absolute; top: 0; bottom: 0; width: 1px;
@@ -359,6 +383,13 @@ img { max-width: 100%; display: block; }
 .alert-emerald .icon-wrap { background: rgba(16,185,129,0.1); color: var(--emerald); }
 .alert-emerald .time { color: var(--emerald); }
 
+@keyframes row-in { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+.reveal.on .alert-row, .reveal.on .doc-row { animation: row-in 0.7s var(--ease) backwards; }
+.reveal.on .alert-row:nth-child(1), .reveal.on .doc-row:nth-child(1) { animation-delay: 0.05s; }
+.reveal.on .alert-row:nth-child(2), .reveal.on .doc-row:nth-child(2) { animation-delay: 0.15s; }
+.reveal.on .alert-row:nth-child(3), .reveal.on .doc-row:nth-child(3) { animation-delay: 0.25s; }
+.reveal.on .doc-row:nth-child(4) { animation-delay: 0.35s; }
+
 .chapter-media { position: relative; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
 .chapter-media img { width: 100%; height: 360px; object-fit: cover; opacity: 0.8; transition: opacity 0.7s, transform 0.7s; }
 .chapter-media:hover img { opacity: 1; transform: scale(1.03); }
@@ -489,7 +520,8 @@ footer { border-top: 1px solid var(--border); background: var(--bg); }
     .reveal { transition: none; opacity: 1; transform: none; }
     #navbar, .hero-kicker, .hero-lede, .hero-actions, .hero-stats, .hero-visual-inner,
     .hero-title .line span { animation: none !important; opacity: 1 !important; transform: none !important; }
-    .marquee-track, .radar-dot::before, .scanline, .grain-overlay, .hero-chip, .success-icon { animation: none !important; }
+    .marquee-track, .radar-dot::before, .scanline, .grain-overlay, .hero-chip, .success-icon, .aurora { animation: none !important; }
+    .reveal.on .alert-row, .reveal.on .doc-row { animation: none !important; opacity: 1; transform: none; }
 }
 </style>
 </head>
@@ -521,6 +553,10 @@ footer { border-top: 1px solid var(--border); background: var(--bg); }
   <div class="hero-bg" id="hero-bg">
     <img src="https://images.unsplash.com/photo-1760127831098-6a75c69ee79c?q=80&w=2000&auto=format&fit=crop" alt="Camion de nuit sur autoroute">
   </div>
+  <div class="hero-aurora" aria-hidden="true">
+    <span class="aurora a1"></span>
+    <span class="aurora a2"></span>
+  </div>
   <div class="hero-fade" aria-hidden="true"></div>
   <div class="scanline" aria-hidden="true"></div>
 
@@ -551,10 +587,10 @@ footer { border-top: 1px solid var(--border); background: var(--bg); }
         <a href="#fonctionnalites" class="btn-secondary">Voir les fonctionnalités</a>
       </div>
 
-      <div class="hero-stats">
-        <div><div class="value">2 400+</div><div class="label">véhicules suivis</div></div>
-        <div><div class="value">98,7 %</div><div class="label">d'échéances honorées</div></div>
-        <div><div class="value">0</div><div class="label">amende pour oubli</div></div>
+      <div class="hero-stats" id="hero-stats">
+        <div><div class="value" data-count="2400" data-suffix="+">0</div><div class="label">véhicules suivis</div></div>
+        <div><div class="value" data-count="98.7" data-decimals="1" data-suffix=" %">0</div><div class="label">d'échéances honorées</div></div>
+        <div><div class="value" data-count="0" data-suffix="">0</div><div class="label">amende pour oubli</div></div>
       </div>
     </div>
 
@@ -837,6 +873,48 @@ footer { border-top: 1px solid var(--border); background: var(--bg); }
     });
   }, { threshold: 0.15, rootMargin: '-80px' });
   els.forEach(function (el) { io.observe(el); });
+})();
+
+// ── HERO STATS COUNT-UP ──
+(function () {
+  var statsEl = document.getElementById('hero-stats');
+  if (!statsEl) return;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var values = statsEl.querySelectorAll('.value[data-count]');
+
+  function formatValue(el, val) {
+    var decimals = parseInt(el.dataset.decimals || '0', 10);
+    var suffix = el.dataset.suffix || '';
+    var text;
+    if (decimals) {
+      text = val.toFixed(decimals).replace('.', ',');
+    } else {
+      text = Math.round(val).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+    el.textContent = text + suffix;
+  }
+
+  function animateValue(el) {
+    var target = parseFloat(el.dataset.count);
+    if (reduced || !target) { formatValue(el, target || 0); return; }
+    var start = performance.now();
+    var duration = 1400;
+    function tick(now) {
+      var p = Math.min((now - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      formatValue(el, target * eased);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  if (!('IntersectionObserver' in window)) { values.forEach(function (el) { formatValue(el, parseFloat(el.dataset.count)); }); return; }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) { values.forEach(animateValue); io.unobserve(entry.target); }
+    });
+  }, { threshold: 0.4 });
+  io.observe(statsEl);
 })();
 
 // ── HERO BACKGROUND PARALLAX ──
