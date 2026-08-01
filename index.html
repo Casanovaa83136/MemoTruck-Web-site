@@ -439,13 +439,22 @@ img { max-width: 100%; display: block; }
 
 .app-showcase-slider {
     position: relative; z-index: 1; max-width: 420px; margin: 0 auto;
-    border-radius: 18px; overflow: hidden; border: 1px solid var(--border);
-    aspect-ratio: 4 / 3; background: var(--surface);
-    box-shadow: 0 0 60px rgba(6,182,212,0.18);
+    aspect-ratio: 4 / 3;
 }
-.app-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s var(--ease); }
-.app-slide.active { opacity: 1; }
+.app-slide {
+    position: absolute; inset: 0; border-radius: 18px; overflow: hidden;
+    border: 1px solid var(--border); background: var(--surface);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+    transition: transform 0.5s var(--ease), opacity 0.5s var(--ease), box-shadow 0.5s var(--ease);
+}
 .app-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.app-slide.stack-0 { transform: none; opacity: 1; z-index: 3; box-shadow: 0 0 60px rgba(6,182,212,0.18); }
+.app-slide.stack-1 { transform: translateY(-16px) scale(0.94) rotate(-2.5deg); opacity: 0.75; z-index: 2; }
+.app-slide.stack-2 { transform: translateY(-28px) scale(0.89) rotate(2.5deg); opacity: 0.45; z-index: 1; }
+.app-slide.leaving {
+    transform: translateY(36px) scale(0.92) rotate(-6deg); opacity: 0; z-index: 4;
+    transition: transform 0.45s var(--ease), opacity 0.4s var(--ease);
+}
 
 .app-showcase-dots { position: relative; z-index: 1; margin-top: 20px; display: flex; justify-content: center; gap: 8px; }
 .app-dot {
@@ -828,9 +837,9 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
       <div class="app-showcase-visual">
         <div class="app-showcase-glow" aria-hidden="true"></div>
         <div class="app-showcase-slider" id="app-showcase-slider">
-          <div class="app-slide active"><img src="assets/images/app-chauffeur-1.png" alt="Aperçu application chauffeur"></div>
-          <div class="app-slide"><img src="assets/images/app-chauffeur-2.png" alt="Aperçu application chauffeur"></div>
-          <div class="app-slide"><img src="assets/images/app-chauffeur-3.png" alt="Aperçu application chauffeur"></div>
+          <div class="app-slide stack-0"><img src="assets/images/app-chauffeur-1.png" alt="Aperçu application chauffeur"></div>
+          <div class="app-slide stack-1"><img src="assets/images/app-chauffeur-2.png" alt="Aperçu application chauffeur"></div>
+          <div class="app-slide stack-2"><img src="assets/images/app-chauffeur-3.png" alt="Aperçu application chauffeur"></div>
         </div>
         <div class="app-showcase-dots" id="app-showcase-dots">
           <button class="app-dot active" aria-label="Écran 1"></button>
@@ -1191,27 +1200,45 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
 
   var current = 'chauffeur';
   var switching = false;
-  var slideIndex = 0;
+  var order = [0, 1, 2];
   var slideTimer;
 
-  function showSlide(n) {
+  function applyStackClasses() {
     var slides = sliderEl.querySelectorAll('.app-slide');
     var dots = dotsWrap.querySelectorAll('.app-dot');
-    slides[slideIndex].classList.remove('active');
-    if (dots[slideIndex]) dots[slideIndex].classList.remove('active');
-    slideIndex = (n + slides.length) % slides.length;
-    slides[slideIndex].classList.add('active');
-    if (dots[slideIndex]) dots[slideIndex].classList.add('active');
+    slides.forEach(function (el) { el.classList.remove('stack-0', 'stack-1', 'stack-2', 'leaving'); });
+    dots.forEach(function (el) { el.classList.remove('active'); });
+    order.forEach(function (idx, pos) { slides[idx] && slides[idx].classList.add('stack-' + pos); });
+    if (dots[order[0]]) dots[order[0]].classList.add('active');
+  }
+
+  function cycleStack() {
+    var slides = sliderEl.querySelectorAll('.app-slide');
+    if (slides.length < 2) return;
+    var frontEl = slides[order[0]];
+    frontEl.classList.remove('stack-0');
+    frontEl.classList.add('leaving');
+    setTimeout(function () {
+      order.push(order.shift());
+      applyStackClasses();
+    }, 450);
+  }
+
+  function goToSlide(idx) {
+    var startPos = order.indexOf(idx);
+    if (startPos <= 0) return;
+    order = order.slice(startPos).concat(order.slice(0, startPos));
+    applyStackClasses();
   }
 
   function stopSlideTimer() { clearInterval(slideTimer); }
-  function startSlideTimer() { slideTimer = setInterval(function () { showSlide(slideIndex + 1); }, 3500); }
+  function startSlideTimer() { slideTimer = setInterval(cycleStack, 3500); }
 
   function wireDots() {
     dotsWrap.querySelectorAll('.app-dot').forEach(function (dot, idx) {
       dot.addEventListener('click', function () {
         stopSlideTimer();
-        showSlide(idx);
+        goToSlide(idx);
         startSlideTimer();
       });
     });
@@ -1220,12 +1247,13 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
   function renderSlides() {
     var d = DATA[current];
     sliderEl.innerHTML = d.images.map(function (src, i) {
-      return '<div class="app-slide' + (i === 0 ? ' active' : '') + '"><img src="' + src + '" alt="Aperçu application ' + current + '"></div>';
+      return '<div class="app-slide"><img src="' + src + '" alt="Aperçu application ' + current + '"></div>';
     }).join('');
     dotsWrap.innerHTML = d.images.map(function (_, i) {
-      return '<button class="app-dot' + (i === 0 ? ' active' : '') + '" aria-label="Écran ' + (i + 1) + '"></button>';
+      return '<button class="app-dot" aria-label="Écran ' + (i + 1) + '"></button>';
     }).join('');
-    slideIndex = 0;
+    order = d.images.map(function (_, i) { return i; });
+    applyStackClasses();
     wireDots();
     stopSlideTimer();
     startSlideTimer();
@@ -1268,8 +1296,7 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
     btn.addEventListener('click', function () { setSide(btn.dataset.side, btn); });
   });
 
-  wireDots();
-  startSlideTimer();
+  renderSlides();
   movePill(toggleWrap.querySelector('.app-toggle-btn.active'));
   window.addEventListener('resize', function () {
     movePill(toggleWrap.querySelector('.app-toggle-btn.active'));
