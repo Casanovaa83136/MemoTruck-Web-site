@@ -427,7 +427,9 @@ img { max-width: 100%; display: block; }
 .app-showcase { display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center; }
 @media (min-width: 900px) { .app-showcase { grid-template-columns: 1fr 1fr; gap: 64px; } }
 
-.app-showcase-visual { position: relative; }
+.app-showcase-visual { position: relative; transition: opacity 0.28s var(--ease), transform 0.28s var(--ease); }
+.app-showcase-info { transition: opacity 0.28s var(--ease), transform 0.28s var(--ease); }
+.app-showcase-visual.fading, .app-showcase-info.fading { opacity: 0; transform: translateY(10px); }
 .app-showcase-glow {
     position: absolute; inset: -15%; z-index: 0; pointer-events: none;
     background: radial-gradient(circle, rgba(6,182,212,0.35), rgba(6,182,212,0.06) 45%, transparent 70%);
@@ -1184,8 +1186,11 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
   var toggleWrap = document.getElementById('app-toggle');
   var pill = document.getElementById('app-toggle-pill');
   var buttons = toggleWrap.querySelectorAll('.app-toggle-btn');
+  var visualEl = root.querySelector('.app-showcase-visual');
+  var infoEl = root.querySelector('.app-showcase-info');
 
   var current = 'chauffeur';
+  var switching = false;
   var slideIndex = 0;
   var slideTimer;
 
@@ -1232,20 +1237,31 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
   }
 
   function setSide(side, btn) {
-    if (side === current) return;
-    current = side;
-    var d = DATA[side];
-    eyebrowEl.textContent = d.eyebrow;
-    titleEl.textContent = d.title;
-    descEl.textContent = d.desc;
-    boxEl.innerHTML = d.box.map(function (line) { return '<p>' + line + '</p>'; }).join('');
-    renderSlides();
+    if (side === current || switching) return;
+    switching = true;
+    movePill(btn);
     buttons.forEach(function (b) {
       var isActive = b === btn;
       b.classList.toggle('active', isActive);
       b.setAttribute('aria-selected', isActive ? 'true' : 'false');
     });
-    movePill(btn);
+
+    visualEl.classList.add('fading');
+    infoEl.classList.add('fading');
+
+    setTimeout(function () {
+      current = side;
+      var d = DATA[side];
+      eyebrowEl.textContent = d.eyebrow;
+      titleEl.textContent = d.title;
+      descEl.textContent = d.desc;
+      boxEl.innerHTML = d.box.map(function (line) { return '<p>' + line + '</p>'; }).join('');
+      renderSlides();
+
+      visualEl.classList.remove('fading');
+      infoEl.classList.remove('fading');
+      switching = false;
+    }, 280);
   }
 
   buttons.forEach(function (btn) {
