@@ -423,31 +423,61 @@ img { max-width: 100%; display: block; }
 
 /* ════ APPLICATION (chauffeur / bureau) ════ */
 #application { padding: 112px 0; background: rgba(5,11,24,0.82); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-.app-grid { display: grid; grid-template-columns: 1fr; gap: 64px; }
-@media (min-width: 900px) { .app-grid { grid-template-columns: 1fr 1fr; gap: 56px; } }
 
-.app-slider {
-    position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--border);
-    aspect-ratio: 4 / 3; background: var(--surface); cursor: pointer;
+.app-showcase { display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center; }
+@media (min-width: 900px) { .app-showcase { grid-template-columns: 1fr 1fr; gap: 64px; } }
+
+.app-showcase-visual { position: relative; }
+.app-showcase-glow {
+    position: absolute; inset: -15%; z-index: 0; pointer-events: none;
+    background: radial-gradient(circle, rgba(6,182,212,0.35), rgba(6,182,212,0.06) 45%, transparent 70%);
+    animation: showcase-pulse 5s ease-in-out infinite;
+}
+@keyframes showcase-pulse { 0%, 100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
+
+.app-showcase-slider {
+    position: relative; z-index: 1; max-width: 420px; margin: 0 auto;
+    border-radius: 18px; overflow: hidden; border: 1px solid var(--border);
+    aspect-ratio: 4 / 3; background: var(--surface);
+    box-shadow: 0 0 60px rgba(6,182,212,0.18);
 }
 .app-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s var(--ease); }
 .app-slide.active { opacity: 1; }
 .app-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.app-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 2; }
+
+.app-showcase-dots { position: relative; z-index: 1; margin-top: 20px; display: flex; justify-content: center; gap: 8px; }
 .app-dot {
-    width: 8px; height: 8px; border-radius: 999px; background: rgba(255,255,255,0.35);
+    width: 8px; height: 8px; border-radius: 999px; background: rgba(255,255,255,0.25);
     border: none; padding: 0; cursor: pointer; transition: background 0.3s, transform 0.3s;
 }
 .app-dot.active { background: var(--cyan); transform: scale(1.3); }
-.app-side.bureau .app-dot.active { background: var(--blue); }
 
-.app-side h3 { margin-top: 28px; font-size: clamp(1.5rem, 2.5vw, 1.875rem); font-weight: 700; }
-.app-side .feature-text { margin-top: 12px; }
-.app-points { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; padding: 0; list-style: none; }
-.app-points li { display: flex; align-items: center; gap: 10px; font-size: 0.9375rem; color: #cbd5e1; }
-.app-points svg { flex-shrink: 0; }
-.app-side .app-points svg { color: var(--cyan); }
-.app-side.bureau .app-points svg { color: var(--blue); }
+.app-showcase-info h3 { margin-top: 16px; font-size: clamp(1.5rem, 2.5vw, 1.875rem); font-weight: 700; }
+.app-showcase-info .feature-text { margin-top: 12px; }
+
+.app-info-box {
+    margin-top: 24px; padding: 20px 22px; border-radius: 14px;
+    border: 1px solid var(--border); background: rgba(15,23,42,0.5);
+}
+.app-info-box p { font-size: 0.9375rem; line-height: 1.6; color: #cbd5e1; }
+.app-info-box p + p { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
+
+.app-toggle {
+    position: relative; display: inline-flex; margin-top: 28px;
+    padding: 4px; border-radius: 999px; border: 1px solid var(--border);
+    background: rgba(15,23,42,0.6);
+}
+.app-toggle-pill {
+    position: absolute; top: 4px; bottom: 4px; left: 4px;
+    border-radius: 999px; background: var(--cyan);
+    transition: transform 0.4s var(--ease), width 0.4s var(--ease), left 0.4s var(--ease);
+}
+.app-toggle-btn {
+    position: relative; z-index: 1; padding: 10px 26px; border-radius: 999px;
+    font-family: var(--display); font-weight: 600; font-size: 0.875rem;
+    color: var(--muted); transition: color 0.3s;
+}
+.app-toggle-btn.active { color: var(--bg); }
 
 /* ════ CONTACT ════ */
 #contact { position: relative; padding: 112px 0; overflow: hidden; }
@@ -792,53 +822,41 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
       <h2>Une appli, deux usages.<br><span class="muted">Chauffeur et bureau.</span></h2>
     </div>
 
-    <div class="app-grid">
-      <div class="app-side reveal">
-        <div class="app-slider" data-slider>
-          <div class="app-slide active"><img src="assets/images/app-chauffeur-1.png" alt="Application chauffeur — écran 1"></div>
-          <div class="app-slide"><img src="assets/images/app-chauffeur-2.png" alt="Application chauffeur — écran 2"></div>
-          <div class="app-slide"><img src="assets/images/app-chauffeur-3.png" alt="Application chauffeur — écran 3"></div>
-          <div class="app-dots">
-            <button class="app-dot active" aria-label="Écran 1"></button>
-            <button class="app-dot" aria-label="Écran 2"></button>
-            <button class="app-dot" aria-label="Écran 3"></button>
-          </div>
+    <div class="app-showcase reveal">
+      <div class="app-showcase-visual">
+        <div class="app-showcase-glow" aria-hidden="true"></div>
+        <div class="app-showcase-slider" id="app-showcase-slider">
+          <div class="app-slide active"><img src="assets/images/app-chauffeur-1.png" alt="Aperçu application chauffeur"></div>
+          <div class="app-slide"><img src="assets/images/app-chauffeur-2.png" alt="Aperçu application chauffeur"></div>
+          <div class="app-slide"><img src="assets/images/app-chauffeur-3.png" alt="Aperçu application chauffeur"></div>
         </div>
-        <h3>Côté chauffeur</h3>
-        <p class="feature-text">
+        <div class="app-showcase-dots" id="app-showcase-dots">
+          <button class="app-dot active" aria-label="Écran 1"></button>
+          <button class="app-dot" aria-label="Écran 2"></button>
+          <button class="app-dot" aria-label="Écran 3"></button>
+        </div>
+      </div>
+
+      <div class="app-showcase-info">
+        <span class="eyebrow" id="app-showcase-eyebrow">Côté chauffeur</span>
+        <h3 id="app-showcase-title">Sur la route, sans y penser</h3>
+        <p class="feature-text" id="app-showcase-desc">
           L'application tient dans la poche. Elle prévient chaque conducteur avant
           l'expiration d'un document important, lui permet d'envoyer ses papiers en
           photo en quelques secondes, et affiche en un coup d'œil l'état de son véhicule.
         </p>
-        <ul class="app-points">
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> Rappels automatiques : contrôle technique, visite médicale, permis</li>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg> Envoi de documents en photo, sans scanner ni imprimante</li>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Suivi du véhicule assigné et de son historique d'entretien</li>
-        </ul>
-      </div>
 
-      <div class="app-side bureau reveal d1">
-        <div class="app-slider" data-slider>
-          <div class="app-slide active"><img src="assets/images/app-bureau-1.png" alt="Application bureau — écran 1"></div>
-          <div class="app-slide"><img src="assets/images/app-bureau-2.png" alt="Application bureau — écran 2"></div>
-          <div class="app-slide"><img src="assets/images/app-bureau-3.png" alt="Application bureau — écran 3"></div>
-          <div class="app-dots">
-            <button class="app-dot active" aria-label="Écran 1"></button>
-            <button class="app-dot" aria-label="Écran 2"></button>
-            <button class="app-dot" aria-label="Écran 3"></button>
-          </div>
+        <div class="app-info-box" id="app-showcase-box">
+          <p>Rappels automatiques : contrôle technique, visite médicale, permis.</p>
+          <p>Envoi de documents en photo, sans scanner ni imprimante.</p>
+          <p>Suivi du véhicule assigné et de son historique d'entretien.</p>
         </div>
-        <h3>Côté bureau</h3>
-        <p class="feature-text">
-          Le gestionnaire de flotte pilote toute son activité depuis un tableau de bord
-          unique : chaque véhicule, chaque conducteur, chaque échéance à surveiller,
-          classés et priorisés automatiquement.
-        </p>
-        <ul class="app-points">
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> Vue d'ensemble de la flotte et des alertes en cours</li>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg> Historique et export des documents en un clic</li>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg> Attribution des véhicules et suivi des conducteurs</li>
-        </ul>
+
+        <div class="app-toggle" id="app-toggle" role="tablist" aria-label="Choisir la vue">
+          <span class="app-toggle-pill" id="app-toggle-pill"></span>
+          <button class="app-toggle-btn active" data-side="chauffeur" role="tab" aria-selected="true">Chauffeur</button>
+          <button class="app-toggle-btn" data-side="bureau" role="tab" aria-selected="false">Bureau</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1127,31 +1145,118 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
   els.forEach(function (el) { io.observe(el); });
 })();
 
-// ── APP SHOWCASE SLIDERS ──
+// ── APP SHOWCASE (chauffeur / bureau toggle) ──
 (function () {
-  document.querySelectorAll('[data-slider]').forEach(function (root) {
-    var slides = root.querySelectorAll('.app-slide');
-    var dots = root.querySelectorAll('.app-dot');
-    var i = 0;
-    var timer;
+  var root = document.getElementById('application');
+  if (!root) return;
 
-    function show(n) {
-      slides[i].classList.remove('active');
-      if (dots[i]) dots[i].classList.remove('active');
-      i = (n + slides.length) % slides.length;
-      slides[i].classList.add('active');
-      if (dots[i]) dots[i].classList.add('active');
+  var DATA = {
+    chauffeur: {
+      eyebrow: 'Côté chauffeur',
+      title: 'Sur la route, sans y penser',
+      desc: "L'application tient dans la poche. Elle prévient chaque conducteur avant l'expiration d'un document important, lui permet d'envoyer ses papiers en photo en quelques secondes, et affiche en un coup d'œil l'état de son véhicule.",
+      box: [
+        'Rappels automatiques : contrôle technique, visite médicale, permis.',
+        'Envoi de documents en photo, sans scanner ni imprimante.',
+        "Suivi du véhicule assigné et de son historique d'entretien."
+      ],
+      images: ['assets/images/app-chauffeur-1.png', 'assets/images/app-chauffeur-2.png', 'assets/images/app-chauffeur-3.png']
+    },
+    bureau: {
+      eyebrow: 'Côté bureau',
+      title: "Toute la flotte, en un coup d'œil",
+      desc: "Le gestionnaire de flotte pilote toute son activité depuis un tableau de bord unique : chaque véhicule, chaque conducteur, chaque échéance à surveiller, classés et priorisés automatiquement.",
+      box: [
+        "Vue d'ensemble de la flotte et des alertes en cours.",
+        'Historique et export des documents en un clic.',
+        'Attribution des véhicules et suivi des conducteurs.'
+      ],
+      images: ['assets/images/app-bureau-1.png', 'assets/images/app-bureau-2.png', 'assets/images/app-bureau-3.png']
     }
+  };
 
-    function start() { timer = setInterval(function () { show(i + 1); }, 3500); }
-    function stop() { clearInterval(timer); }
+  var eyebrowEl = document.getElementById('app-showcase-eyebrow');
+  var titleEl = document.getElementById('app-showcase-title');
+  var descEl = document.getElementById('app-showcase-desc');
+  var boxEl = document.getElementById('app-showcase-box');
+  var sliderEl = document.getElementById('app-showcase-slider');
+  var dotsWrap = document.getElementById('app-showcase-dots');
+  var toggleWrap = document.getElementById('app-toggle');
+  var pill = document.getElementById('app-toggle-pill');
+  var buttons = toggleWrap.querySelectorAll('.app-toggle-btn');
 
-    dots.forEach(function (dot, idx) {
-      dot.addEventListener('click', function () { stop(); show(idx); start(); });
+  var current = 'chauffeur';
+  var slideIndex = 0;
+  var slideTimer;
+
+  function showSlide(n) {
+    var slides = sliderEl.querySelectorAll('.app-slide');
+    var dots = dotsWrap.querySelectorAll('.app-dot');
+    slides[slideIndex].classList.remove('active');
+    if (dots[slideIndex]) dots[slideIndex].classList.remove('active');
+    slideIndex = (n + slides.length) % slides.length;
+    slides[slideIndex].classList.add('active');
+    if (dots[slideIndex]) dots[slideIndex].classList.add('active');
+  }
+
+  function stopSlideTimer() { clearInterval(slideTimer); }
+  function startSlideTimer() { slideTimer = setInterval(function () { showSlide(slideIndex + 1); }, 3500); }
+
+  function wireDots() {
+    dotsWrap.querySelectorAll('.app-dot').forEach(function (dot, idx) {
+      dot.addEventListener('click', function () {
+        stopSlideTimer();
+        showSlide(idx);
+        startSlideTimer();
+      });
     });
-    root.addEventListener('mouseenter', stop);
-    root.addEventListener('mouseleave', start);
-    start();
+  }
+
+  function renderSlides() {
+    var d = DATA[current];
+    sliderEl.innerHTML = d.images.map(function (src, i) {
+      return '<div class="app-slide' + (i === 0 ? ' active' : '') + '"><img src="' + src + '" alt="Aperçu application ' + current + '"></div>';
+    }).join('');
+    dotsWrap.innerHTML = d.images.map(function (_, i) {
+      return '<button class="app-dot' + (i === 0 ? ' active' : '') + '" aria-label="Écran ' + (i + 1) + '"></button>';
+    }).join('');
+    slideIndex = 0;
+    wireDots();
+    stopSlideTimer();
+    startSlideTimer();
+  }
+
+  function movePill(btn) {
+    pill.style.width = btn.offsetWidth + 'px';
+    pill.style.left = btn.offsetLeft + 'px';
+  }
+
+  function setSide(side, btn) {
+    if (side === current) return;
+    current = side;
+    var d = DATA[side];
+    eyebrowEl.textContent = d.eyebrow;
+    titleEl.textContent = d.title;
+    descEl.textContent = d.desc;
+    boxEl.innerHTML = d.box.map(function (line) { return '<p>' + line + '</p>'; }).join('');
+    renderSlides();
+    buttons.forEach(function (b) {
+      var isActive = b === btn;
+      b.classList.toggle('active', isActive);
+      b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    movePill(btn);
+  }
+
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () { setSide(btn.dataset.side, btn); });
+  });
+
+  wireDots();
+  startSlideTimer();
+  movePill(toggleWrap.querySelector('.app-toggle-btn.active'));
+  window.addEventListener('resize', function () {
+    movePill(toggleWrap.querySelector('.app-toggle-btn.active'));
   });
 })();
 
