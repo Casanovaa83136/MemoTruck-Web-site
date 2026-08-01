@@ -391,8 +391,8 @@ img { max-width: 100%; display: block; }
 .reveal.on .alert-row:nth-child(3), .reveal.on .doc-row:nth-child(3) { animation-delay: 0.25s; }
 .reveal.on .doc-row:nth-child(4) { animation-delay: 0.35s; }
 
-.chapter-media { position: relative; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
-.chapter-media img { width: 100%; height: 360px; object-fit: cover; opacity: 0.8; transition: opacity 0.7s, transform 0.7s; }
+.chapter-media { position: relative; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; background: var(--surface); }
+.chapter-media img { width: 100%; height: 360px; object-fit: contain; opacity: 0.8; transition: opacity 0.7s, transform 0.7s; }
 .chapter-media:hover img { opacity: 1; transform: scale(1.03); }
 .chapter-media:hover { border-color: rgba(6,182,212,0.4); }
 .chapter-media::after { content:''; position:absolute; inset:0; background: linear-gradient(to top, rgba(3,7,18,0.8), transparent 60%); }
