@@ -167,6 +167,24 @@ img { max-width: 100%; display: block; }
     90%, 100% { opacity: 0; }
 }
 
+.hero-truck {
+    position: absolute; top: 50%; left: -55%;
+    width: min(78vw, 920px);
+    transform: translateY(-52%);
+    z-index: 5; pointer-events: none;
+    filter: drop-shadow(0 30px 50px rgba(0,0,0,0.55));
+    animation: truck-drive-by 11s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+    animation-delay: 1.6s;
+}
+.hero-truck svg { width: 100%; height: auto; display: block; }
+@keyframes truck-drive-by {
+    0% { left: -65%; opacity: 0; }
+    4% { opacity: 1; }
+    42% { left: 115%; opacity: 1; }
+    46% { opacity: 0; }
+    100% { left: -65%; opacity: 0; }
+}
+
 .hero-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -619,6 +637,48 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
   </div>
   <div class="hero-fade" aria-hidden="true"></div>
   <div class="scanline" aria-hidden="true"></div>
+
+  <div class="hero-truck" aria-hidden="true">
+    <svg viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="truckBody" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f1f5f9"/>
+          <stop offset="100%" stop-color="#94a3b8"/>
+        </linearGradient>
+        <linearGradient id="truckCab" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#334155"/>
+          <stop offset="100%" stop-color="#0f172a"/>
+        </linearGradient>
+      </defs>
+
+      <rect x="20" y="50" width="660" height="120" rx="16" fill="url(#truckBody)" stroke="#0f172a" stroke-width="3"/>
+      <g stroke="#64748b" stroke-width="2" opacity="0.45">
+        <line x1="100" y1="56" x2="100" y2="164"/>
+        <line x1="180" y1="56" x2="180" y2="164"/>
+        <line x1="260" y1="56" x2="260" y2="164"/>
+        <line x1="340" y1="56" x2="340" y2="164"/>
+        <line x1="420" y1="56" x2="420" y2="164"/>
+        <line x1="500" y1="56" x2="500" y2="164"/>
+        <line x1="580" y1="56" x2="580" y2="164"/>
+      </g>
+
+      <path d="M680,50 h130 a48,48 0 0 1 48,48 v24 a48,48 0 0 1 -48,48 h-130 z" fill="url(#truckCab)" stroke="#0f172a" stroke-width="3"/>
+      <rect x="742" y="72" width="88" height="76" rx="10" fill="#22d3ee" opacity="0.8"/>
+
+      <g fill="#0f172a">
+        <rect x="90" y="32" width="34" height="14" rx="4"/>
+        <rect x="90" y="174" width="34" height="14" rx="4"/>
+        <rect x="230" y="32" width="34" height="14" rx="4"/>
+        <rect x="230" y="174" width="34" height="14" rx="4"/>
+        <rect x="370" y="32" width="34" height="14" rx="4"/>
+        <rect x="370" y="174" width="34" height="14" rx="4"/>
+        <rect x="510" y="32" width="34" height="14" rx="4"/>
+        <rect x="510" y="174" width="34" height="14" rx="4"/>
+        <rect x="740" y="30" width="34" height="16" rx="4"/>
+        <rect x="740" y="174" width="34" height="16" rx="4"/>
+      </g>
+    </svg>
+  </div>
 
   <div class="container hero-grid">
     <div>
