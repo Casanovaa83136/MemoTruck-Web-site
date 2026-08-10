@@ -112,7 +112,8 @@ img { max-width: 100%; display: block; }
 .logo:hover .logo-badge { box-shadow: 0 0 28px rgba(6,182,212,0.5); }
 .logo-text { font-family: var(--display); font-weight: 800; font-size: 1.125rem; letter-spacing: -0.02em; }
 .logo-text .accent { color: var(--cyan); }
-.nav-links { display: none; align-items: center; gap: 40px; }
+.nav-links { display: none; align-items: center; gap: 30px; }
+@media (min-width: 900px) { .nav-links { gap: 40px; } }
 .nav-link {
     font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.2em;
     text-transform: uppercase; color: var(--muted); transition: color 0.3s;
@@ -174,13 +175,17 @@ img { max-width: 100%; display: block; }
 .flyer {
     position: absolute; top: 0; left: 0;
     opacity: 0;
-    filter: drop-shadow(0 18px 30px rgba(0,0,0,0.5));
-    transition: opacity 0.3s ease;
+    filter: drop-shadow(0 0 16px rgba(34,211,238,0.32)) drop-shadow(0 18px 30px rgba(0,0,0,0.5));
+    transition: opacity 0.35s ease, filter 0.35s ease;
     will-change: transform, opacity;
 }
 .flyer svg { width: 100%; height: auto; display: block; }
 .flyer-doc { width: min(8vw, 84px); }
 .flyer-phone { width: min(5.5vw, 56px); }
+/* Depth tiers: nearer flyers glow brighter and stay crisp, farther ones
+   soften slightly — reinforces the parallax instead of just faking it. */
+.flyer[data-depth="1"] { filter: drop-shadow(0 0 24px rgba(34,211,238,0.42)) drop-shadow(0 20px 34px rgba(0,0,0,0.55)); }
+.flyer[data-depth="3"] { filter: blur(0.5px) drop-shadow(0 0 10px rgba(34,211,238,0.18)) drop-shadow(0 14px 22px rgba(0,0,0,0.4)); }
 
 .hero-grid {
     display: grid;
@@ -230,7 +235,8 @@ img { max-width: 100%; display: block; }
     display: inline-flex; align-items: center; gap: 8px;
     padding: 16px 28px; border-radius: 999px;
     font-family: var(--display);
-    transition: color 0.4s ease, transform 0.3s, box-shadow 0.3s, border-color 0.4s ease;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.4s ease, transform 0.15s ease, box-shadow 0.3s, border-color 0.4s ease;
 }
 .btn-primary::before, .btn-secondary::before {
     content: ''; position: absolute; inset: 0; z-index: -1;
@@ -416,6 +422,103 @@ img { max-width: 100%; display: block; }
 .doc-row span { font-size: 0.875rem; color: #cbd5e1; }
 .doc-row svg { color: var(--emerald); flex-shrink: 0; }
 
+/* ════ DEMO (live animated stage) ════ */
+#demo { padding: 112px 0; background: rgba(3,7,18,0.82); border-top: 1px solid var(--border); }
+
+.demo-stage {
+    position: relative; border-radius: 20px; border: 1px solid rgba(6,182,212,0.25);
+    background: linear-gradient(160deg, #0a1322, #050b18 65%);
+    box-shadow: 0 0 70px rgba(6,182,212,0.14), inset 0 1px 0 rgba(255,255,255,0.04);
+    overflow: hidden;
+}
+.demo-canvas-wrap { position: relative; aspect-ratio: 16/8; width: 100%; }
+@media (max-width: 640px) { .demo-canvas-wrap { aspect-ratio: 4/5; } }
+#demo-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: pointer; }
+
+.demo-hud-top {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 3;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px; pointer-events: none;
+}
+.demo-live {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: #fca5a5; padding: 6px 12px; border-radius: 999px;
+    background: rgba(15,23,42,0.65); border: 1px solid rgba(248,113,113,0.35);
+    backdrop-filter: blur(10px);
+}
+.demo-live-dot { width: 6px; height: 6px; border-radius: 999px; background: #f87171; animation: demo-live-blink 1.6s ease-in-out infinite; }
+@keyframes demo-live-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+.demo-caption {
+    font-family: var(--mono); font-size: 0.6875rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted-2);
+}
+
+.demo-play-btn {
+    position: absolute; top: 50%; left: 50%; z-index: 4; overflow: hidden;
+    width: 76px; height: 76px; border-radius: 999px; transform: translate(-50%, -50%);
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(3,7,18,0.55); border: 1.5px solid rgba(255,255,255,0.35);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    color: #fff; box-shadow: 0 0 40px rgba(6,182,212,0.35);
+    transition: transform 0.3s var(--ease), background 0.3s, border-color 0.3s, opacity 0.4s;
+    -webkit-tap-highlight-color: transparent;
+}
+.demo-play-btn:hover { transform: translate(-50%, -50%) scale(1.08); border-color: var(--cyan); background: rgba(6,182,212,0.15); }
+.demo-play-btn:active { transform: translate(-50%, -50%) scale(0.94) !important; }
+.demo-play-btn svg { position: relative; }
+.demo-play-btn .icon-play { margin-left: 4px; }
+.demo-stage.is-playing .demo-play-btn { opacity: 0; }
+.demo-stage.is-playing:hover .demo-play-btn,
+.demo-stage.is-playing .demo-play-btn:focus-visible { opacity: 1; }
+.demo-stage.is-playing .demo-play-btn .icon-play { display: none; }
+.demo-stage:not(.is-playing) .demo-play-btn .icon-pause { display: none; }
+
+.demo-callout {
+    position: absolute; z-index: 3; display: flex; align-items: center; gap: 10px;
+    padding: 9px 14px; border-radius: 999px; background: rgba(15,23,42,0.85);
+    backdrop-filter: blur(16px); border: 1px solid rgba(6,182,212,0.35);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    font-size: 0.75rem; color: #e2e8f0; white-space: nowrap;
+    opacity: 0; transform: translateY(8px) scale(0.92);
+    transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+    pointer-events: none;
+}
+.demo-callout.on { opacity: 1; transform: translateY(0) scale(1); }
+.demo-callout .dot { width: 8px; height: 8px; border-radius: 999px; flex-shrink: 0; }
+.demo-callout .time { font-family: var(--mono); font-weight: 700; }
+
+.demo-hud-bottom {
+    position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
+    padding: 18px 24px 20px;
+    background: linear-gradient(to top, rgba(3,7,18,0.75), transparent);
+}
+.demo-scrubber { position: relative; height: 3px; border-radius: 999px; background: rgba(255,255,255,0.15); overflow: hidden; }
+.demo-scrubber-fill {
+    position: absolute; inset: 0; width: 0%; border-radius: 999px;
+    background: linear-gradient(90deg, #67e8f9, #22d3ee, #3b82f6);
+}
+.demo-time-row {
+    margin-top: 10px; display: flex; align-items: center; justify-content: space-between;
+    font-family: var(--mono); font-size: 0.6875rem; color: var(--muted-2);
+}
+
+.demo-below {
+    margin-top: 40px; display: grid; grid-template-columns: 1fr; gap: 16px;
+}
+@media (min-width: 768px) { .demo-below { grid-template-columns: repeat(3, 1fr); } }
+.demo-stat {
+    display: flex; align-items: center; gap: 14px;
+    padding: 18px 20px; border-radius: 14px; border: 1px solid var(--border);
+    background: rgba(15,23,42,0.5);
+}
+.demo-stat .icon-wrap {
+    padding: 9px; border-radius: 9px; background: rgba(6,182,212,0.1); color: var(--cyan);
+    border: 1px solid rgba(6,182,212,0.2); display: flex; flex-shrink: 0;
+}
+.demo-stat .title { font-size: 0.875rem; font-weight: 600; color: #e2e8f0; }
+.demo-stat .sub { margin-top: 2px; font-size: 0.75rem; color: var(--muted-2); }
+
 /* ════ APPLICATION (chauffeur / bureau) ════ */
 #application { padding: 112px 0; background: rgba(5,11,24,0.82); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 
@@ -479,10 +582,13 @@ img { max-width: 100%; display: block; }
     transition: transform 0.4s var(--ease), width 0.4s var(--ease), left 0.4s var(--ease);
 }
 .app-toggle-btn {
-    position: relative; z-index: 1; padding: 10px 26px; border-radius: 999px;
+    position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 7px;
+    padding: 10px 22px; border-radius: 999px;
     font-family: var(--display); font-weight: 600; font-size: 0.875rem;
     color: var(--muted); transition: color 0.3s;
 }
+.app-toggle-btn svg { flex-shrink: 0; opacity: 0.85; transition: opacity 0.3s; }
+.app-toggle-btn.active svg { opacity: 1; }
 .app-toggle-btn.active { color: var(--bg); }
 
 /* ════ CONTACT ════ */
@@ -582,7 +688,7 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
 }
 @media (min-width: 768px) { .footer-main { flex-direction: row; align-items: center; } }
 .footer-tag { font-size: 0.875rem; color: var(--muted-2); max-width: 420px; }
-.footer-links { display: flex; align-items: center; gap: 32px; }
+.footer-links { display: flex; align-items: center; flex-wrap: wrap; gap: 20px 32px; }
 .footer-links button {
     font-family: var(--mono); font-size: 0.6875rem; letter-spacing: 0.2em; text-transform: uppercase;
     color: var(--muted-2); transition: color 0.3s;
@@ -598,6 +704,30 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
 
 /* Animations are intentionally always-on for every visitor, regardless of the
    prefers-reduced-motion preference — a deliberate choice for this site. */
+
+/* ════ BUTTON CLICK FEEDBACK ════
+   Declared last on purpose: the :active states below must win the cascade
+   over the :hover rules defined earlier for the same buttons (equal
+   specificity, so source order decides), otherwise a hover-then-press
+   never shows the press. */
+.btn-primary, .btn-secondary, .btn-submit, .app-toggle-btn, .app-dot, .demo-play-btn {
+    -webkit-tap-highlight-color: transparent;
+}
+.btn-primary:active, .btn-secondary:active { transform: translateY(-1px) scale(0.96) !important; }
+.btn-submit:active:not(:disabled) { transform: scale(0.97) !important; }
+.app-toggle-btn { position: relative; overflow: hidden; }
+.app-toggle-btn:active { transform: scale(0.95); }
+.app-dot:active { transform: scale(0.75); }
+
+.click-ripple {
+    position: absolute; border-radius: 999px; pointer-events: none;
+    background: radial-gradient(circle, rgba(255,255,255,0.55), rgba(255,255,255,0) 70%);
+    mix-blend-mode: overlay;
+    transform: scale(0);
+    animation: ripple-out 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.btn-secondary .click-ripple { mix-blend-mode: normal; background: radial-gradient(circle, rgba(103,232,249,0.5), rgba(103,232,249,0) 70%); }
+@keyframes ripple-out { to { transform: scale(1); opacity: 0; } }
 </style>
 </head>
 <body>
@@ -615,6 +745,7 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
     </a>
     <nav class="nav-links">
       <a href="#fonctionnalites" class="nav-link">Fonctionnalités</a>
+      <a href="#demo" class="nav-link">Démo</a>
       <a href="#application" class="nav-link">L'application</a>
       <a href="#contact" class="nav-link">Contact</a>
     </nav>
@@ -636,7 +767,7 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
   <div class="scanline" aria-hidden="true"></div>
 
   <div class="hero-flyers" aria-hidden="true">
-    <div class="flyer flyer-doc" data-from="-20" data-to="120" data-top="22" data-rot-from="-18" data-rot-to="14" data-window="0,0.5">
+    <div class="flyer flyer-doc" data-depth="1" data-parallax="22" data-from="-20" data-to="120" data-top="22" data-rot-from="-18" data-rot-to="14" data-window="0,0.5">
       <svg viewBox="0 0 100 128" xmlns="http://www.w3.org/2000/svg">
         <path d="M8,4 h64 l20,20 v100 a4,4 0 0 1 -4,4 h-80 a4,4 0 0 1 -4,-4 v-116 a4,4 0 0 1 4,-4 z" fill="#f1f5f9" stroke="#0f172a" stroke-width="3"/>
         <path d="M72,4 v20 h20 z" fill="#cbd5e1" stroke="#0f172a" stroke-width="3"/>
@@ -650,7 +781,7 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
       </svg>
     </div>
 
-    <div class="flyer flyer-phone" data-from="120" data-to="-20" data-top="58" data-rot-from="12" data-rot-to="-16" data-window="0.15,0.65">
+    <div class="flyer flyer-phone" data-depth="2" data-parallax="14" data-from="120" data-to="-20" data-top="58" data-rot-from="12" data-rot-to="-16" data-window="0.15,0.65">
       <svg viewBox="0 0 70 138" xmlns="http://www.w3.org/2000/svg">
         <rect x="3" y="3" width="64" height="132" rx="14" fill="#0f172a" stroke="#334155" stroke-width="3"/>
         <rect x="10" y="16" width="50" height="96" rx="4" fill="#0b1220"/>
@@ -663,7 +794,7 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
       </svg>
     </div>
 
-    <div class="flyer flyer-doc" data-from="-20" data-to="120" data-top="40" data-rot-from="10" data-rot-to="-15" data-window="0.3,0.8">
+    <div class="flyer flyer-doc" data-depth="3" data-parallax="8" data-from="-20" data-to="120" data-top="40" data-rot-from="10" data-rot-to="-15" data-window="0.3,0.8">
       <svg viewBox="0 0 100 128" xmlns="http://www.w3.org/2000/svg">
         <path d="M8,4 h64 l20,20 v100 a4,4 0 0 1 -4,4 h-80 a4,4 0 0 1 -4,-4 v-116 a4,4 0 0 1 4,-4 z" fill="#f1f5f9" stroke="#0f172a" stroke-width="3"/>
         <path d="M72,4 v20 h20 z" fill="#cbd5e1" stroke="#0f172a" stroke-width="3"/>
@@ -677,7 +808,7 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
       </svg>
     </div>
 
-    <div class="flyer flyer-phone" data-from="120" data-to="-20" data-top="70" data-rot-from="-14" data-rot-to="18" data-window="0.45,0.95">
+    <div class="flyer flyer-phone" data-depth="1" data-parallax="20" data-from="120" data-to="-20" data-top="70" data-rot-from="-14" data-rot-to="18" data-window="0.45,0.95">
       <svg viewBox="0 0 70 138" xmlns="http://www.w3.org/2000/svg">
         <rect x="3" y="3" width="64" height="132" rx="14" fill="#0f172a" stroke="#334155" stroke-width="3"/>
         <rect x="10" y="16" width="50" height="96" rx="4" fill="#0b1220"/>
@@ -690,7 +821,7 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
       </svg>
     </div>
 
-    <div class="flyer flyer-doc" data-from="-20" data-to="120" data-top="30" data-rot-from="-12" data-rot-to="16" data-window="0.55,1">
+    <div class="flyer flyer-doc" data-depth="2" data-parallax="12" data-from="-20" data-to="120" data-top="30" data-rot-from="-12" data-rot-to="16" data-window="0.55,1">
       <svg viewBox="0 0 100 128" xmlns="http://www.w3.org/2000/svg">
         <path d="M8,4 h64 l20,20 v100 a4,4 0 0 1 -4,4 h-80 a4,4 0 0 1 -4,-4 v-116 a4,4 0 0 1 4,-4 z" fill="#f1f5f9" stroke="#0f172a" stroke-width="3"/>
         <path d="M72,4 v20 h20 z" fill="#cbd5e1" stroke="#0f172a" stroke-width="3"/>
@@ -889,6 +1020,58 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
   </div>
 </section>
 
+<!-- ════ DEMO (live animated stage) ════ -->
+<section id="demo">
+  <div class="container">
+    <div class="features-head reveal">
+      <span class="eyebrow">En direct</span>
+      <h2>Pas une capture d'écran.<br><span class="muted">Une flotte qui vit.</span></h2>
+    </div>
+
+    <div class="demo-stage reveal" id="demo-stage">
+      <div class="demo-canvas-wrap">
+        <canvas id="demo-canvas" role="img" aria-label="Simulation animée d'une flotte suivie par MémoTruck, avec une alerte qui se déclenche en temps réel"></canvas>
+
+        <div class="demo-hud-top">
+          <span class="demo-live"><span class="demo-live-dot"></span>En direct</span>
+          <span class="demo-caption">Simulation · flotte de démonstration</span>
+        </div>
+
+        <div class="demo-callouts" id="demo-callouts" aria-hidden="true"></div>
+
+        <button type="button" class="demo-play-btn" id="demo-play-btn" aria-label="Lire la simulation">
+          <svg class="icon-play" width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <svg class="icon-pause" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+        </button>
+
+        <div class="demo-hud-bottom">
+          <div class="demo-scrubber"><div class="demo-scrubber-fill" id="demo-scrubber-fill"></div></div>
+          <div class="demo-time-row">
+            <span id="demo-time-elapsed">0:00</span>
+            <span id="demo-time-label">FR-482-XK · en tournée</span>
+            <span id="demo-time-total">0:12</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-below">
+      <div class="demo-stat reveal">
+        <span class="icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></svg></span>
+        <div><div class="title">Alerte déclenchée en 0,4 s</div><div class="sub">Dès qu'un document ou un trajet le justifie</div></div>
+      </div>
+      <div class="demo-stat reveal d1">
+        <span class="icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+        <div><div class="title">Position rafraîchie toutes les 30 s</div><div class="sub">Chaque véhicule suivi, sans intervention</div></div>
+      </div>
+      <div class="demo-stat reveal d2">
+        <span class="icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/><path d="m9 13 2 2 4-4"/></svg></span>
+        <div><div class="title">Document exporté en un clic</div><div class="sub">Prêt à présenter, en pleine tournée</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ════ APPLICATION (chauffeur / bureau) ════ -->
 <section id="application">
   <div class="container">
@@ -929,9 +1112,18 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
 
         <div class="app-toggle" id="app-toggle" role="tablist" aria-label="Choisir la vue">
           <span class="app-toggle-pill" id="app-toggle-pill"></span>
-          <button class="app-toggle-btn active" data-side="chauffeur" role="tab" aria-selected="true">Chauffeur</button>
-          <button class="app-toggle-btn" data-side="bureau" role="tab" aria-selected="false">Bureau</button>
-          <button class="app-toggle-btn" data-side="atelier" role="tab" aria-selected="false">Atelier</button>
+          <button class="app-toggle-btn active" data-side="chauffeur" role="tab" aria-selected="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+            Chauffeur
+          </button>
+          <button class="app-toggle-btn" data-side="bureau" role="tab" aria-selected="false">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+            Bureau
+          </button>
+          <button class="app-toggle-btn" data-side="atelier" role="tab" aria-selected="false">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4l-5.6 5.6a1.5 1.5 0 0 0 2.1 2.1l5.6-5.6a4 4 0 0 0 5.4-5.4l-2.5 2.5-2-2Z"/></svg>
+            Atelier
+          </button>
         </div>
       </div>
     </div>
@@ -1040,6 +1232,7 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
     </p>
     <div class="footer-links">
       <a href="#fonctionnalites">Fonctionnalités</a>
+      <a href="#demo">Démo</a>
       <a href="#application">L'application</a>
       <a href="#contact">Contact</a>
     </div>
@@ -1368,8 +1561,39 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
     }, 280);
   }
 
+  // Some browsers occasionally re-scroll the page toward a focused control
+  // once its surrounding content resizes (seen here right after this toggle
+  // swaps in new text/slides). Guard against it: if scrollY jumps by a lot
+  // right after a tap with no wheel/touch/key scroll from the visitor in
+  // between, put it back where they left it.
+  function guardScrollPosition() {
+    var lockY = window.scrollY;
+    var userScrolled = false;
+    function markUserScroll() { userScrolled = true; cleanup(); }
+    function onScroll() {
+      if (userScrolled) return;
+      if (Math.abs(window.scrollY - lockY) > 150) {
+        window.scrollTo({ top: lockY, left: 0, behavior: 'instant' });
+      }
+    }
+    function cleanup() {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('wheel', markUserScroll);
+      window.removeEventListener('touchmove', markUserScroll);
+      window.removeEventListener('keydown', markUserScroll);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('wheel', markUserScroll, { passive: true });
+    window.addEventListener('touchmove', markUserScroll, { passive: true });
+    window.addEventListener('keydown', markUserScroll);
+    setTimeout(cleanup, 900);
+  }
+
   buttons.forEach(function (btn) {
-    btn.addEventListener('click', function () { setSide(btn.dataset.side, btn); });
+    btn.addEventListener('click', function () {
+      guardScrollPosition();
+      setSide(btn.dataset.side, btn);
+    });
   });
 
   renderSlides();
@@ -1447,10 +1671,15 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
       top: Number(el.dataset.top),
       rotFrom: Number(el.dataset.rotFrom),
       rotTo: Number(el.dataset.rotTo),
+      parallax: Number(el.dataset.parallax) || 0,
       winStart: win[0],
       winEnd: win[1]
     };
   });
+
+  // Mouse position drifts the flyers a little extra on top of the scroll
+  // path, each by its own strength (data-parallax) — nearer ones drift more.
+  var mx = 0, my = 0;
 
   function update() {
     var rect = hero.getBoundingClientRect();
@@ -1463,15 +1692,24 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
       var left = f.from + (f.to - f.from) * local;
       var rot = f.rotFrom + (f.rotTo - f.rotFrom) * local;
       var bob = Math.sin(local * Math.PI) * -18;
+      var px = mx * f.parallax;
+      var py = my * f.parallax * 0.6;
       f.el.style.left = left + '%';
       f.el.style.top = f.top + '%';
-      f.el.style.transform = 'translateY(' + bob + 'px) rotate(' + rot + 'deg)';
+      f.el.style.transform = 'translate(' + px + 'px, ' + (bob + py) + 'px) rotate(' + rot + 'deg)';
       f.el.style.opacity = visible ? 1 : 0;
     });
   }
 
   window.addEventListener('scroll', update, { passive: true });
   window.addEventListener('resize', update, { passive: true });
+  hero.addEventListener('mousemove', function (e) {
+    var r = hero.getBoundingClientRect();
+    mx = (e.clientX - r.left) / r.width - 0.5;
+    my = (e.clientY - r.top) / r.height - 0.5;
+    update();
+  }, { passive: true });
+  hero.addEventListener('mouseleave', function () { mx = 0; my = 0; update(); });
   update();
 })();
 
@@ -1523,6 +1761,226 @@ footer { border-top: 1px solid var(--border); background: rgba(3,7,18,0.9); }
         submitLabel.textContent = 'Demander ma démo';
       });
   });
+})();
+
+// ── BUTTON CLICK FEEDBACK (ripple on every primary interactive control) ──
+(function () {
+  var selector = '.btn-primary, .btn-secondary, .btn-submit, .app-toggle-btn, .demo-play-btn';
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest(selector);
+    if (!btn || btn.disabled) return;
+    var rect = btn.getBoundingClientRect();
+    var size = Math.max(rect.width, rect.height) * 1.6;
+    var span = document.createElement('span');
+    span.className = 'click-ripple';
+    span.style.width = span.style.height = size + 'px';
+    var cx = (typeof e.clientX === 'number' && e.clientX) ? e.clientX : rect.left + rect.width / 2;
+    var cy = (typeof e.clientY === 'number' && e.clientY) ? e.clientY : rect.top + rect.height / 2;
+    span.style.left = (cx - rect.left - size / 2) + 'px';
+    span.style.top = (cy - rect.top - size / 2) + 'px';
+    btn.appendChild(span);
+    span.addEventListener('animationend', function () { span.remove(); });
+  });
+})();
+
+// ── DEMO STAGE — live animated route, alerts firing in real time ──
+(function () {
+  var stage = document.getElementById('demo-stage');
+  var canvas = document.getElementById('demo-canvas');
+  if (!stage || !canvas || !canvas.getContext) return;
+  var ctx = canvas.getContext('2d');
+  var playBtn = document.getElementById('demo-play-btn');
+  var scrubberFill = document.getElementById('demo-scrubber-fill');
+  var elapsedEl = document.getElementById('demo-time-elapsed');
+  var calloutsWrap = document.getElementById('demo-callouts');
+
+  var DURATION = 12000;
+
+  // Route as a Catmull-Rom spline through five normalized (0–1) points —
+  // reads as a stretch of highway, not a generic straight progress bar.
+  var PTS = [
+    { x: 0.04, y: 0.74 }, { x: 0.27, y: 0.28 }, { x: 0.52, y: 0.64 },
+    { x: 0.76, y: 0.20 }, { x: 0.97, y: 0.48 }
+  ];
+  var EXT = [PTS[0]].concat(PTS, [PTS[PTS.length - 1]]);
+
+  var ALERTS = [
+    { t: 0.20, color: '#fbbf24', label: 'CT · FR-482-XK', time: 'J-7' },
+    { t: 0.53, color: '#22d3ee', label: 'Assurance flotte', time: 'J-30' },
+    { t: 0.84, color: '#34d399', label: 'Permis · J. Martin', time: 'J-90' }
+  ];
+
+  function catmullRom(p0, p1, p2, p3, t) {
+    var t2 = t * t, t3 = t2 * t;
+    return {
+      x: 0.5 * ((2 * p1.x) + (-p0.x + p2.x) * t + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3),
+      y: 0.5 * ((2 * p1.y) + (-p0.y + p2.y) * t + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3)
+    };
+  }
+
+  function pointAtT(t) {
+    var segments = PTS.length - 1;
+    var scaled = Math.min(Math.max(t, 0), 0.9999) * segments;
+    var seg = Math.floor(scaled);
+    var localT = scaled - seg;
+    return catmullRom(EXT[seg], EXT[seg + 1], EXT[seg + 2], EXT[seg + 3], localT);
+  }
+
+  var callouts = ALERTS.map(function (a) {
+    var p = pointAtT(a.t);
+    var el = document.createElement('div');
+    el.className = 'demo-callout';
+    el.style.left = (p.x * 100) + '%';
+    el.style.top = (p.y * 100) + '%';
+    el.innerHTML = '<span class="dot" style="background:' + a.color + '"></span>' + a.label +
+      ' <span class="time" style="color:' + a.color + '">' + a.time + '</span>';
+    calloutsWrap.appendChild(el);
+    return { el: el, t: a.t };
+  });
+
+  var W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  function resize() {
+    var rect = canvas.getBoundingClientRect();
+    W = rect.width; H = rect.height;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function drawRoute(t) {
+    ctx.clearRect(0, 0, W, H);
+
+    // faint full route
+    ctx.beginPath();
+    for (var i = 0; i <= 100; i++) {
+      var p = pointAtT(i / 100);
+      var x = p.x * W, y = p.y * H;
+      if (i === 0) { ctx.moveTo(x, y); } else { ctx.lineTo(x, y); }
+    }
+    ctx.strokeStyle = 'rgba(148,163,184,0.16)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([2, 10]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // bright traveled portion, glowing
+    var n = Math.max(2, Math.round(t * 120));
+    ctx.beginPath();
+    for (var k = 0; k <= n; k++) {
+      var pk = pointAtT((k / n) * t);
+      var xk = pk.x * W, yk = pk.y * H;
+      if (k === 0) { ctx.moveTo(xk, yk); } else { ctx.lineTo(xk, yk); }
+    }
+    var grad = ctx.createLinearGradient(0, 0, W, 0);
+    grad.addColorStop(0, 'rgba(103,232,249,0.9)');
+    grad.addColorStop(1, 'rgba(59,130,246,0.9)');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.shadowColor = 'rgba(34,211,238,0.6)';
+    ctx.shadowBlur = 10;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // alert pins along the route
+    ALERTS.forEach(function (a) {
+      var p = pointAtT(a.t);
+      var x = p.x * W, y = p.y * H;
+      var passed = t > a.t;
+      ctx.beginPath();
+      ctx.arc(x, y, passed ? 6 : 4, 0, Math.PI * 2);
+      ctx.fillStyle = a.color;
+      ctx.globalAlpha = passed ? 1 : 0.4;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      var dist = Math.abs(t - a.t);
+      if (dist < 0.12) {
+        var ringT = 1 - dist / 0.12;
+        ctx.beginPath();
+        ctx.arc(x, y, 6 + (1 - ringT) * 16, 0, Math.PI * 2);
+        ctx.strokeStyle = a.color;
+        ctx.globalAlpha = ringT * 0.5;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+    });
+
+    // truck marker at current position
+    var head = pointAtT(t);
+    var hx = head.x * W, hy = head.y * H;
+    ctx.beginPath();
+    ctx.arc(hx, hy, 9, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(3,7,18,0.9)';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(hx, hy, 9, 0, Math.PI * 2);
+    ctx.strokeStyle = '#22d3ee';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(hx, hy, 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#22d3ee';
+    ctx.fill();
+
+    callouts.forEach(function (c) {
+      c.el.classList.toggle('on', Math.abs(t - c.t) < 0.12);
+    });
+  }
+
+  function formatTime(ms) {
+    var s = Math.floor(ms / 1000);
+    return Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60);
+  }
+
+  var playing = false, rafId = null, startTime = 0, elapsedAtPause = 0;
+
+  function frame(now) {
+    if (!playing) return;
+    var elapsed = (now - startTime) % DURATION;
+    var t = elapsed / DURATION;
+    drawRoute(t);
+    scrubberFill.style.width = (t * 100) + '%';
+    elapsedEl.textContent = formatTime(elapsed);
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function play() {
+    if (playing) return;
+    playing = true;
+    stage.classList.add('is-playing');
+    startTime = performance.now() - elapsedAtPause;
+    rafId = requestAnimationFrame(frame);
+  }
+  function pause() {
+    if (!playing) return;
+    playing = false;
+    stage.classList.remove('is-playing');
+    if (rafId) cancelAnimationFrame(rafId);
+    elapsedAtPause = (performance.now() - startTime) % DURATION;
+  }
+  function toggle() { if (playing) { pause(); } else { play(); } }
+
+  playBtn.addEventListener('click', function (e) { e.stopPropagation(); toggle(); });
+  canvas.addEventListener('click', toggle);
+
+  window.addEventListener('resize', function () {
+    resize();
+    if (!playing) drawRoute((elapsedAtPause % DURATION) / DURATION);
+  }, { passive: true });
+
+  resize();
+  drawRoute(0);
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) { play(); } else { pause(); }
+      });
+    }, { threshold: 0.35 });
+    io.observe(stage);
+  } else {
+    play();
+  }
 })();
 </script>
 
