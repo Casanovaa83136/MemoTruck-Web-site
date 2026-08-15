@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mentions légales — MémoTruck</title>
-<meta name="description" content="Mentions légales du site MémoTruck : éditeur, hébergement, propriété intellectuelle, données personnelles.">
+<title>Politique de confidentialité — MémoTruck</title>
+<meta name="description" content="Politique de confidentialité du site MémoTruck : données collectées, finalité, conservation, droits RGPD.">
 <meta name="robots" content="noindex">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23030712'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='%2322d3ee'%3E🚛%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,6 +70,7 @@ header.nav { position: sticky; top: 0; z-index: 50; background: var(--paper); bo
 .eyebrow::before { content: ''; width: 8px; height: 8px; background: var(--cyan); flex-shrink: 0; }
 .legal-head h1 { margin-top: 14px; font-size: clamp(2rem, 5vw, 2.75rem); }
 .legal-updated { margin-top: 14px; font-family: var(--mono); font-size: 0.75rem; color: var(--steel); text-transform: uppercase; letter-spacing: 0.06em; }
+.legal-intro { margin-top: 20px; max-width: 62ch; font-size: 0.9375rem; color: var(--steel); }
 
 .legal-body { padding: 48px 0 96px; }
 .legal-section { padding: 32px 0; border-top: 1px solid var(--hair); }
@@ -90,7 +91,7 @@ header.nav { position: sticky; top: 0; z-index: 50; background: var(--paper); bo
 }
 
 footer { background: var(--ink); color: var(--paper); padding: 44px 0; }
-.footer-inner { display: flex; flex-direction: column; gap: 24px; align-items: flex-start; justify-content: space-between; }
+.footer-inner { max-width: 1180px; margin: 0 auto; padding: 0 28px; display: flex; flex-direction: column; gap: 24px; align-items: flex-start; justify-content: space-between; }
 @media (min-width: 780px) { .footer-inner { flex-direction: row; align-items: center; } }
 .footer-tag { font-size: 0.875rem; color: #9aa0a6; max-width: 380px; }
 .footer-links { display: flex; flex-wrap: wrap; gap: 24px; font-family: var(--mono); font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase; }
@@ -98,7 +99,6 @@ footer { background: var(--ink); color: var(--paper); padding: 44px 0; }
 .footer-links a:hover { color: var(--cyan); }
 .footer-bottom { max-width: 1180px; margin: 32px auto 0; padding: 20px 28px 0; border-top: 1px solid rgba(241,241,234,0.15); font-family: var(--mono); font-size: 0.6875rem; color: #9aa0a6; display: flex; flex-direction: column; gap: 8px; text-transform: uppercase; letter-spacing: 0.06em; }
 @media (min-width: 640px) { .footer-bottom { flex-direction: row; justify-content: space-between; } }
-footer .footer-inner { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
 
 </style>
 </head>
@@ -107,7 +107,7 @@ footer .footer-inner { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
 <div class="top-strip">
   <div class="container">
     <span>Manifeste de flotte <span class="doc-no">N° MT-2026-0417</span></span>
-    <span>Mentions légales</span>
+    <span>Politique de confidentialité</span>
   </div>
 </div>
 
@@ -124,64 +124,78 @@ footer .footer-inner { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
 <main>
   <div class="container">
     <div class="legal-head">
-      <span class="eyebrow">Informations légales</span>
-      <h1>Mentions légales</h1>
+      <span class="eyebrow">Protection des données</span>
+      <h1>Politique de confidentialité</h1>
       <p class="legal-updated">Dernière mise à jour : <span class="fill">JJ/MM/AAAA</span></p>
+      <p class="legal-intro">
+        Cette politique explique quelles données personnelles memotruck.fr collecte, pourquoi, combien
+        de temps elles sont conservées, et comment vous pouvez exercer vos droits — conformément au
+        Règlement Général sur la Protection des Données (RGPD).
+      </p>
     </div>
 
     <div class="legal-body">
 
       <div class="legal-section">
-        <h2>Éditeur du site</h2>
-        <p>Le site memotruck.fr est édité par :</p>
+        <h2>Responsable du traitement</h2>
+        <p>Le responsable du traitement des données collectées sur ce site est :</p>
         <ul>
           <li><strong>Raison sociale :</strong> <span class="fill">Nom de la société</span></li>
-          <li><strong>Forme juridique :</strong> <span class="fill">SAS / SARL / auto-entreprise…</span></li>
-          <li><strong>Capital social :</strong> <span class="fill">Montant en €</span></li>
           <li><strong>Siège social :</strong> <span class="fill">Adresse complète</span></li>
-          <li><strong>RCS / SIREN :</strong> <span class="fill">Numéro</span></li>
-          <li><strong>N° TVA intracommunautaire :</strong> <span class="fill">Numéro</span></li>
-          <li><strong>Directeur de la publication :</strong> <span class="fill">Nom, prénom</span></li>
           <li><strong>Email :</strong> <a href="mailto:contact@memotruck.fr">contact@memotruck.fr</a></li>
-          <li><strong>Téléphone :</strong> <a href="tel:+33184602210">+33 6 50 71 65 07</a></li>
         </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>Données collectées</h2>
+        <p>Le site collecte des données uniquement lorsque vous remplissez volontairement le formulaire de contact / demande de démo :</p>
+        <ul>
+          <li>Nom complet</li>
+          <li>Adresse email professionnelle</li>
+          <li>Nom de la société</li>
+          <li>Taille de flotte (nombre de véhicules)</li>
+          <li>Message (optionnel)</li>
+        </ul>
+        <p>Aucune autre donnée n'est collectée activement — le site n'utilise pas de cookies de suivi ni d'outil d'analyse d'audience à ce jour.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>Finalité et base légale</h2>
+        <p>Ces données sont utilisées exclusivement pour traiter votre demande de démonstration et vous recontacter. La base légale du traitement est l'intérêt légitime de MémoTruck à répondre aux demandes commerciales que vous nous adressez volontairement.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>Destinataires des données</h2>
+        <p>Vos données sont destinées à l'équipe commerciale de MémoTruck. Le formulaire de contact est traité par le prestataire tiers <a href="https://formsubmit.co" target="_blank" rel="noopener">FormSubmit</a>, qui transmet les messages par email sans les stocker durablement.</p>
+        <p>Vos données ne sont ni vendues, ni louées, ni partagées avec des tiers à des fins commerciales.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>Durée de conservation</h2>
+        <p>Les données transmises via le formulaire de contact sont conservées pendant <span class="fill">durée, ex. 3 ans à compter du dernier contact</span>, conformément aux recommandations de la CNIL en matière de prospection commerciale.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>Vos droits</h2>
+        <p>Conformément au RGPD, vous disposez des droits suivants sur vos données personnelles :</p>
+        <ul>
+          <li><strong>Droit d'accès</strong> — obtenir une copie des données vous concernant</li>
+          <li><strong>Droit de rectification</strong> — corriger des données inexactes</li>
+          <li><strong>Droit à l'effacement</strong> — demander la suppression de vos données</li>
+          <li><strong>Droit d'opposition</strong> — vous opposer au traitement de vos données</li>
+          <li><strong>Droit à la portabilité</strong> — recevoir vos données dans un format structuré</li>
+        </ul>
+        <p>Pour exercer ces droits, contactez-nous à <a href="mailto:contact@memotruck.fr">contact@memotruck.fr</a>. Vous disposez également du droit d'introduire une réclamation auprès de la CNIL (<a href="https://www.cnil.fr" target="_blank" rel="noopener">cnil.fr</a>).</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>Polices et ressources externes</h2>
+        <p>Ce site charge ses polices de caractères depuis les serveurs de Google Fonts, ce qui peut transmettre votre adresse IP à Google lors du chargement de la page.</p>
       </div>
 
       <div class="legal-section">
         <h2>Hébergement</h2>
-        <p>Le site est hébergé par :</p>
-        <ul>
-          <li><strong>Hébergeur :</strong> Vercel Inc.</li>
-          <li><strong>Adresse :</strong> 340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis</li>
-          <li><strong>Site web :</strong> <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a></li>
-        </ul>
-      </div>
-
-      <div class="legal-section">
-        <h2>Propriété intellectuelle</h2>
-        <p>L'ensemble des contenus présents sur ce site (textes, logos, graphismes, icônes, structure) est la propriété de <span class="fill">Nom de la société</span>, sauf mention contraire, et est protégé par le droit d'auteur. Toute reproduction, représentation ou diffusion, totale ou partielle, sans autorisation préalable est interdite.</p>
-      </div>
-
-      <div class="legal-section">
-        <h2>Données personnelles</h2>
-        <p>Les informations transmises via le formulaire de contact de ce site (nom, société, email, téléphone, taille de flotte) sont utilisées uniquement pour répondre à votre demande de démonstration et ne sont ni cédées ni revendues à des tiers.</p>
-        <p>Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Pour l'exercer, contactez-nous à <a href="mailto:contact@memotruck.fr">contact@memotruck.fr</a>.</p>
-        <p>Le formulaire de contact est traité par le prestataire tiers <a href="https://formsubmit.co" target="_blank" rel="noopener">FormSubmit</a>, qui transmet les messages par email sans les stocker durablement.</p>
-      </div>
-
-      <div class="legal-section">
-        <h2>Cookies</h2>
-        <p><span class="fill">À confirmer : ce site utilise-t-il des cookies de mesure d'audience, publicitaires, ou uniquement des cookies techniques ?</span></p>
-      </div>
-
-      <div class="legal-section">
-        <h2>Droit applicable</h2>
-        <p>Les présentes mentions légales sont soumises au droit français. En cas de litige, et à défaut de résolution amiable, les tribunaux français seront seuls compétents.</p>
-      </div>
-
-      <div class="legal-section">
-        <h2>Contact</h2>
-        <p>Pour toute question relative à ces mentions légales, écrivez à <a href="mailto:contact@memotruck.fr">contact@memotruck.fr</a>.</p>
+        <p>Le site est hébergé par Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis. Les journaux techniques d'hébergement (adresse IP, horodatage des requêtes) sont gérés directement par Vercel selon sa propre politique de confidentialité.</p>
       </div>
 
     </div>
