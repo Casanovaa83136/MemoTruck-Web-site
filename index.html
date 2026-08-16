@@ -128,10 +128,10 @@ header.nav { position: sticky; top: 0; z-index: 50; background: var(--paper); bo
 .hero .exhibit-photo { transition: box-shadow 0.35s ease; }
 .hero .exhibit { perspective: 1200px; }
 
-/* ════ SOUS LE CAPOT (exploded-view scroll animation) ════ */
+/* ════ SOUS LE CAPOT (3D scroll scene) ════ */
 .capot { position: relative; background: var(--paper); border-bottom: 3px solid var(--ink); }
-.capot-track { height: 440vh; position: relative; }
-@media (max-width: 700px) { .capot-track { height: 340vh; } }
+.capot-track { height: 380vh; position: relative; }
+@media (max-width: 700px) { .capot-track { height: 300vh; } }
 .capot-pin {
     position: sticky; top: 0; height: 100vh; overflow: hidden;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -139,20 +139,22 @@ header.nav { position: sticky; top: 0; z-index: 50; background: var(--paper); bo
 }
 .capot-head { text-align: center; margin-bottom: 4px; z-index: 2; }
 .capot-head h2 { margin-top: 14px; font-size: clamp(1.8rem, 4vw, 2.7rem); }
-.capot-stage { flex: 1; width: 100%; max-width: 760px; min-height: 0; display: flex; align-items: center; justify-content: center; }
-.expl-svg { width: 100%; height: 100%; max-height: 58vh; display: block; overflow: visible; }
-.expl-part { transform-origin: 50% 50%; transition: opacity 0.5s ease, filter 0.5s ease; }
-.expl-part.is-dim { opacity: 0.32; }
-.expl-part.is-focus { filter: drop-shadow(0 0 16px rgba(34,211,238,0.6)); }
-.expl-float { transform-origin: 50% 50%; }
+.capot-stage { flex: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.capot-canvas { width: min(100%, 780px); aspect-ratio: 16 / 11; max-height: 58vh; }
+.capot-canvas canvas { display: block; width: 100% !important; height: 100% !important; }
 
 .capot-callout {
-    position: absolute; left: 50%; bottom: 34px; transform: translateX(-50%) translateY(14px);
+    position: absolute; left: 50%; bottom: 34px; transform: translateX(-50%) translateY(10px) scale(0.94);
     width: min(92vw, 460px); background: var(--panel); border: 3px solid var(--ink);
-    box-shadow: 8px 8px 0 var(--ink); padding: 20px 24px; text-align: left;
-    opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; z-index: 3;
+    box-shadow: 8px 8px 0 var(--ink); text-align: left;
+    opacity: 0; pointer-events: none; z-index: 3;
 }
-.capot-callout.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+.callout-titlebar { display: flex; gap: 6px; padding: 10px 12px; border-bottom: 1.5px solid var(--hair); }
+.callout-titlebar span { width: 9px; height: 9px; border-radius: 50%; background: var(--hair); }
+.callout-titlebar span:nth-child(1) { background: #e2685c; }
+.callout-titlebar span:nth-child(2) { background: #e3b341; }
+.callout-titlebar span:nth-child(3) { background: #57ab5a; }
+.capot-callout-body { padding: 16px 24px 20px; }
 .capot-callout .item-num { font-family: var(--mono); font-size: 0.8125rem; font-weight: 600; color: var(--steel); }
 .capot-callout .item-num strong { color: var(--cyan-deep); }
 .capot-callout h3 { margin-top: 6px; font-size: clamp(1.1rem, 2vw, 1.4rem); }
@@ -271,7 +273,8 @@ footer { background: var(--ink); color: var(--paper); padding: 44px 0; }
 .footer-links { display: flex; flex-wrap: wrap; gap: 24px; font-family: var(--mono); font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase; }
 .footer-links a:hover { color: var(--cyan); }
 .footer-bottom { margin-top: 32px; padding-top: 20px; border-top: 1px solid rgba(241,241,234,0.15); font-family: var(--mono); font-size: 0.6875rem; color: #9aa0a6; display: flex; flex-direction: column; gap: 8px; text-transform: uppercase; letter-spacing: 0.06em; }
-@media (min-width: 640px) { .footer-bottom { flex-direction: row; justify-content: space-between; } }
+@media (min-width: 640px) { .footer-bottom { flex-direction: row; justify-content: space-between; flex-wrap: wrap; row-gap: 6px; } }
+.footer-bottom a:hover { color: var(--cyan); }
 
 /* ════ BUTTON CLICK FEEDBACK ════ */
 .btn, .nav-cta, .crew-toggle button { position: relative; overflow: hidden; -webkit-tap-highlight-color: transparent; }
@@ -363,170 +366,24 @@ header.nav { transform: translateY(-100%); opacity: 0; animation: nav-in 0.7s cu
   </div>
 </section>
 
-<!-- ════ SOUS LE CAPOT (exploded-view scroll animation) ════ -->
+<!-- ════ SOUS LE CAPOT (3D laptop scroll scene) ════ -->
 <section class="capot" id="sous-le-capot">
   <div class="capot-track">
     <div class="capot-pin">
       <div class="container capot-head reveal">
         <span class="eyebrow">Sous le capot</span>
-        <h2>Quatre pièces.<br>Un seul objectif&nbsp;: zéro oubli.</h2>
+        <h2>Une appli.<br>Quatre bonnes raisons d'y passer.</h2>
       </div>
       <div class="capot-stage">
-        <svg class="expl-svg" viewBox="-460 -540 920 960" role="img" aria-label="Ordinateur portable en vue éclatée">
-<ellipse cx="0" cy="130" rx="220" ry="46" fill="var(--ink)" opacity="0.08"/><g id="part-shell" class="expl-part"><g class="expl-float"><polygon points="-211.31,-35.0 45.03,113.0 45.03,122.0 -211.31,-26.0" fill="#dbd8ca" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
-<polygon points="211.31,17.0 45.03,113.0 45.03,122.0 211.31,26.0" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
-<polygon points="-45.03,-131.0 211.31,17.0 45.03,113.0 -211.31,-35.0" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
-<line x1="-17.32" y1="41.0" x2="-27.71" y2="53.0" stroke="var(--ink)" stroke-width="1" />
-<line x1="-8.66" y1="46.0" x2="-19.05" y2="58.0" stroke="var(--ink)" stroke-width="1" />
-<line x1="0.0" y1="51.0" x2="-10.39" y2="63.0" stroke="var(--ink)" stroke-width="1" />
-<line x1="8.66" y1="56.0" x2="-1.73" y2="68.0" stroke="var(--ink)" stroke-width="1" />
-<line x1="17.32" y1="61.0" x2="6.93" y2="73.0" stroke="var(--ink)" stroke-width="1" />
-<line x1="25.98" y1="66.0" x2="15.59" y2="78.0" stroke="var(--ink)" stroke-width="1" />
-<circle cx="-43.3" cy="-114.0" r="4" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1"/>
-<circle cx="181.87" cy="16.0" r="4" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1"/>
-<circle cx="-181.87" cy="-34.0" r="4" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1"/>
-<circle cx="43.3" cy="96.0" r="4" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1"/></g></g><g id="part-battery" class="expl-part"><g class="expl-float"><polygon points="-152.42,-26.0 3.46,64.0 3.46,78.0 -152.42,-12.0" fill="#dbd8ca" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
-<polygon points="83.14,18.0 3.46,64.0 3.46,78.0 83.14,32.0" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
-<polygon points="-72.75,-72.0 83.14,18.0 3.46,64.0 -152.42,-26.0" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
-<line x1="-43.3" y1="-53.0" x2="-119.51" y2="-9.0" stroke="var(--ink)" stroke-width="1" />
-<line x1="-12.12" y1="-35.0" x2="-88.33" y2="9.0" stroke="var(--ink)" stroke-width="1" />
-<line x1="19.05" y1="-17.0" x2="-57.16" y2="27.0" stroke="var(--ink)" stroke-width="1" />
-<line x1="50.23" y1="1.0" x2="-25.98" y2="45.0" stroke="var(--ink)" stroke-width="1" />
-<polygon points="-72.75,-68.0 76.21,18.0 3.46,60.0 -145.49,-26.0" fill="none" stroke="var(--ink)" stroke-width="1.4"/></g></g><g id="part-board" class="expl-part"><g class="expl-float"><polygon points="-164.54,-31.0 57.16,97.0 57.16,101.0 -164.54,-27.0" fill="#dbd8ca" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round"/>
-<polygon points="192.26,19.0 57.16,97.0 57.16,101.0 192.26,23.0" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round"/>
-<polygon points="-29.44,-109.0 192.26,19.0 57.16,97.0 -164.54,-31.0" fill="#ecebe1" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round"/>
-<polyline points="-12.12,-81.0 13.86,-66.0 -12.12,-51.0 22.52,-31.0" fill="none" stroke="var(--cyan-deep)" stroke-width="1" opacity="0.5"/>
-<polyline points="-46.77,-61.0 -3.46,-36.0 -29.44,-21.0 13.86,4.0" fill="none" stroke="var(--cyan-deep)" stroke-width="1" opacity="0.5"/>
-<polyline points="126.44,-11.0 100.46,4.0 126.44,19.0 91.8,39.0" fill="none" stroke="var(--cyan-deep)" stroke-width="1" opacity="0.5"/>
-<polyline points="-98.73,-31.0 -72.75,-16.0 -90.07,-6.0" fill="none" stroke="var(--cyan-deep)" stroke-width="1" opacity="0.5"/>
-<polyline points="5.2,39.0 31.18,54.0 57.16,39.0 83.14,54.0" fill="none" stroke="var(--cyan-deep)" stroke-width="1" opacity="0.5"/></g></g><g id="part-netcard" class="expl-part"><g class="expl-float"><polygon points="-65.82,-84.0 -38.11,-68.0 -38.11,-62.0 -65.82,-78.0" fill="#dbd8ca" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
-<polygon points="-20.78,-78.0 -38.11,-68.0 -38.11,-62.0 -20.78,-72.0" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
-<polygon points="-48.5,-94.0 -20.78,-78.0 -38.11,-68.0 -65.82,-84.0" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
-<polygon points="-46.77,-89.0 -29.44,-79.0 -39.84,-73.0 -57.16,-83.0" fill="none" stroke="var(--ink)" stroke-width="1"/>
-<line x1="-48.5" y1="-94.0" x2="-48.5" y2="-108.0" stroke="var(--ink)" stroke-width="1" />
-<circle cx="-48.5" cy="-108.0" r="2" fill="var(--panel)" stroke="var(--ink)" stroke-width="1"/>
-<line x1="-43.3" y1="-91.0" x2="-34.64" y2="-106.0" stroke="var(--ink)" stroke-width="1" />
-<circle cx="-34.64" cy="-106.0" r="2" fill="var(--panel)" stroke="var(--ink)" stroke-width="1"/></g></g><g id="part-ram" class="expl-part"><g class="expl-float"><polygon points="52.83,-11.5 58.02,-8.5 58.02,17.5 52.83,14.5" fill="#dbd8ca" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
-<polygon points="116.91,-42.5 58.02,-8.5 58.02,17.5 116.91,-16.5" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
-<polygon points="111.72,-45.5 116.91,-42.5 58.02,-8.5 52.83,-11.5" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
-<polygon points="64.95,-4.5 70.15,-1.5 70.15,24.5 64.95,21.5" fill="#dbd8ca" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
-<polygon points="129.04,-35.5 70.15,-1.5 70.15,24.5 129.04,-9.5" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
-<polygon points="123.84,-38.5 129.04,-35.5 70.15,-1.5 64.95,-4.5" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
-<line x1="99.59" y1="-38.5" x2="104.79" y2="-35.5" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="90.07" y1="-33.0" x2="95.26" y2="-30.0" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="80.54" y1="-27.5" x2="85.74" y2="-24.5" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="71.01" y1="-22.0" x2="76.21" y2="-19.0" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="111.72" y1="-31.5" x2="116.91" y2="-28.5" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="102.19" y1="-26.0" x2="107.39" y2="-23.0" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="92.66" y1="-20.5" x2="97.86" y2="-17.5" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="83.14" y1="-15.0" x2="88.33" y2="-12.0" stroke="var(--ink)" stroke-width="0.8" /></g></g><g id="part-cpu" class="expl-part"><g class="expl-float"><polygon points="-98.73,-38.0 -57.16,-14.0 -57.16,-5.0 -98.73,-29.0" fill="#dbd8ca" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="-15.59,-38.0 -57.16,-14.0 -57.16,-5.0 -15.59,-29.0" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="-57.16,-62.0 -15.59,-38.0 -57.16,-14.0 -98.73,-38.0" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="-57.16,-55.0 -27.71,-38.0 -57.16,-21.0 -86.6,-38.0" fill="none" stroke="var(--ink)" stroke-width="1.1"/>
-<line x1="-57.16" y1="-55.0" x2="-51.1" y2="-51.5" stroke="var(--ink)" stroke-width="1.4" /></g></g><g id="part-gpu" class="expl-part"><g class="expl-float"><polygon points="-67.55,3.0 39.84,65.0 39.84,83.0 -67.55,21.0" fill="#dbd8ca" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="74.48,45.0 39.84,65.0 39.84,83.0 74.48,63.0" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="-32.91,-17.0 74.48,45.0 39.84,65.0 -67.55,3.0" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"/>
-<circle cx="-20.78" cy="10.0" r="15" fill="none" stroke="var(--ink)" stroke-width="1.3"/>
-<circle cx="-20.78" cy="10.0" r="4" fill="none" stroke="var(--ink)" stroke-width="1"/>
-<circle cx="27.71" cy="38.0" r="15" fill="none" stroke="var(--ink)" stroke-width="1.3"/>
-<circle cx="27.71" cy="38.0" r="4" fill="none" stroke="var(--ink)" stroke-width="1"/>
-<line x1="-20.78" y1="10.0" x2="-8.66" y2="17.0" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="-20.78" y1="10.0" x2="-20.78" y2="19.9" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="-20.78" y1="10.0" x2="-32.91" y2="17.0" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="-20.78" y1="10.0" x2="-37.93" y2="10.0" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="-20.78" y1="10.0" x2="-32.91" y2="3.0" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="-20.78" y1="10.0" x2="-20.78" y2="0.1" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="-20.78" y1="10.0" x2="-8.66" y2="3.0" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="-20.78" y1="10.0" x2="-3.64" y2="10.0" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="27.71" y1="38.0" x2="39.84" y2="45.0" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="27.71" y1="38.0" x2="27.71" y2="47.9" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="27.71" y1="38.0" x2="15.59" y2="45.0" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="27.71" y1="38.0" x2="10.57" y2="38.0" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="27.71" y1="38.0" x2="15.59" y2="31.0" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="27.71" y1="38.0" x2="27.71" y2="28.1" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="27.71" y1="38.0" x2="39.84" y2="31.0" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="27.71" y1="38.0" x2="44.86" y2="38.0" stroke="var(--ink)" stroke-width="0.8" />
-<line x1="-64.09" y1="23.0" x2="-58.89" y2="20.0" stroke="var(--ink)" stroke-width="1" />
-<line x1="-52.83" y1="29.5" x2="-47.63" y2="26.5" stroke="var(--ink)" stroke-width="1" />
-<line x1="-41.57" y1="36.0" x2="-36.37" y2="33.0" stroke="var(--ink)" stroke-width="1" />
-<line x1="-30.31" y1="42.5" x2="-25.11" y2="39.5" stroke="var(--ink)" stroke-width="1" />
-<line x1="-19.05" y1="49.0" x2="-13.86" y2="46.0" stroke="var(--ink)" stroke-width="1" />
-<line x1="-7.79" y1="55.5" x2="-2.6" y2="52.5" stroke="var(--ink)" stroke-width="1" />
-<line x1="3.46" y1="62.0" x2="8.66" y2="59.0" stroke="var(--ink)" stroke-width="1" />
-<line x1="14.72" y1="68.5" x2="19.92" y2="65.5" stroke="var(--ink)" stroke-width="1" />
-<line x1="25.98" y1="75.0" x2="31.18" y2="72.0" stroke="var(--ink)" stroke-width="1" />
-<line x1="37.24" y1="81.5" x2="42.44" y2="78.5" stroke="var(--ink)" stroke-width="1" /></g></g><g id="part-keyboard" class="expl-part"><g class="expl-float"><polygon points="-199.19,-33.0 43.3,107.0 43.3,115.0 -199.19,-25.0" fill="#dbd8ca" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
-<polygon points="199.19,17.0 43.3,107.0 43.3,115.0 199.19,25.0" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
-<polygon points="-43.3,-123.0 199.19,17.0 43.3,107.0 -199.19,-33.0" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
-<polygon points="-49.8,-106.75 -36.81,-99.25 -49.8,-91.75 -62.79,-99.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-33.34,-97.25 -20.35,-89.75 -33.34,-82.25 -46.33,-89.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-16.89,-87.75 -3.9,-80.25 -16.89,-72.75 -29.88,-80.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-0.43,-78.25 12.56,-70.75 -0.43,-63.25 -13.42,-70.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="16.02,-68.75 29.01,-61.25 16.02,-53.75 3.03,-61.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="32.48,-59.25 45.47,-51.75 32.48,-44.25 19.49,-51.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="48.93,-49.75 61.92,-42.25 48.93,-34.75 35.94,-42.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="65.38,-40.25 78.38,-32.75 65.38,-25.25 52.39,-32.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="81.84,-30.75 94.83,-23.25 81.84,-15.75 68.85,-23.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="98.29,-21.25 111.28,-13.75 98.29,-6.25 85.3,-13.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="114.75,-11.75 127.74,-4.25 114.75,3.25 101.76,-4.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="131.2,-2.25 144.19,5.25 131.2,12.75 118.21,5.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="147.66,7.25 160.65,14.75 147.66,22.25 134.67,14.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-66.25,-97.25 -53.26,-89.75 -66.25,-82.25 -79.24,-89.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-49.8,-87.75 -36.81,-80.25 -49.8,-72.75 -62.79,-80.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-33.34,-78.25 -20.35,-70.75 -33.34,-63.25 -46.33,-70.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-16.89,-68.75 -3.9,-61.25 -16.89,-53.75 -29.88,-61.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-0.43,-59.25 12.56,-51.75 -0.43,-44.25 -13.42,-51.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="16.02,-49.75 29.01,-42.25 16.02,-34.75 3.03,-42.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="32.48,-40.25 45.47,-32.75 32.48,-25.25 19.49,-32.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="48.93,-30.75 61.92,-23.25 48.93,-15.75 35.94,-23.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="65.38,-21.25 78.38,-13.75 65.38,-6.25 52.39,-13.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="81.84,-11.75 94.83,-4.25 81.84,3.25 68.85,-4.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="98.29,-2.25 111.28,5.25 98.29,12.75 85.3,5.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="114.75,7.25 127.74,14.75 114.75,22.25 101.76,14.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="131.2,16.75 144.19,24.25 131.2,31.75 118.21,24.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-82.71,-87.75 -69.72,-80.25 -82.71,-72.75 -95.7,-80.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-66.25,-78.25 -53.26,-70.75 -66.25,-63.25 -79.24,-70.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-49.8,-68.75 -36.81,-61.25 -49.8,-53.75 -62.79,-61.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-33.34,-59.25 -20.35,-51.75 -33.34,-44.25 -46.33,-51.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-16.89,-49.75 -3.9,-42.25 -16.89,-34.75 -29.88,-42.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-0.43,-40.25 12.56,-32.75 -0.43,-25.25 -13.42,-32.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="16.02,-30.75 29.01,-23.25 16.02,-15.75 3.03,-23.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="32.48,-21.25 45.47,-13.75 32.48,-6.25 19.49,-13.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="48.93,-11.75 61.92,-4.25 48.93,3.25 35.94,-4.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="65.38,-2.25 78.38,5.25 65.38,12.75 52.39,5.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="81.84,7.25 94.83,14.75 81.84,22.25 68.85,14.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="98.29,16.75 111.28,24.25 98.29,31.75 85.3,24.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="114.75,26.25 127.74,33.75 114.75,41.25 101.76,33.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-99.16,-78.25 -86.17,-70.75 -99.16,-63.25 -112.15,-70.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-82.71,-68.75 -69.72,-61.25 -82.71,-53.75 -95.7,-61.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-66.25,-59.25 -53.26,-51.75 -66.25,-44.25 -79.24,-51.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-49.8,-49.75 -36.81,-42.25 -49.8,-34.75 -62.79,-42.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-33.34,-40.25 -20.35,-32.75 -33.34,-25.25 -46.33,-32.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-16.89,-30.75 -3.9,-23.25 -16.89,-15.75 -29.88,-23.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-0.43,-21.25 12.56,-13.75 -0.43,-6.25 -13.42,-13.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="16.02,-11.75 29.01,-4.25 16.02,3.25 3.03,-4.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="32.48,-2.25 45.47,5.25 32.48,12.75 19.49,5.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="48.93,7.25 61.92,14.75 48.93,22.25 35.94,14.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="65.38,16.75 78.38,24.25 65.38,31.75 52.39,24.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="81.84,26.25 94.83,33.75 81.84,41.25 68.85,33.75" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="98.29,35.75 111.28,43.25 98.29,50.75 85.3,43.25" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
-<polygon points="-51.96,-17.0 25.98,28.0 -13.86,51.0 -91.8,6.0" fill="none" stroke="var(--ink)" stroke-width="1.2"/></g></g><g id="part-screen" class="expl-part"><g class="expl-float"><polygon points="-45.03,-292.0 193.99,-154.0 193.99,18.0 -45.03,-120.0" fill="#dbd8ca" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
-<polygon points="200.92,-158.0 193.99,-154.0 193.99,18.0 200.92,14.0" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
-<polygon points="-38.11,-296.0 200.92,-158.0 193.99,-154.0 -45.03,-292.0" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
-<polygon points="-35.51,-130.5 184.46,-3.5 184.46,-155.5 -35.51,-282.5" fill="none" stroke="var(--ink)" stroke-width="1.6"/>
-<circle cx="74.48" cy="-213.0" r="2.6" fill="var(--ink)" stroke="none" stroke-width="1"/>
-<polygon points="-30.31,-241.5 23.38,-210.5 23.38,-226.5 -30.31,-257.5" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="1"/>
-<circle cx="-24.25" cy="-246.0" r="4.4" fill="none" stroke="var(--cyan-deep)" stroke-width="1.3"/>
-<polygon points="-32.91,-212.5 102.19,-134.5 102.19,-147.5 -32.91,-225.5" fill="none" stroke="var(--ink)" stroke-width="1"/>
-<polygon points="-32.91,-186.5 136.83,-88.5 136.83,-101.5 -32.91,-199.5" fill="none" stroke="var(--ink)" stroke-width="1"/>
-<polygon points="-32.91,-160.5 77.94,-96.5 77.94,-109.5 -32.91,-173.5" fill="none" stroke="var(--ink)" stroke-width="1"/>
-<polygon points="-32.91,-134.5 119.51,-46.5 119.51,-59.5 -32.91,-147.5" fill="none" stroke="var(--ink)" stroke-width="1"/></g></g>
-        </svg>
+        <div id="capot-canvas" class="capot-canvas" role="img" aria-label="Ordinateur portable MémoTruck, tableau de bord affiché à l'écran"></div>
       </div>
       <div class="capot-callout" id="capot-callout">
-        <span class="item-num">Poste<strong id="capot-num">01</strong></span>
-        <h3 id="capot-title">Rapide, même à 2 400 véhicules.</h3>
-        <p class="body-text" id="capot-desc">Chaque alerte est calculée et poussée en temps réel, sans latence, quelle que soit la taille de votre flotte.</p>
+        <div class="callout-titlebar"><span></span><span></span><span></span></div>
+        <div class="capot-callout-body">
+          <span class="item-num">Poste<strong id="capot-num">01</strong></span>
+          <h3 id="capot-title">Rapide, même à 2 400 véhicules.</h3>
+          <p class="body-text" id="capot-desc">Chaque alerte est calculée et poussée en temps réel, sans latence, quelle que soit la taille de votre flotte.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -735,6 +592,7 @@ header.nav { transform: translateY(-100%); opacity: 0; animation: nav-in 0.7s cu
     </div>
     <div class="footer-bottom">
       <span>© 2026 MémoTruck — Tous droits réservés</span>
+      <span>Modèle 3D « Laptop » par <a href="https://sketchfab.com/senthil123" target="_blank" rel="noopener">senthil123</a>, licence <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></span>
       <span>Fait pour la route</span>
     </div>
   </div>
@@ -949,48 +807,113 @@ header.nav { transform: translateY(-100%); opacity: 0; animation: nav-in 0.7s cu
 })();
 </script>
 
-<!-- ── SOUS LE CAPOT — vue éclatée pilotée au scroll (anime.js v4) ── -->
+<!-- ── SOUS LE CAPOT — laptop 3D piloté au scroll (three.js + anime.js v4) ── -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.min.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+  }
+}
+</script>
 <script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
 (function () {
   var section = document.getElementById('sous-le-capot');
   if (!section) return;
   var track = section.querySelector('.capot-track');
+  var container = document.getElementById('capot-canvas');
   var callout = document.getElementById('capot-callout');
   var numEl = document.getElementById('capot-num');
   var titleEl = document.getElementById('capot-title');
   var descEl = document.getElementById('capot-desc');
+  if (!container || !('IntersectionObserver' in window)) return;
 
-  var EXPLODE = {
-    shell:    { x: 0,    y: 220,  r: -2 },
-    battery:  { x: -40,  y: 120,  r: -6 },
-    board:    { x: 10,   y: 35,   r: 3 },
-    netcard:  { x: -190, y: -20,  r: -10 },
-    ram:      { x: 190,  y: -25,  r: 12 },
-    cpu:      { x: -230, y: -45,  r: -6 },
-    gpu:      { x: 230,  y: 15,   r: 7 },
-    keyboard: { x: -60,  y: -110, r: -3 },
-    screen:   { x: 60,   y: -150, r: 6 }
-  };
-  var DECOR = ['shell', 'battery', 'board', 'keyboard', 'screen'];
   var STEPS = ['cpu', 'gpu', 'ram', 'netcard'];
   var CONTENT = {
-    cpu:     { num: '01', title: 'Rapide, même à 2 400 véhicules.', desc: "Chaque alerte est calculée et poussée en temps réel, sans latence, quelle que soit la taille de votre flotte." },
+    cpu:     { num: '01', title: 'Rapide, même à 2 400 véhicules.', desc: "Chaque alerte est calculée et poussée en temps réel, sans latence, quelle que soit la taille de votre flotte." },
     gpu:     { num: '02', title: 'Une interface qui ne demande pas de formation.', desc: "Plusieurs thèmes, une navigation pensée pour les exploitants — pas pour les informaticiens." },
     ram:     { num: '03', title: 'Zéro oubli, par design.', desc: "Chaque échéance reste en mémoire jusqu'à ce qu'elle soit traitée. C'est littéralement le nom de l'app." },
     netcard: { num: '04', title: 'Panels et application, connectés en permanence.', desc: "Une mise à jour d'un côté est visible instantanément de l'autre, sans synchronisation manuelle." }
   };
 
-  var partEls = {};
-  Object.keys(EXPLODE).forEach(function (id) { partEls[id] = document.getElementById('part-' + id); });
+  // camera keyframes: spherical coords (degrees) around the laptop, radius as a
+  // fraction of the model's own max dimension — same 4-step "tour" structure as
+  // the rest of the page's scroll storytelling.
+  var CAM_KEYS = [
+    { p: 0.00, az: 34, el: 24, r: 2.35 },
+    { p: 0.22, az: 14, el: 15, r: 1.95 },
+    { p: 0.385, az: -12, el: 21, r: 1.85 },
+    { p: 0.55, az: -32, el: 13, r: 1.8 },
+    { p: 0.715, az: 10, el: 27, r: 1.95 },
+    { p: 0.88, az: 24, el: 20, r: 2.25 },
+    { p: 1.00, az: 24, el: 20, r: 2.25 }
+  ];
+  var STORY_START = 0.22, STORY_END = 0.88;
 
-  var EXPLODE_END = 0.22;
-  var STORY_START = 0.22;
-  var STORY_END = 0.88;
-  var lastIdx = -2;
-  var swapTimer = null;
-
+  function lerp(a, b, t) { return a + (b - a) * t; }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
-  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+  function camAt(progress) {
+    var p = clamp(progress, 0, 1);
+    var i = 0;
+    while (i < CAM_KEYS.length - 2 && CAM_KEYS[i + 1].p < p) i++;
+    var a = CAM_KEYS[i], b = CAM_KEYS[i + 1];
+    var span = b.p - a.p;
+    var t = span > 0 ? clamp((p - a.p) / span, 0, 1) : 0;
+    return { az: lerp(a.az, b.az, t), el: lerp(a.el, b.el, t), r: lerp(a.r, b.r, t) };
+  }
+
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(30, 1, 0.05, 50);
+  var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  container.appendChild(renderer.domElement);
+
+  scene.add(new THREE.HemisphereLight(0xfff7ea, 0xd8d4c4, 1.1));
+  var key = new THREE.DirectionalLight(0xffffff, 2.4);
+  key.position.set(2.4, 3.6, -2.6);
+  key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024);
+  key.shadow.bias = -0.0015;
+  scene.add(key);
+  var fill = new THREE.DirectionalLight(0x9fd8e8, 0.5);
+  fill.position.set(-3, 1.6, 2.2);
+  scene.add(fill);
+
+  var rig = new THREE.Group();
+  scene.add(rig);
+
+  var camTarget = new THREE.Vector3(0, 0, 0);
+  var camPos = new THREE.Vector3(0, 0, 3);
+  var camGoal = { az: 34, el: 24, r: 2.35 };
+  var maxDim = 1;
+
+  function sphToCartesian(az, el, r) {
+    var azR = THREE.MathUtils.degToRad(az);
+    var elR = THREE.MathUtils.degToRad(el);
+    var horiz = Math.cos(elR) * r;
+    return new THREE.Vector3(horiz * Math.sin(azR), camTarget.y + Math.sin(elR) * r, -horiz * Math.cos(azR));
+  }
+
+  function resize() {
+    var w = container.clientWidth, h = container.clientHeight;
+    if (!w || !h) return;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  }
+  new ResizeObserver(resize).observe(container);
+
+  var animeMod = null;
+  var lastIdx = -2;
+  var running = false;
+  var startT = performance.now();
 
   function fillCallout(idx) {
     var d = CONTENT[STEPS[idx]];
@@ -999,40 +922,28 @@ header.nav { transform: translateY(-100%); opacity: 0; animation: nav-in 0.7s cu
     descEl.textContent = d.desc;
   }
 
+  function showCallout(idx, isSwap) {
+    fillCallout(idx);
+    if (!animeMod) { callout.classList.add('on'); return; }
+    if (isSwap) {
+      animeMod.animate(callout, { scale: [1, 1.05, 1], duration: 380, ease: 'outQuad' });
+    } else {
+      animeMod.animate(callout, { opacity: 1, translateY: 0, scale: 1, translateX: '-50%', duration: 420, ease: 'outBack' });
+    }
+  }
+
+  function hideCallout() {
+    if (!animeMod) { callout.classList.remove('on'); return; }
+    animeMod.animate(callout, { opacity: 0, translateY: 10, scale: 0.94, translateX: '-50%', duration: 260, ease: 'inQuad' });
+  }
+
   function showStep(idx) {
     if (idx === lastIdx) return;
     var wasActive = lastIdx >= 0 && lastIdx < STEPS.length;
     var willActive = idx >= 0 && idx < STEPS.length;
     lastIdx = idx;
-
-    STEPS.forEach(function (id, i) {
-      partEls[id].classList.toggle('is-focus', willActive && i === idx);
-      partEls[id].classList.toggle('is-dim', willActive && i !== idx);
-    });
-    DECOR.forEach(function (id) { partEls[id].classList.toggle('is-dim', willActive); });
-
-    if (willActive) {
-      if (wasActive) {
-        callout.classList.remove('on');
-        clearTimeout(swapTimer);
-        swapTimer = setTimeout(function () { fillCallout(idx); callout.classList.add('on'); }, 180);
-      } else {
-        fillCallout(idx);
-        callout.classList.add('on');
-      }
-    } else {
-      callout.classList.remove('on');
-    }
-  }
-
-  function applyTransforms(progress) {
-    var t = easeOutCubic(clamp(progress / EXPLODE_END, 0, 1));
-    Object.keys(EXPLODE).forEach(function (id) {
-      var d = EXPLODE[id];
-      var focused = lastIdx >= 0 && lastIdx < STEPS.length && STEPS[lastIdx] === id;
-      partEls[id].style.transform =
-        'translate(' + (d.x * t) + 'px,' + (d.y * t) + 'px) rotate(' + (d.r * t) + 'deg) scale(' + (focused ? 1.08 : 1) + ')';
-    });
+    if (willActive) showCallout(idx, wasActive);
+    else if (wasActive) hideCallout();
   }
 
   function update(progress) {
@@ -1042,37 +953,74 @@ header.nav { transform: translateY(-100%); opacity: 0; animation: nav-in 0.7s cu
     else if (progress >= STORY_END) idx = STEPS.length;
     else idx = Math.min(STEPS.length - 1, Math.floor(storyP * STEPS.length));
     showStep(idx);
-    applyTransforms(progress);
+    camGoal = camAt(progress);
   }
 
-  update(0);
+  function loop() {
+    if (!running) return;
+    requestAnimationFrame(loop);
+    var t = performance.now() - startT;
+    rig.rotation.y = Math.sin(t * 0.00035) * 0.05;
+    var target = sphToCartesian(camGoal.az, camGoal.el, camGoal.r * maxDim);
+    camPos.lerp(target, 0.07);
+    camera.position.copy(camPos);
+    camera.lookAt(camTarget);
+    renderer.render(scene, camera);
+  }
 
-  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting && !running) { running = true; requestAnimationFrame(loop); }
+      else if (!entry.isIntersecting) { running = false; }
+    });
+  }, { threshold: 0.02 });
+  io.observe(section);
+
+  new GLTFLoader().load('assets/laptop/scene.gltf', function (gltf) {
+    var model = gltf.scene;
+    model.traverse(function (o) { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+
+    var box = new THREE.Box3().setFromObject(model);
+    var size = new THREE.Vector3();
+    box.getSize(size);
+    var center = new THREE.Vector3();
+    box.getCenter(center);
+    model.position.x -= center.x;
+    model.position.z -= center.z;
+    model.position.y -= box.min.y;
+    rig.add(model);
+
+    maxDim = Math.max(size.x, size.y, size.z);
+    camTarget.set(0, size.y * 0.42, 0);
+    camPos.copy(sphToCartesian(camGoal.az, camGoal.el, camGoal.r * maxDim));
+
+    var shadowPlane = new THREE.Mesh(
+      new THREE.CircleGeometry(Math.max(size.x, size.z) * 1.15, 48),
+      new THREE.ShadowMaterial({ opacity: 0.22 })
+    );
+    shadowPlane.rotation.x = -Math.PI / 2;
+    shadowPlane.receiveShadow = true;
+    rig.add(shadowPlane);
+
+    resize();
+    camera.position.copy(camPos);
+    camera.lookAt(camTarget);
+    renderer.render(scene, camera);
+
+    update(0);
+    if (section.getBoundingClientRect().top < window.innerHeight) { running = true; requestAnimationFrame(loop); }
+  }, undefined, function (err) { console.error('laptop model failed to load', err); });
 
   import('https://cdn.jsdelivr.net/npm/animejs@4.5.0/dist/bundles/anime.esm.min.js').then(function (anime) {
-    var animate = anime.animate, onScroll = anime.onScroll, stagger = anime.stagger, utils = anime.utils;
-
-    // idle "apesanteur" float — each piece drifts on its own cycle
-    animate('#sous-le-capot .expl-float', {
-      translateX: function () { return utils.random(-6, 6); },
-      translateY: function () { return utils.random(-11, -4); },
-      rotate: function () { return utils.random(-3, 3); },
-      duration: function () { return utils.random(2600, 4200); },
-      delay: stagger(90),
-      direction: 'alternate',
-      loop: true,
-      ease: 'inOutSine'
-    });
-
-    // scroll-linked explode + spotlight tour
-    onScroll({
+    animeMod = anime;
+    anime.onScroll({
       target: track,
       enter: 'top top',
       leave: 'bottom bottom',
       onUpdate: function (self) { update(self.progress); }
     });
   }).catch(function () {
-    // CDN unreachable: the assembled illustration stays put, no crash.
+    // CDN unreachable: the laptop stays in its resting pose, no crash.
   });
 })();
 </script>
