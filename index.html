@@ -140,12 +140,14 @@ header.nav { position: sticky; top: 0; z-index: 50; background: var(--paper); bo
 .capot-head { text-align: center; margin-bottom: 4px; z-index: 2; }
 .capot-head h2 { margin-top: 14px; font-size: clamp(1.8rem, 4vw, 2.7rem); }
 .capot-stage { flex: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; }
-.capot-canvas { width: min(100%, 780px); aspect-ratio: 16 / 11; max-height: 58vh; }
+.capot-viewport { position: relative; width: min(100%, 960px); aspect-ratio: 16 / 10.5; max-height: 68vh; }
+@media (max-width: 700px) { .capot-viewport { aspect-ratio: 3 / 3.6; max-height: 62vh; } .capot-callout { width: min(90vw, 340px) !important; } }
+.capot-canvas { position: absolute; inset: 0; }
 .capot-canvas canvas { display: block; width: 100% !important; height: 100% !important; }
 
 .capot-callout {
-    position: absolute; left: 50%; bottom: 34px; transform: translateX(-50%) translateY(10px) scale(0.94);
-    width: min(92vw, 460px); background: var(--panel); border: 3px solid var(--ink);
+    position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%) translateY(10px) scale(0.94);
+    width: min(88vw, 440px); background: var(--panel); border: 3px solid var(--ink);
     box-shadow: 8px 8px 0 var(--ink); text-align: left;
     opacity: 0; pointer-events: none; z-index: 3;
 }
@@ -375,14 +377,16 @@ header.nav { transform: translateY(-100%); opacity: 0; animation: nav-in 0.7s cu
         <h2>Une appli.<br>Quatre bonnes raisons d'y passer.</h2>
       </div>
       <div class="capot-stage">
-        <div id="capot-canvas" class="capot-canvas" role="img" aria-label="Ordinateur portable MémoTruck, tableau de bord affiché à l'écran"></div>
-      </div>
-      <div class="capot-callout" id="capot-callout">
-        <div class="callout-titlebar"><span></span><span></span><span></span></div>
-        <div class="capot-callout-body">
-          <span class="item-num">Poste<strong id="capot-num">01</strong></span>
-          <h3 id="capot-title">Rapide, même à 2 400 véhicules.</h3>
-          <p class="body-text" id="capot-desc">Chaque alerte est calculée et poussée en temps réel, sans latence, quelle que soit la taille de votre flotte.</p>
+        <div class="capot-viewport">
+          <div id="capot-canvas" class="capot-canvas" role="img" aria-label="Ordinateur portable MémoTruck, tableau de bord affiché à l'écran"></div>
+          <div class="capot-callout" id="capot-callout">
+            <div class="callout-titlebar"><span></span><span></span><span></span></div>
+            <div class="capot-callout-body">
+              <span class="item-num">Poste<strong id="capot-num">01</strong></span>
+              <h3 id="capot-title">Rapide, même à 2 400 véhicules.</h3>
+              <p class="body-text" id="capot-desc">Chaque alerte est calculée et poussée en temps réel, sans latence, quelle que soit la taille de votre flotte.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -844,11 +848,11 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   // hold while each card is on screen. Target coords are fractions of the
   // model's own bounding size, so they scale with whatever the box turns out
   // to be once loaded.
-  var SHOT_HERO   = { az: 34,   el: 24, r: 2.35, tx: 0, ty: 0.42, tz: 0 };
-  var SHOT_SCREEN = { az: 4,    el: 8,  r: 0.95, tx: 0, ty: 0.80, tz: -0.15 };
-  var SHOT_KBD    = { az: -58,  el: 60, r: 1.2,  tx: 0, ty: 0.08, tz: 0.10 };
-  var SHOT_SIDE   = { az: 88,   el: 11, r: 2.05, tx: 0, ty: 0.4,  tz: 0 };
-  var SHOT_WIDE   = { az: 58,   el: 16, r: 2.65, tx: 0, ty: 0.42, tz: 0 };
+  var SHOT_HERO   = { az: 34,   el: 24, r: 2.7,  tx: 0, ty: 0.42, tz: 0 };
+  var SHOT_SCREEN = { az: 4,    el: 8,  r: 1.25, tx: 0, ty: 0.78, tz: -0.15 };
+  var SHOT_KBD    = { az: -58,  el: 58, r: 1.55, tx: 0, ty: 0.08, tz: 0.10 };
+  var SHOT_SIDE   = { az: 88,   el: 11, r: 2.35, tx: 0, ty: 0.4,  tz: 0 };
+  var SHOT_WIDE   = { az: 58,   el: 16, r: 3.0,  tx: 0, ty: 0.42, tz: 0 };
 
   var CAM_KEYS = [
     { p: 0.000, s: SHOT_HERO },
@@ -884,7 +888,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   }
 
   var scene = new THREE.Scene();
-  var camera = new THREE.PerspectiveCamera(30, 1, 0.05, 50);
+  var camera = new THREE.PerspectiveCamera(32, 1, 0.05, 50);
   var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.shadowMap.enabled = true;
