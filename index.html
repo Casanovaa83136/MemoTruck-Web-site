@@ -829,7 +829,6 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   var numEl = document.getElementById('capot-num');
   var titleEl = document.getElementById('capot-title');
   var descEl = document.getElementById('capot-desc');
-  if (!container || !('IntersectionObserver' in window)) return;
 
   var STEPS = ['cpu', 'gpu', 'ram', 'netcard'];
   var CONTENT = {
@@ -839,31 +838,49 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     netcard: { num: '04', title: 'Panels et application, connectés en permanence.', desc: "Une mise à jour d'un côté est visible instantanément de l'autre, sans synchronisation manuelle." }
   };
 
-  // camera keyframes: spherical coords (degrees) around the laptop, radius as a
-  // fraction of the model's own max dimension — same 4-step "tour" structure as
-  // the rest of the page's scroll storytelling.
+  // Distinct "shots" (not just a gentle pan): each feature card gets its own
+  // framing — a punch-in on the screen, a top-down look at the keyboard, a
+  // side profile, a wide pull-back — with a snappy whip between them and a
+  // hold while each card is on screen. Target coords are fractions of the
+  // model's own bounding size, so they scale with whatever the box turns out
+  // to be once loaded.
+  var SHOT_HERO   = { az: 34,   el: 24, r: 2.35, tx: 0, ty: 0.42, tz: 0 };
+  var SHOT_SCREEN = { az: 4,    el: 8,  r: 0.95, tx: 0, ty: 0.80, tz: -0.15 };
+  var SHOT_KBD    = { az: -58,  el: 60, r: 1.2,  tx: 0, ty: 0.08, tz: 0.10 };
+  var SHOT_SIDE   = { az: 88,   el: 11, r: 2.05, tx: 0, ty: 0.4,  tz: 0 };
+  var SHOT_WIDE   = { az: 58,   el: 16, r: 2.65, tx: 0, ty: 0.42, tz: 0 };
+
   var CAM_KEYS = [
-    { p: 0.00, az: 34, el: 24, r: 2.35 },
-    { p: 0.22, az: 14, el: 15, r: 1.95 },
-    { p: 0.385, az: -12, el: 21, r: 1.85 },
-    { p: 0.55, az: -32, el: 13, r: 1.8 },
-    { p: 0.715, az: 10, el: 27, r: 1.95 },
-    { p: 0.88, az: 24, el: 20, r: 2.25 },
-    { p: 1.00, az: 24, el: 20, r: 2.25 }
+    { p: 0.000, s: SHOT_HERO },
+    { p: 0.200, s: SHOT_HERO },
+    { p: 0.260, s: SHOT_SCREEN },
+    { p: 0.360, s: SHOT_SCREEN },
+    { p: 0.400, s: SHOT_KBD },
+    { p: 0.530, s: SHOT_KBD },
+    { p: 0.565, s: SHOT_SIDE },
+    { p: 0.695, s: SHOT_SIDE },
+    { p: 0.730, s: SHOT_WIDE },
+    { p: 0.860, s: SHOT_WIDE },
+    { p: 0.900, s: SHOT_HERO },
+    { p: 1.000, s: SHOT_HERO }
   ];
   var STORY_START = 0.22, STORY_END = 0.88;
 
   function lerp(a, b, t) { return a + (b - a) * t; }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function easeInOut(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
 
   function camAt(progress) {
     var p = clamp(progress, 0, 1);
     var i = 0;
     while (i < CAM_KEYS.length - 2 && CAM_KEYS[i + 1].p < p) i++;
-    var a = CAM_KEYS[i], b = CAM_KEYS[i + 1];
-    var span = b.p - a.p;
-    var t = span > 0 ? clamp((p - a.p) / span, 0, 1) : 0;
-    return { az: lerp(a.az, b.az, t), el: lerp(a.el, b.el, t), r: lerp(a.r, b.r, t) };
+    var a = CAM_KEYS[i].s, b = CAM_KEYS[i + 1].s;
+    var span = CAM_KEYS[i + 1].p - CAM_KEYS[i].p;
+    var t = span > 0 ? easeInOut(clamp((p - CAM_KEYS[i].p) / span, 0, 1)) : 0;
+    return {
+      az: lerp(a.az, b.az, t), el: lerp(a.el, b.el, t), r: lerp(a.r, b.r, t),
+      tx: lerp(a.tx, b.tx, t), ty: lerp(a.ty, b.ty, t), tz: lerp(a.tz, b.tz, t)
+    };
   }
 
   var scene = new THREE.Scene();
@@ -875,7 +892,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   container.appendChild(renderer.domElement);
 
-  scene.add(new THREE.HemisphereLight(0xfff7ea, 0xd8d4c4, 1.1));
+  var hemi = new THREE.HemisphereLight(0xfff7ea, 0xd8d4c4, 1.1);
+  scene.add(hemi);
   var key = new THREE.DirectionalLight(0xffffff, 2.4);
   key.position.set(2.4, 3.6, -2.6);
   key.castShadow = true;
@@ -889,16 +907,22 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   var rig = new THREE.Group();
   scene.add(rig);
 
-  var camTarget = new THREE.Vector3(0, 0, 0);
+  var modelSize = new THREE.Vector3(1, 1, 1);
+  var camTargetGoal = new THREE.Vector3(0, 0, 0);
+  var camTargetCur = new THREE.Vector3(0, 0, 0);
   var camPos = new THREE.Vector3(0, 0, 3);
-  var camGoal = { az: 34, el: 24, r: 2.35 };
+  var camGoal = SHOT_HERO;
   var maxDim = 1;
 
-  function sphToCartesian(az, el, r) {
+  function sphToCartesian(az, el, r, target) {
     var azR = THREE.MathUtils.degToRad(az);
     var elR = THREE.MathUtils.degToRad(el);
     var horiz = Math.cos(elR) * r;
-    return new THREE.Vector3(horiz * Math.sin(azR), camTarget.y + Math.sin(elR) * r, -horiz * Math.cos(azR));
+    return new THREE.Vector3(
+      target.x + horiz * Math.sin(azR),
+      target.y + Math.sin(elR) * r,
+      target.z - horiz * Math.cos(azR)
+    );
   }
 
   function resize() {
@@ -908,7 +932,9 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
   }
-  new ResizeObserver(resize).observe(container);
+
+  var ro = new ResizeObserver(resize);
+  ro.observe(container);
 
   var animeMod = null;
   var lastIdx = -2;
@@ -925,10 +951,11 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   function showCallout(idx, isSwap) {
     fillCallout(idx);
     if (!animeMod) { callout.classList.add('on'); return; }
+    var animate = animeMod.animate;
     if (isSwap) {
-      animeMod.animate(callout, { scale: [1, 1.05, 1], duration: 380, ease: 'outQuad' });
+      animate(callout, { scale: [1, 1.05, 1], duration: 380, ease: 'outQuad' });
     } else {
-      animeMod.animate(callout, { opacity: 1, translateY: 0, scale: 1, translateX: '-50%', duration: 420, ease: 'outBack' });
+      animate(callout, { opacity: 1, translateY: 0, scale: 1, translateX: '-50%', duration: 420, ease: 'outBack' });
     }
   }
 
@@ -954,6 +981,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     else idx = Math.min(STEPS.length - 1, Math.floor(storyP * STEPS.length));
     showStep(idx);
     camGoal = camAt(progress);
+    camTargetGoal.set(camGoal.tx * modelSize.x, camGoal.ty * modelSize.y, camGoal.tz * modelSize.z);
   }
 
   function loop() {
@@ -961,10 +989,13 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     requestAnimationFrame(loop);
     var t = performance.now() - startT;
     rig.rotation.y = Math.sin(t * 0.00035) * 0.05;
-    var target = sphToCartesian(camGoal.az, camGoal.el, camGoal.r * maxDim);
-    camPos.lerp(target, 0.07);
+
+    camTargetCur.lerp(camTargetGoal, 0.09);
+    var goalPos = sphToCartesian(camGoal.az, camGoal.el, camGoal.r * maxDim, camTargetGoal);
+    camPos.lerp(goalPos, 0.09);
     camera.position.copy(camPos);
-    camera.lookAt(camTarget);
+    camera.lookAt(camTargetCur);
+
     renderer.render(scene, camera);
   }
 
@@ -976,9 +1007,12 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   }, { threshold: 0.02 });
   io.observe(section);
 
-  new GLTFLoader().load('assets/laptop/scene.gltf', function (gltf) {
+  var loader = new GLTFLoader();
+  loader.load('assets/laptop/scene.gltf', function (gltf) {
     var model = gltf.scene;
-    model.traverse(function (o) { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+    model.traverse(function (o) {
+      if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; }
+    });
 
     var box = new THREE.Box3().setFromObject(model);
     var size = new THREE.Vector3();
@@ -991,25 +1025,30 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     rig.add(model);
 
     maxDim = Math.max(size.x, size.y, size.z);
-    camTarget.set(0, size.y * 0.42, 0);
-    camPos.copy(sphToCartesian(camGoal.az, camGoal.el, camGoal.r * maxDim));
+    modelSize.copy(size);
+    camTargetGoal.set(camGoal.tx * modelSize.x, camGoal.ty * modelSize.y, camGoal.tz * modelSize.z);
+    camTargetCur.copy(camTargetGoal);
+    camPos.copy(sphToCartesian(camGoal.az, camGoal.el, camGoal.r * maxDim, camTargetGoal));
 
-    var shadowPlane = new THREE.Mesh(
-      new THREE.CircleGeometry(Math.max(size.x, size.z) * 1.15, 48),
-      new THREE.ShadowMaterial({ opacity: 0.22 })
-    );
+    var shadowGeo = new THREE.CircleGeometry(Math.max(size.x, size.z) * 1.15, 48);
+    var shadowMat = new THREE.ShadowMaterial({ opacity: 0.22 });
+    var shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
     shadowPlane.rotation.x = -Math.PI / 2;
     shadowPlane.receiveShadow = true;
     rig.add(shadowPlane);
 
     resize();
     camera.position.copy(camPos);
-    camera.lookAt(camTarget);
+    camera.lookAt(camTargetCur);
     renderer.render(scene, camera);
+    window.__rendered = true;
 
     update(0);
+    io.takeRecords();
     if (section.getBoundingClientRect().top < window.innerHeight) { running = true; requestAnimationFrame(loop); }
-  }, undefined, function (err) { console.error('laptop model failed to load', err); });
+  }, undefined, function (err) {
+    console.error('laptop model failed to load', err);
+  });
 
   import('https://cdn.jsdelivr.net/npm/animejs@4.5.0/dist/bundles/anime.esm.min.js').then(function (anime) {
     animeMod = anime;
@@ -1019,9 +1058,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
       leave: 'bottom bottom',
       onUpdate: function (self) { update(self.progress); }
     });
-  }).catch(function () {
-    // CDN unreachable: the laptop stays in its resting pose, no crash.
-  });
+  }).catch(function () {});
 })();
 </script>
 
