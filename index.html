@@ -107,6 +107,11 @@ header.nav { position: sticky; top: 0; z-index: 50; background: var(--paper); bo
 
 .ledger { margin-top: 52px; border-top: 3px solid var(--ink); display: grid; grid-template-columns: repeat(3, 1fr); }
 @media (max-width: 480px) { .ledger { grid-template-columns: 1fr; } .ledger div { border-right: none; border-bottom: 1px solid var(--hair); } .ledger div:last-child { border-bottom: none; } }
+@media (max-width: 560px) {
+    .top-strip .container { justify-content: flex-start; gap: 4px 16px; }
+    .top-strip .container > span:last-child { display: none; }
+    .exhibit-cap { flex-direction: column; align-items: flex-start; gap: 2px; }
+}
 .ledger div { min-width: 0; padding: 18px 20px 0; border-right: 1px solid var(--hair); }
 .ledger div:last-child { border-right: none; }
 .ledger .num { font-family: var(--mono); font-size: clamp(1.25rem, 2.6vw, 2rem); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -236,8 +241,12 @@ header.nav { position: sticky; top: 0; z-index: 50; background: var(--paper); bo
     font: inherit; font-size: 0.9375rem; color: var(--ink); outline: none; transition: border-color 0.2s, background 0.2s;
 }
 .field input:focus, .field select:focus, .field textarea:focus { background: #fff; border-color: var(--cyan-deep); }
-.field select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2314161a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+.field select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2314161a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px; text-overflow: ellipsis; }
 .field textarea { resize: none; }
+@media (max-width: 480px) {
+    .form-panel { padding: 24px 20px; }
+    .field select { padding-right: 30px; padding-left: 10px; font-size: 0.8125rem; background-position: right 8px center; }
+}
 .field-full { margin-bottom: 18px; }
 .btn-submit {
     width: 100%; padding: 16px; background: var(--ink); color: var(--paper);
@@ -443,7 +452,7 @@ header.nav { transform: translateY(-100%); opacity: 0; animation: nav-in 0.7s cu
       <div>
         <div class="exhibit">
           <div class="exhibit-photo"><img src="assets/images/chapitre-02.png" alt="Analytique de flotte en temps réel"></div>
-          <div class="exhibit-cap"><span>Pièce jointe — 38 véhicules en régle</span><span class="tag">Réf. MT-03</span></div>
+          <div class="exhibit-cap"><span>Pièce jointe — 38 véhicules en règle</span><span class="tag">Réf. MT-03</span></div>
         </div>
       </div>
       <div>
