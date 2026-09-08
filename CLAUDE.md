@@ -48,3 +48,13 @@ The single file is organized into three chunks, in order:
 - **The contact form has no backend.** It's a plain `<form>` posting to FormSubmit.co, intercepted by JS to submit via `fetch` so the page can swap in a styled success state instead of redirecting off-site. `contact@memotruck.fr` must click FormSubmit's one-time activation email before the first real submission will be delivered — test submissions before that will silently fail to arrive (though the on-page success/error state doesn't depend on that activation).
 - **No JS framework or build pipeline** — new interactivity should be added as plain vanilla JS appended to the existing `<script>` block, consistent with the existing style (small IIFEs, `// ── SECTION ──` comment banners). Don't reach for a library for effects plain CSS/JS can already do, which is how everything else on this page works.
 - Hero/feature photography is linked directly from Unsplash/Pexels CDN URLs rather than downloaded/inlined — keep that pattern for new stock imagery to avoid bloating the single HTML file.
+
+## Delivering multiple generated images to the user on mobile (e.g. Instagram carousel assets)
+
+When the user needs to save several generated images (renders, carousel slides, etc.) from their phone, a plain `SendUserFile`/base64-`<img>`-long-press page renames every file to the same generic "Téléchargement.PNG" on Android/Chrome, overwriting all but the last one. The working fix, validated end-to-end with the user:
+
+1. Publish an Artifact with `capabilities: {downloads: true}`.
+2. Embed each image as a base64 `data:` URI in an `<img>`, with one button per image calling `await (await window.claude.use('downloads')).save({filename, data: blob})` — this gives each file a real, distinct filename via a native save confirmation.
+3. **Never `fetch()` the image's own `data:` URI to get the Blob** — it fails with "Failed to fetch" in this runtime. Instead decode the base64 payload directly: `atob()` the payload, build a `Uint8Array`, wrap it in `new Blob([bytes], {type: mime})`.
+4. **Space out saves** — calling `downloads.save()` back-to-back (e.g. 6 slides tapped quickly) trips a rate limit ("too many save prompts; try again shortly") on roughly the 6th rapid call. If a save fails with that message, just wait ~30-60s and retry that one file; it's not a bug, it's the platform's one-prompt-at-a-time throttle.
+5. Show a persistent on-page status log (not `alert()`) of each step/result — `alert()`/modals are unreliable inside the sandboxed artifact iframe, so silent failures are otherwise undebuggable.
