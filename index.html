@@ -140,14 +140,14 @@ header.nav { position: sticky; top: 0; z-index: 50; background: var(--paper); bo
 .capot-track { height: 380vh; position: relative; }
 @media (max-width: 700px) { .capot-track { height: 300vh; } }
 .capot-pin {
-    position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: hidden;
+    position: sticky; top: 0; height: 100vh; height: 100dvh; max-height: 900px; overflow: hidden;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     padding: 88px 0 40px;
 }
 .capot-head { text-align: center; margin-bottom: 4px; z-index: 2; }
 .capot-head h2 { margin-top: 14px; font-size: clamp(1.8rem, 4vw, 2.7rem); }
 .capot-stage { flex: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; }
-.capot-viewport { position: relative; width: min(100%, 960px); height: 100%; max-height: min(220vw, 1536px); }
+.capot-viewport { position: relative; width: min(100%, 960px); height: 100%; }
 @media (max-width: 700px) { .capot-callout { width: min(90vw, 340px) !important; } }
 .capot-canvas { position: absolute; inset: 0; }
 .capot-canvas canvas { display: block; width: 100% !important; height: 100% !important; }
@@ -1029,14 +1029,14 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   }
 
   var radiusScale = 1;
-  var REF_DIAG = Math.sqrt(390 * 390 + 588 * 588);
+  var REF_CANVAS_H = 588;
   function resize() {
     var w = container.clientWidth, h = container.clientHeight;
     if (!w || !h) return;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
-    radiusScale = Math.sqrt(w * w + h * h) / REF_DIAG;
+    radiusScale = h / REF_CANVAS_H;
   }
 
   var ro = new ResizeObserver(resize);
