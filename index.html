@@ -949,7 +949,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   // to be once loaded.
   var SHOT_HERO   = { az: 34,   el: 24, r: 2.7,  tx: 0, ty: 0.42, tz: 0 };
   var SHOT_SCREEN = { az: 4,    el: 8,  r: 1.25, tx: 0, ty: 0.78, tz: -0.15 };
-  var SHOT_KBD    = { az: -58,  el: 58, r: 1.55, tx: 0, ty: 0.08, tz: 0.10 };
+  var SHOT_KBD    = { az: -58,  el: 58, r: 1.85, tx: 0, ty: 0.08, tz: 0.10 };
   var SHOT_SIDE   = { az: 88,   el: 11, r: 2.35, tx: 0, ty: 0.4,  tz: 0 };
   var SHOT_WIDE   = { az: 58,   el: 16, r: 3.0,  tx: 0, ty: 0.42, tz: 0 };
 
@@ -1029,14 +1029,14 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   }
 
   var radiusScale = 1;
-  var REF_CANVAS_H = 588;
+  var REF_DIAG = Math.sqrt(390 * 390 + 588 * 588);
   function resize() {
     var w = container.clientWidth, h = container.clientHeight;
     if (!w || !h) return;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
-    radiusScale = h / REF_CANVAS_H;
+    radiusScale = Math.sqrt(w * w + h * h) / REF_DIAG;
   }
 
   var ro = new ResizeObserver(resize);
