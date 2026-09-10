@@ -1028,12 +1028,15 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     );
   }
 
+  var radiusScale = 1;
+  var REF_CANVAS_H = 588;
   function resize() {
     var w = container.clientWidth, h = container.clientHeight;
     if (!w || !h) return;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
+    radiusScale = h / REF_CANVAS_H;
   }
 
   var ro = new ResizeObserver(resize);
@@ -1094,7 +1097,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     rig.rotation.y = Math.sin(t * 0.00035) * 0.05;
 
     camTargetCur.lerp(camTargetGoal, 0.09);
-    var goalPos = sphToCartesian(camGoal.az, camGoal.el, camGoal.r * maxDim, camTargetGoal);
+    var goalPos = sphToCartesian(camGoal.az, camGoal.el, camGoal.r * maxDim * radiusScale, camTargetGoal);
     camPos.lerp(goalPos, 0.09);
     camera.position.copy(camPos);
     camera.lookAt(camTargetCur);
@@ -1131,7 +1134,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     modelSize.copy(size);
     camTargetGoal.set(camGoal.tx * modelSize.x, camGoal.ty * modelSize.y, camGoal.tz * modelSize.z);
     camTargetCur.copy(camTargetGoal);
-    camPos.copy(sphToCartesian(camGoal.az, camGoal.el, camGoal.r * maxDim, camTargetGoal));
+    camPos.copy(sphToCartesian(camGoal.az, camGoal.el, camGoal.r * maxDim * radiusScale, camTargetGoal));
 
     var shadowGeo = new THREE.CircleGeometry(Math.max(size.x, size.z) * 1.15, 48);
     var shadowMat = new THREE.ShadowMaterial({ opacity: 0.22 });
