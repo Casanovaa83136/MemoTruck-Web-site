@@ -140,7 +140,7 @@ header.nav { position: sticky; top: 0; z-index: 50; background: var(--paper); bo
 .capot-track { height: 380vh; position: relative; }
 @media (max-width: 700px) { .capot-track { height: 300vh; } }
 .capot-pin {
-    position: sticky; top: 0; height: 100vh; height: 100dvh; max-height: 900px; overflow: hidden;
+    position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: hidden;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     padding: 88px 0 40px;
 }
@@ -1029,14 +1029,14 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   }
 
   var radiusScale = 1;
-  var REF_CANVAS_H = 588;
+  var REF_ASPECT = 390 / 588;
   function resize() {
     var w = container.clientWidth, h = container.clientHeight;
     if (!w || !h) return;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
-    radiusScale = h / REF_CANVAS_H;
+    radiusScale = Math.max(1, REF_ASPECT / (w / h));
   }
 
   var ro = new ResizeObserver(resize);
