@@ -289,6 +289,36 @@ footer { background: var(--ink); color: var(--paper); padding: 44px 0; }
 @media (min-width: 640px) { .footer-bottom { flex-direction: row; justify-content: space-between; flex-wrap: wrap; row-gap: 6px; } }
 .footer-bottom a:hover { color: var(--cyan); }
 
+/* ════ COOKIE CONSENT ════ */
+.cookie-overlay {
+    position: fixed; inset: 0; z-index: 300; background: rgba(20,22,26,0.55);
+    display: flex; align-items: flex-end; justify-content: center; padding: 20px;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+}
+@media (min-width: 640px) { .cookie-overlay { align-items: center; } }
+.cookie-overlay.on { opacity: 1; pointer-events: auto; }
+.cookie-modal {
+    background: var(--panel); border: 3px solid var(--ink); max-width: 480px; width: 100%;
+    padding: 32px; transform: translateY(16px); transition: transform 0.25s ease;
+}
+.cookie-overlay.on .cookie-modal { transform: translateY(0); }
+.cookie-modal h3 { font-size: 1.375rem; margin: 10px 0 16px; }
+.cookie-modal > p { font-size: 0.9375rem; color: var(--steel); }
+.cookie-modal > p strong { color: var(--ink); }
+.cookie-row {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+    padding: 16px 0; border-top: 1px solid var(--hair); margin-top: 16px;
+}
+.cookie-row strong { display: block; font-size: 0.875rem; margin-bottom: 3px; }
+.cookie-row div span { font-size: 0.8125rem; color: var(--steel); }
+.cookie-badge {
+    flex-shrink: 0; font-family: var(--mono); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--good); white-space: nowrap; margin-top: 3px;
+}
+.cookie-badge.off { color: var(--steel-2); }
+.cookie-more { margin-top: 18px !important; font-size: 0.8125rem !important; }
+.cookie-modal .btn { margin-top: 20px; width: 100%; }
+
 /* ════ BUTTON CLICK FEEDBACK ════ */
 .btn, .nav-cta, .crew-toggle button { position: relative; overflow: hidden; -webkit-tap-highlight-color: transparent; }
 .btn:active, .nav-cta:active { transform: scale(0.96); }
@@ -603,6 +633,7 @@ header.nav { transform: translateY(-100%); opacity: 0; animation: nav-in 0.7s cu
         <a href="#contact">Contact</a>
         <a href="mentions-legales.html">Mentions légales</a>
         <a href="confidentialite.html">Confidentialité</a>
+        <a href="#" id="cookie-manage-link">Gérer les cookies</a>
       </div>
     </div>
     <div class="footer-bottom">
@@ -612,6 +643,30 @@ header.nav { transform: translateY(-100%); opacity: 0; animation: nav-in 0.7s cu
     </div>
   </div>
 </footer>
+
+<div class="cookie-overlay" id="cookie-overlay">
+  <div class="cookie-modal">
+    <span class="eyebrow">Vos cookies, vos règles</span>
+    <h3>Gestion des cookies</h3>
+    <p>MémoTruck n'utilise <strong>aucun cookie de mesure d'audience, publicitaire ou de traçage.</strong> Seuls des cookies strictement techniques, indispensables au fonctionnement du site, sont susceptibles d'être déposés.</p>
+    <div class="cookie-row">
+      <div>
+        <strong>Cookies techniques</strong>
+        <span>Nécessaires au bon fonctionnement du site. Ne peuvent pas être désactivés.</span>
+      </div>
+      <span class="cookie-badge">Toujours actifs</span>
+    </div>
+    <div class="cookie-row">
+      <div>
+        <strong>Mesure d'audience</strong>
+        <span>Aucun outil d'analyse ou de statistiques n'est installé sur ce site.</span>
+      </div>
+      <span class="cookie-badge off">Non utilisé</span>
+    </div>
+    <p class="cookie-more">Pour en savoir plus, consultez notre <a href="confidentialite.html">politique de confidentialité</a>.</p>
+    <button class="btn btn-fill" id="cookie-close">J'ai compris</button>
+  </div>
+</div>
 
 <script>
 // ── TICKER CONTENT ──
@@ -819,6 +874,38 @@ header.nav { transform: translateY(-100%); opacity: 0; animation: nav-in 0.7s cu
         submitLabel.textContent = 'Demander ma démo';
       });
   });
+})();
+
+// ── COOKIE CONSENT ──
+(function () {
+  var STORAGE_KEY = 'mt-cookies-ack';
+  var overlay = document.getElementById('cookie-overlay');
+  var openLink = document.getElementById('cookie-manage-link');
+  var closeBtn = document.getElementById('cookie-close');
+  if (!overlay) return;
+
+  function openModal() {
+    overlay.classList.add('on');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(ack) {
+    overlay.classList.remove('on');
+    document.body.style.overflow = '';
+    if (ack) { try { localStorage.setItem(STORAGE_KEY, '1'); } catch (e) {} }
+  }
+
+  closeBtn.addEventListener('click', function () { closeModal(true); });
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(true); });
+  openLink.addEventListener('click', function (e) { e.preventDefault(); openModal(); });
+
+  var alreadyAck = false;
+  try { alreadyAck = localStorage.getItem(STORAGE_KEY) === '1'; } catch (e) {}
+
+  if (window.location.hash === '#cookies') {
+    openModal();
+  } else if (!alreadyAck) {
+    setTimeout(openModal, 900);
+  }
 })();
 </script>
 
