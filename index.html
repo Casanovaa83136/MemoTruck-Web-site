@@ -147,7 +147,7 @@ header.nav { position: sticky; top: 0; z-index: 50; background: var(--paper); bo
 .capot-head { text-align: center; margin-bottom: 4px; z-index: 2; }
 .capot-head h2 { margin-top: 14px; font-size: clamp(1.8rem, 4vw, 2.7rem); }
 .capot-stage { flex: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; }
-.capot-viewport { position: relative; width: min(100%, 960px); height: 100%; }
+.capot-viewport { position: relative; width: min(100%, 960px); height: 100%; max-height: min(220vw, 1536px); }
 @media (max-width: 700px) { .capot-callout { width: min(90vw, 340px) !important; } }
 .capot-canvas { position: absolute; inset: 0; }
 .capot-canvas canvas { display: block; width: 100% !important; height: 100% !important; }
