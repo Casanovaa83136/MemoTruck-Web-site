@@ -743,12 +743,12 @@ async function renderDashboardAdmin() {
     // ── Alertes ──────────────────────────────────────────────────────────
     const champsTracteur  = ["date_ct","date_assurance","date_limiteur_vitesse","date_chronotachygraphe"];
     const champsRemorque  = ["date_ct","date_assurance"];
-    const champsChauffeur = ["date_carte_conducteur","date_visite_medicale","date_fco","date_adr","date_carte_as24","date_carte_total"];
+    const champsChauffeur = ["date_carte_conducteur","date_visite_medicale","date_fco","date_adr","date_carte_identite","date_carte_as24","date_carte_total"];
     const labelChamp = {
       date_ct:"Contrôle technique", date_assurance:"Assurance",
       date_limiteur_vitesse:"Limiteur de vitesse", date_chronotachygraphe:"Chronotachy.",
       date_carte_conducteur:"Carte conducteur", date_visite_medicale:"Visite médicale",
-      date_fco:"FCO", date_adr:"ADR",
+      date_fco:"FCO", date_adr:"ADR", date_carte_identite:"Carte d'identité",
       date_carte_as24:"Carte AS24", date_carte_total:"Carte TOTAL"
     };
 
@@ -1571,7 +1571,7 @@ async function renderChauffeurs() {
               const enServiceStr = session
                 ? `<span style="color:var(--color-success);font-weight:700;">🚚 ${esc(sessPlaqueT)}</span>${sessPlaqueR ? `<br><span style="color:var(--color-success);font-weight:700;">🚛 ${esc(sessPlaqueR)}</span>` : `<br><span style="color:var(--color-text-secondary);font-size:12px;">Solo</span>`}`
                 : `<span style="color:var(--color-text-secondary);">—</span>`;
-              const DOCS_KEYS = ["date_carte_conducteur","date_visite_medicale","date_fco","date_adr","date_carte_as24","date_carte_total"];
+              const DOCS_KEYS = ["date_carte_conducteur","date_visite_medicale","date_fco","date_adr","date_carte_identite","date_carte_as24","date_carte_total"];
               let pireRang = 0;
               DOCS_KEYS.forEach(k => { const st = alerteStatut(c[k]); if (st && st.rang > pireRang) pireRang = st.rang; });
               const statut = alerteStatutLabel(pireRang);
@@ -1750,7 +1750,7 @@ async function renderParc() {
     function dateCell(iso) {
       if (!iso) return `<span style="color:var(--color-text-secondary);">—</span>`;
       const diff = Math.floor((new Date(iso) - Date.now()) / 86400000);
-      const color = diff < 0 ? "var(--color-danger)" : diff < 15 ? "var(--color-warning)" : diff < 60 ? "var(--color-warning-soft)" : "var(--color-success)";
+      const color = diff < 0 ? "var(--color-danger)" : diff < 15 ? "var(--color-warning)" : diff <= 30 ? "var(--color-warning-soft)" : "var(--color-success)";
       return `<span style="color:${color};font-weight:600;">${formatDate(iso)}</span>`;
     }
 
@@ -3731,9 +3731,9 @@ async function ouvrirGestionCartesVehicule(plaque, type) {
   function dateColor(iso) {
     if (!iso) return "var(--color-text-secondary)";
     const diff = Math.floor((new Date(iso) - Date.now()) / 86400000);
-    if (diff < 0)  return "var(--color-danger)";
-    if (diff < 15) return "var(--color-warning)";
-    if (diff < 60) return "var(--color-warning-soft)";
+    if (diff < 0)   return "var(--color-danger)";
+    if (diff < 15)  return "var(--color-warning)";
+    if (diff <= 30) return "var(--color-warning-soft)";
     return "var(--color-success)";
   }
 
@@ -4222,9 +4222,9 @@ async function ouvrirDetailChauffeur(chauffeurId, chauffeurs) {
     function dateColor(iso) {
       if (!iso) return "var(--color-text-secondary)";
       const diff = Math.floor((new Date(iso) - Date.now()) / 86400000);
-      if (diff < 0)  return "var(--color-danger)";
-      if (diff < 15) return "var(--color-warning)";
-      if (diff < 60) return "var(--color-warning-soft)";
+      if (diff < 0)   return "var(--color-danger)";
+      if (diff < 15)  return "var(--color-warning)";
+      if (diff <= 30) return "var(--color-warning-soft)";
       return "var(--color-success)";
     }
 
@@ -4551,10 +4551,10 @@ function attachAlerteBandeauListeners(chauffeurs) {
 function dateBadge(iso) {
   if (!iso) return `<span style="color:var(--color-text-secondary);">—</span>`;
   const diff  = Math.floor((new Date(iso) - Date.now()) / 86400000);
-  const color = diff < 0 ? "var(--color-danger)" : diff < 15 ? "var(--color-warning)" : diff < 60 ? "var(--color-warning-soft)" : "var(--color-success)";
-  const label = diff < 0   ? `⚠️ Expiré`
-              : diff < 15  ? `⚡ ${diff}j`
-              : diff < 60  ? `⏳ ${formatDate(iso)}`
+  const color = diff < 0 ? "var(--color-danger)" : diff < 15 ? "var(--color-warning)" : diff <= 30 ? "var(--color-warning-soft)" : "var(--color-success)";
+  const label = diff < 0    ? `⚠️ Expiré`
+              : diff < 15   ? `⚡ ${diff}j`
+              : diff <= 30  ? `⏳ ${formatDate(iso)}`
               : `✓ ${formatDate(iso)}`;
   return `<span style="color:${color};font-weight:600;font-size:11px;">${label}</span>`;
 }
@@ -4587,7 +4587,7 @@ async function chargerAlertes() {
   try {
     const [chauffeurs, tracteurs, remorques, engins] = await Promise.all([
       dbSelect("chauffeurs", {
-        select: "id,prenom,nom,date_carte_conducteur,date_visite_medicale,date_fco,date_adr,date_carte_as24,date_carte_total",
+        select: "id,prenom,nom,date_carte_conducteur,date_visite_medicale,date_fco,date_adr,date_carte_identite,date_carte_as24,date_carte_total",
         filters: [
           { col: "entreprise_id", op: "eq", val: adminSession.entreprise_id },
           { col: "est_valide",    op: "eq", val: "true" }
@@ -6548,7 +6548,7 @@ async function renderEngins() {
     function dateCell(iso) {
       if (!iso) return `<span style="color:var(--color-text-secondary);">—</span>`;
       const diff  = Math.floor((new Date(iso) - Date.now()) / 86400000);
-      const color = diff < 0 ? "var(--color-danger)" : diff < 15 ? "var(--color-warning)" : diff < 60 ? "var(--color-warning-soft)" : "var(--color-success)";
+      const color = diff < 0 ? "var(--color-danger)" : diff < 15 ? "var(--color-warning)" : diff <= 30 ? "var(--color-warning-soft)" : "var(--color-success)";
       return `<span style="color:${color};font-weight:600;">${formatDate(iso)}</span>`;
     }
 
