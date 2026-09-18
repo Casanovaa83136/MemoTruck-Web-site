@@ -1257,6 +1257,7 @@ async function renderAlertes() {
       { c:"date_visite_medicale",  l:"Visite médicale" },
       { c:"date_fco",              l:"FCO" },
       { c:"date_adr",              l:"ADR" },
+      { c:"date_carte_identite",   l:"Carte d'identité" },
       { c:"date_carte_as24",       l:"Carte AS24" },
       { c:"date_carte_total",      l:"Carte TOTAL" }
     ];
@@ -4369,10 +4370,10 @@ async function ouvrirDetailChauffeur(chauffeurId, chauffeurs) {
 function alerteStatut(iso) {
   if (!iso) return null;
   const diff = Math.floor((new Date(iso) - Date.now()) / 86400000);
-  if (diff < 0)   return { rang: 3, label: `Expiré depuis ${Math.abs(diff)}j`, classe: "red",    badge: "🔴" };
-  if (diff < 15)  return { rang: 2, label: `Dans ${diff} jour${diff > 1 ? "s" : ""}`,  classe: "orange", badge: "🟠" };
-  if (diff < 60)  return { rang: 1, label: `Dans ${diff} jours`, classe: "yellow", badge: "🟡" };
-  return null; // OK, pas d'alerte
+  if (diff < 0)    return { rang: 3, label: `Expiré depuis ${Math.abs(diff)}j`, classe: "red",    badge: "🔴" };
+  if (diff < 15)   return { rang: 2, label: `Dans ${diff} jour${diff > 1 ? "s" : ""}`,  classe: "orange", badge: "🟠" };
+  if (diff <= 30)  return { rang: 1, label: `Dans ${diff} jours`, classe: "yellow", badge: "🟡" };
+  return null; // OK, pas d'alerte — même fenêtre de 30j que la page Alertes & Échéances
 }
 
 function alerteStatutLabel(rang) {
