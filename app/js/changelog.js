@@ -13,6 +13,13 @@
 // ════════════════════════════════════════════════════════════════════════
 export const CHANGELOG = [
   {
+    version: "v1.4.8.16",
+    date: "2026-09-18",
+    changes: [
+      "Technique : l'appli a déménagé sur memotruck.fr/app — aucun changement visible pour toi une fois la mise à jour appliquée."
+    ]
+  },
+  {
     version: "v1.4.8.15",
     date: "2026-09-17",
     changes: [

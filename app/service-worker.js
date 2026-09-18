@@ -5,7 +5,7 @@
 // fichier importé. Si ce numéro ne change pas, rien d'autre ne se passera
 // (pas de popup, pas de purge de cache), quels que soient les autres
 // fichiers modifiés. Penser aussi à ajouter une entrée dans js/changelog.js.
-const APP_VERSION = "v1.4.8.15";
+const APP_VERSION = "v1.4.8.16";
 const CACHE_NAME = "atil-cache-" + APP_VERSION;
 // Racine de l'appli sur memotruck.fr — l'appli est servie depuis ce sous-dossier,
 // pas depuis la racine du domaine. Tous les chemins absolus ci-dessous en dépendent.

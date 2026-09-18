@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<script>
+  // L'appli a déménagé sur memotruck.fr/app — toute autre origine (ex: l'ancien
+  // déploiement Vercel) redirige immédiatement, avant de charger le moindre asset.
+  if (location.hostname !== "memotruck.fr" && location.hostname !== "www.memotruck.fr") {
+    location.replace("https://memotruck.fr/app/");
+  }
+</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
 <meta name="theme-color" content="#0F1923" />
