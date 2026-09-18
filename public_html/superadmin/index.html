@@ -1,0 +1,3174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MémoTruck — Superadmin</title>
+<link rel="icon" href="icon192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  color-scheme: dark;
+  --bg:#09111B;
+  --surface:#0D1825;
+  --card:#111F2E;
+  --border:rgba(255,255,255,0.07);
+  --accent:#00C2FF;
+  --success:#22C55E;
+  --warning:#F59E0B;
+  --danger:#EF4444;
+  --text:#F1F5F9;
+  --muted:#64748B;
+  --muted-2:#8492A6;
+  --border-strong:rgba(255,255,255,0.13);
+  --radius:12px;
+  --radius-sm:8px;
+  --sidebar:220px;
+  --series-starter:#d95926;
+  --series-pme:#199e70;
+  --series-pro:#c98500;
+  --series-ent:#d55181;
+  --mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;-webkit-font-smoothing:antialiased}
+
+/* ── LOGIN ── */
+#screen-login{width:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 0%,rgba(0,194,255,0.09) 0%,var(--bg) 65%)}
+.login-box{width:380px;max-width:92vw;display:flex;flex-direction:column;gap:22px}
+.login-card{
+  background:var(--surface);border:1px solid rgba(0,194,255,0.15);
+  border-radius:20px;padding:30px;
+  display:flex;flex-direction:column;gap:16px;
+  box-shadow:0 0 60px rgba(0,194,255,0.05);
+}
+.login-name{font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.4px}
+.login-role{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase}
+.login-field{display:flex;flex-direction:column;gap:6px}
+.login-field label{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+.login-field input{
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);
+  font-size:14px;outline:none;font-family:inherit;transition:border-color 0.2s;
+}
+.login-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,194,255,0.08)}
+.btn-login{
+  background:var(--accent);color:#09111B;font-size:13px;font-weight:800;
+  padding:14px;border-radius:var(--radius-sm);border:none;cursor:pointer;
+  transition:all 0.15s;font-family:inherit;letter-spacing:0.5px;
+}
+.btn-login:hover{opacity:0.88;transform:translateY(-1px)}
+.login-error{font-size:12px;color:var(--danger);text-align:center;min-height:16px}
+
+/* ── APP ── */
+#screen-app{width:100%;display:none;flex-direction:row}
+
+/* ── SIDEBAR ── */
+.sa-sidebar{
+  width:var(--sidebar);flex-shrink:0;
+  background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  transition:transform 0.25s ease;
+}
+
+/* ── MOBILE TOPBAR (masquée en desktop, réutilise .sa-topbar/.sa-topbar-title) ── */
+.sa-topbar{
+  display:none;height:58px;background:var(--surface);border-bottom:1px solid var(--border);
+  align-items:center;justify-content:space-between;padding:0 24px;
+  position:sticky;top:0;z-index:50;flex-shrink:0;
+}
+.sa-hamburger{
+  background:none;border:none;color:var(--text);font-size:22px;line-height:1;
+  cursor:pointer;padding:6px 8px;border-radius:var(--radius-sm);flex-shrink:0;
+}
+.sa-hamburger:hover{background:rgba(255,255,255,0.06)}
+.sa-mobile-backdrop{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:190;
+}
+.sa-mobile-backdrop.show{display:block}
+
+@media (max-width:860px){
+  #screen-app{flex-direction:column}
+  .sa-topbar{display:flex;align-items:center;gap:12px}
+  .sa-sidebar{
+    position:fixed;top:0;left:0;bottom:0;z-index:200;
+    width:min(78vw,260px);
+    transform:translateX(-100%);
+    box-shadow:0 0 40px rgba(0,0,0,0.5);
+  }
+  .sa-sidebar.open{transform:translateX(0)}
+  .sa-main{padding:16px}
+  .sa-field-row{flex-direction:column}
+}
+@media (max-width:480px){
+  .sa-modal{padding:18px}
+}
+.sa-logo-wrap{
+  padding:18px 16px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.sa-logo-img{width:38px;height:38px;border-radius:10px;object-fit:cover;box-shadow:0 0 16px rgba(0,194,255,0.2);flex-shrink:0}
+.sa-logo-text{display:flex;flex-direction:column}
+.sa-logo{font-size:14px;font-weight:900;color:#fff;letter-spacing:-0.3px}
+.sa-logo-sub{font-size:9px;font-weight:600;color:var(--muted);margin-top:1px;letter-spacing:0.5px}
+.sa-nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px}
+.sa-nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);
+  border-radius:var(--radius-sm);position:relative;
+  transition:background 0.15s, color 0.15s, transform 0.15s;
+}
+.sa-nav-item:hover{background:rgba(0,194,255,0.07);color:var(--text);transform:translateX(3px)}
+.sa-nav-item:not(.active):hover::before{
+  content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);
+  width:3px;height:16px;background:var(--accent);border-radius:0 2px 2px 0;
+  opacity:0.35;
+}
+.sa-nav-item.active{
+  background:rgba(0,194,255,0.1);color:var(--accent);
+  border:1px solid rgba(0,194,255,0.18);
+}
+.sa-nav-item.active::before{
+  content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);
+  width:3px;height:16px;background:var(--accent);border-radius:0 2px 2px 0;
+  box-shadow:0 0 8px var(--accent);
+}
+@media (prefers-reduced-motion: reduce){
+  .sa-nav-item{transition:background 0.15s, color 0.15s}
+  .sa-nav-item:hover{transform:none}
+}
+.sa-badge{
+  margin-left:auto;background:var(--danger);color:#fff;
+  font-size:9px;font-weight:800;padding:2px 6px;
+  border-radius:8px;display:none;min-width:18px;text-align:center;
+}
+.sa-badge.show{display:block}
+.sa-sidebar-footer{
+  padding:10px 8px;border-top:1px solid var(--border);
+  display:flex;flex-direction:column;gap:8px;
+}
+.sa-user-card{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;background:var(--card);border-radius:var(--radius-sm);
+}
+.sa-user-avatar{
+  width:28px;height:28px;background:rgba(0,194,255,0.1);
+  border:1px solid rgba(0,194,255,0.2);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;
+}
+.sa-user-email{font-size:11px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sa-user-role{font-size:9px;color:var(--accent);font-weight:600;margin-top:1px}
+.sa-logout{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.18);
+  border-radius:var(--radius-sm);color:var(--danger);font-size:12px;font-weight:600;
+  cursor:pointer;padding:9px 12px;width:100%;font-family:inherit;transition:background 0.15s;
+}
+.sa-logout:hover{background:rgba(239,68,68,0.13)}
+
+/* ── TOPBAR ── */
+.sa-topbar-title{font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px}
+.sa-topbar-badge{
+  font-size:12px;font-weight:700;color:var(--accent);
+  background:rgba(0,194,255,0.1);border:1px solid rgba(0,194,255,0.2);
+  border-radius:20px;padding:4px 14px;
+}
+
+/* ── MAIN ── */
+.sa-main-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.sa-main{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px}
+.sa-section-title{font-size:17px;font-weight:800;color:var(--text);letter-spacing:-0.3px;margin-bottom:2px}
+
+/* ── STATS ── */
+.sa-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.sa-stat{
+  background:var(--surface);border:1px solid var(--border);
+  border-left:4px solid var(--stat-color,var(--accent));
+  border-radius:var(--radius);padding:16px 18px;
+  transition:transform 0.15s,box-shadow 0.15s;
+}
+.sa-stat:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.25)}
+.sa-stat-val{font-size:26px;font-weight:900;color:var(--stat-color,var(--accent));letter-spacing:-0.5px}
+.sa-stat-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
+
+/* ── ALERT BANNER ── */
+.sa-alert-banner{
+  background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.15);
+  border-radius:var(--radius);padding:14px 18px;
+}
+.sa-alert-title{font-size:12px;font-weight:700;color:var(--danger);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px}
+.sa-alert-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;
+  transition:background 0.1s;border-radius:4px;
+}
+.sa-alert-row:last-child{border-bottom:none}
+.sa-alert-row:hover .sa-alert-nom{color:var(--accent)}
+.sa-alert-nom{font-size:12px;font-weight:600;color:var(--text);flex:1}
+.sa-alert-date{font-size:11px;font-weight:700;color:var(--warning)}
+.sa-alert-date.expired{color:var(--danger)}
+
+/* ── DASHBOARD : recherche rapide ── */
+.dash-toprow{display:flex;gap:12px;align-items:center}
+.dash-search{flex:1;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 14px}
+.dash-search input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:13px;padding:11px 0;font-family:inherit}
+.dash-search input::placeholder{color:var(--muted)}
+
+/* ── DASHBOARD : hero MRR ── */
+.dash-hero-row{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:12px}
+.dash-hero-mrr{
+  background:linear-gradient(160deg, rgba(0,194,255,0.10), rgba(0,194,255,0.02) 60%), var(--surface);
+  border:1px solid rgba(0,194,255,0.25);border-radius:var(--radius);padding:18px 20px;
+  display:flex;flex-direction:column;gap:5px;justify-content:center;
+}
+.dash-hero-mrr .lbl{font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.6px}
+.dash-hero-mrr .val{font-size:34px;font-weight:900;letter-spacing:-1px;font-variant-numeric:tabular-nums;line-height:1.05}
+.dash-hero-mrr .sub{font-size:11px;color:var(--muted)}
+@media (max-width:920px){ .dash-hero-row{grid-template-columns:1fr 1fr} }
+
+/* ── DASHBOARD : cartes / grille widgets ── */
+.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.dash-card-title{font-size:12.5px;font-weight:800;color:var(--text)}
+.dash-card-title .n{color:var(--muted);font-weight:600;margin-left:4px}
+.dash-midrow{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:12px}
+.dash-botrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:920px){ .dash-midrow, .dash-botrow{grid-template-columns:1fr} }
+
+/* growth sparkline */
+.spark-top{display:flex;justify-content:space-between;align-items:baseline}
+.spark-val{font-size:19px;font-weight:900;font-variant-numeric:tabular-nums}
+.spark-val .plus{color:var(--accent)}
+.spark-caption{font-size:11px;color:var(--muted)}
+.spark-wrap{position:relative}
+.spark-svg{width:100%;height:70px;overflow:visible}
+.spark-tip{position:absolute;background:var(--card);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;pointer-events:none;opacity:0;transition:opacity .12s;white-space:nowrap;transform:translate(-50%,-130%);z-index:10}
+
+/* pack donut */
+.donut-body{display:flex;align-items:center;gap:16px}
+.donut-svg{flex-shrink:0}
+.donut-legend{display:flex;flex-direction:column;gap:7px;flex:1;min-width:0}
+.donut-row{display:flex;align-items:center;gap:8px;font-size:12px}
+.donut-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.donut-name{flex:1;color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.donut-pct{color:var(--muted);font-variant-numeric:tabular-nums;font-size:11.5px}
+.donut-count{font-weight:800;font-variant-numeric:tabular-nums;width:18px;text-align:right}
+.donut-seg{transition:opacity .12s;cursor:pointer}
+.donut-seg:hover{opacity:0.7}
+.donut-center-val{font-size:18px;font-weight:900;font-variant-numeric:tabular-nums}
+.donut-center-lbl{font-size:8px;font-weight:700}
+
+/* watchlist */
+.watch-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.watch-row:last-child{border-bottom:none;padding-bottom:0}
+.watch-name{flex:1;font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.watch-chip{font-size:9.5px;font-weight:800;padding:3px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.watch-chip-danger{background:rgba(239,68,68,0.12);color:var(--danger);border:1px solid rgba(239,68,68,0.25)}
+.watch-chip-warning{background:rgba(245,158,11,0.12);color:var(--warning);border:1px solid rgba(245,158,11,0.25)}
+.watch-empty{font-size:12px;color:var(--muted);padding:6px 0}
+
+/* activity feed (dashboard preview) */
+.dash-feed-row{display:flex;gap:9px;padding:7px 0;border-bottom:1px solid var(--border)}
+.dash-feed-row:last-child{border-bottom:none;padding-bottom:0}
+.dash-feed-icon{width:24px;height:24px;border-radius:6px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.dash-feed-body{flex:1;font-size:11.5px;line-height:1.45;min-width:0}
+.dash-feed-body b{font-weight:700}
+.dash-feed-meta{font-size:10px;color:var(--muted);font-family:var(--mono);white-space:nowrap}
+
+/* budget table */
+.budget-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.budget-kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 13px}
+.budget-kpi .val{font-size:18px;font-weight:900;font-variant-numeric:tabular-nums}
+.budget-kpi .lbl{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-top:2px}
+@media (max-width:900px){ .budget-kpis{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:480px){ .budget-kpis{grid-template-columns:1fr} }
+.budget-table-wrap{overflow-x:auto}
+table.budget{width:100%;border-collapse:collapse;font-size:12px}
+table.budget th{
+  text-align:left;font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;
+  letter-spacing:0.5px;padding:8px 10px;border-bottom:1px solid var(--border-strong);white-space:nowrap;
+}
+table.budget td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle;white-space:nowrap}
+table.budget td.num{font-variant-numeric:tabular-nums;text-align:right}
+table.budget tr.more td{color:var(--muted);font-style:italic;text-align:center;cursor:pointer}
+table.budget tr.more td:hover{color:var(--accent)}
+table.budget tr.total td{border-bottom:none;border-top:1.5px solid var(--border-strong);font-weight:800;padding-top:11px}
+.pack-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;display:inline-block}
+.pack-pill-starter{background:rgba(217,89,38,0.13);color:#e8834f}
+.pack-pill-pme{background:rgba(25,158,112,0.15);color:#3fd39c}
+.pack-pill-pro{background:rgba(201,133,0,0.15);color:#e0ab2e}
+.pack-pill-entreprise{background:rgba(213,81,129,0.15);color:#eb8bab}
+.status-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px}
+.status-pill-active{background:rgba(34,197,94,0.12);color:var(--success)}
+.status-pill-suspended{background:rgba(239,68,68,0.12);color:var(--danger)}
+.budget-note{font-size:10.5px;color:var(--muted);line-height:1.5}
+
+/* ── AVATARS (monogrammes colorés) ── */
+.avatar{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.avatar-sm{width:26px;height:26px;border-radius:7px;font-size:10.5px}
+.btn-icon{width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+
+/* ── ENTREPRISES (lignes) ── */
+.ent-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;flex-shrink:0}
+.ent-row{display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.ent-row:last-child{border-bottom:none}
+.ent-row:hover{background:rgba(0,194,255,0.025)}
+.ent-name{font-weight:700;font-size:13px;color:var(--text)}
+.ent-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.ent-col{width:100px;flex-shrink:0}
+.ent-col-num{width:56px;text-align:center;flex-shrink:0}
+.ent-num-val{font-weight:800;font-size:13px;font-variant-numeric:tabular-nums}
+.ent-num-lbl{font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px}
+.ent-actions{display:flex;gap:5px;flex-shrink:0}
+.ent-checkbox{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+
+/* ── CONTRATS (triage par urgence) ── */
+.triage-group{margin-bottom:18px}
+.triage-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.triage-head .dot{width:8px;height:8px;border-radius:50%}
+.triage-head h3{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:var(--text)}
+.triage-head .n{font-size:11px;color:var(--muted);font-weight:600}
+.triage-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.triage-row{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.triage-row:last-child{border-bottom:none}
+.triage-dates{font-size:11px;color:var(--muted);font-family:var(--mono);flex:1;min-width:120px}
+.triage-name{font-weight:700;font-size:12.5px;width:220px;flex-shrink:0}
+
+/* ── JOURNAL (fil groupé par jour) ── */
+.journal-day{margin-bottom:20px}
+.journal-day-lbl{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;padding-left:2px}
+.journal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.journal-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.journal-row:last-child{border-bottom:none}
+.journal-icon{width:30px;height:30px;border-radius:8px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.journal-body{flex:1;font-size:12.5px;line-height:1.5;min-width:0}
+.journal-body b{font-weight:700}
+.journal-who{font-size:10px;font-weight:800;padding:2px 7px;border-radius:5px;margin-right:2px}
+.journal-time{font-size:10.5px;color:var(--muted);font-family:var(--mono);white-space:nowrap}
+
+/* ── LOGIN (raffiné) ── */
+.login-lockup{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;margin-bottom:4px}
+.login-logo-icon{width:64px;height:64px;border-radius:17px;object-fit:cover;box-shadow:0 0 30px rgba(0,194,255,0.2)}
+.login-tagline{font-size:12.5px;color:var(--muted);max-width:280px}
+.login-foot{display:flex;align-items:center;justify-content:center;gap:6px;font-size:10.5px;color:var(--muted);margin-top:6px}
+
+/* ── TABLE ── */
+.sa-table-wrap{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;
+}
+.sa-table-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 18px;border-bottom:1px solid var(--border);
+}
+.sa-table-header h3{font-size:13px;font-weight:700;color:var(--text)}
+.sa-table-header-right{display:flex;gap:8px;align-items:center}
+table{width:100%;border-collapse:collapse}
+thead tr{background:rgba(255,255,255,0.02)}
+th{
+  font-size:9px;font-weight:700;letter-spacing:1px;
+  color:var(--muted);padding:10px 14px;text-align:left;
+  border-bottom:1px solid var(--border);text-transform:uppercase;
+}
+td{
+  padding:12px 14px;font-size:12px;
+  border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;
+}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(0,194,255,0.03)}
+
+/* ── BADGES ── */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;
+}
+.badge-green {background:rgba(34,197,94,0.1);color:var(--success);border:1px solid rgba(34,197,94,0.2)}
+.badge-red   {background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.2)}
+.badge-orange{background:rgba(245,158,11,0.1);color:var(--warning);border:1px solid rgba(245,158,11,0.2)}
+.badge-yellow{background:rgba(234,179,8,0.08);color:#EAB308;border:1px solid rgba(234,179,8,0.2)}
+.badge-blue  {background:rgba(0,194,255,0.1);color:var(--accent);border:1px solid rgba(0,194,255,0.2)}
+
+/* ── BOUTONS ── */
+.btn{
+  padding:7px 14px;border-radius:var(--radius-sm);border:none;
+  font-size:12px;font-weight:700;cursor:pointer;
+  transition:all 0.15s;font-family:inherit;
+}
+.btn:hover{opacity:0.85}
+.btn-primary{background:var(--accent);color:#09111B}
+.btn-danger {background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.25)}
+.btn-danger:hover{background:rgba(239,68,68,0.18)}
+.btn-success{background:rgba(34,197,94,0.1);color:var(--success);border:1px solid rgba(34,197,94,0.25)}
+.btn-success:hover{background:rgba(34,197,94,0.18)}
+.btn-ghost  {background:var(--card);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:rgba(255,255,255,0.15)}
+.btn-sm     {padding:4px 10px;font-size:11px}
+
+/* ── MODAL ── */
+.sa-modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.75);
+  display:none;align-items:center;justify-content:center;z-index:9000;
+  backdrop-filter:blur(4px);
+}
+.sa-modal-overlay.open{display:flex}
+.sa-modal{
+  background:var(--surface);border:1px solid rgba(0,194,255,0.15);
+  border-radius:18px;padding:28px;width:500px;max-width:95vw;
+  max-height:90vh;overflow-y:auto;
+  display:flex;flex-direction:column;gap:18px;
+  box-shadow:0 24px 60px rgba(0,0,0,0.5);
+}
+.sa-modal h2{font-size:16px;font-weight:800;color:var(--text)}
+.sa-modal-close{margin-left:auto;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0 4px}
+.sa-modal-close:hover{color:var(--text)}
+.sa-modal-header{display:flex;align-items:center}
+.sa-field{display:flex;flex-direction:column;gap:6px}
+.sa-field label{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+.sa-field input,.sa-field textarea,.sa-field select{
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);padding:10px 12px;color:var(--text);
+  font-size:13px;outline:none;font-family:inherit;transition:border-color 0.2s;
+}
+.sa-field input:focus,.sa-field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,194,255,0.07)}
+.sa-field-row{display:flex;gap:12px}
+.sa-field-row .sa-field{flex:1}
+.sa-section-sep{
+  font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;
+  padding:4px 0;border-bottom:1px solid var(--border);text-transform:uppercase;
+}
+.sa-modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:4px}
+.sa-error{font-size:12px;color:var(--danger);text-align:center;min-height:16px}
+
+/* ── PROFILS VÉHICULES (grille de cases à cocher) ── */
+.sa-profils-hint{font-size:11.5px;color:var(--muted-2);margin-top:-6px;line-height:1.5;background:rgba(0,194,255,0.06);border:1px solid rgba(0,194,255,0.15);border-radius:var(--radius-sm);padding:8px 10px}
+.sa-profils-hint b{color:var(--text)}
+.sa-profils-toolbar{display:flex;justify-content:flex-end;gap:14px}
+.sa-profils-link{font-size:11px;color:var(--accent);cursor:pointer;font-weight:700;background:none;border:none;font-family:inherit;padding:0}
+.sa-profils-link:hover{text-decoration:underline}
+.sa-profils-wrap{display:flex;flex-direction:column;gap:10px}
+.sa-profils-group{border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px}
+.sa-profils-group-title{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.sa-profils-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.sa-profils-item{
+  display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--text);cursor:pointer;
+  padding:9px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--card);transition:border-color .15s,background .15s;
+}
+.sa-profils-item:hover{border-color:var(--border-strong)}
+.sa-profils-item:has(input:checked){
+  border-color:var(--accent);background:rgba(0,194,255,0.1);color:var(--text);font-weight:600;
+}
+.sa-profils-item input{accent-color:var(--accent);width:18px;height:18px;cursor:pointer;flex-shrink:0}
+.sa-profils-badges{display:flex;flex-wrap:wrap;gap:6px}
+.sa-profils-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(0,194,255,0.08);color:var(--accent);border:1px solid rgba(0,194,255,0.18)}
+
+/* ── Toggle "option" carte (case + titre + description) ── */
+.sa-option-toggle{
+  display:flex;align-items:flex-start;gap:12px;cursor:pointer;
+  padding:12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--card);transition:border-color .15s,background .15s;
+}
+.sa-option-toggle:hover{border-color:var(--border-strong)}
+.sa-option-toggle:has(input:checked){border-color:var(--accent);background:rgba(0,194,255,0.1)}
+.sa-option-toggle input{accent-color:var(--accent);width:20px;height:20px;cursor:pointer;flex-shrink:0;margin-top:1px}
+.sa-option-toggle-text{display:flex;flex-direction:column;gap:3px}
+.sa-option-toggle-title-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sa-option-toggle-title{font-size:13px;font-weight:700;color:var(--text)}
+.sa-option-toggle-price{flex-shrink:0;font-size:11px;font-weight:700;color:var(--accent);background:rgba(0,194,255,0.1);border:1px solid rgba(0,194,255,0.25);padding:2px 9px;border-radius:20px;white-space:nowrap}
+.sa-option-toggle-desc{font-size:11.5px;color:var(--muted-2);line-height:1.4}
+
+/* ── TOAST ── */
+.sa-toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--card);color:var(--text);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:12px 20px;font-size:13px;font-weight:600;
+  z-index:9999;transition:opacity 0.3s;pointer-events:none;
+  box-shadow:0 8px 24px rgba(0,0,0,0.3);
+}
+
+/* ── LOADING ── */
+.sa-loading{
+  text-align:center;padding:60px;color:var(--muted);font-size:14px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.sa-loading::before{
+  content:'';width:16px;height:16px;border:2px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin 0.7s linear infinite;flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── DETAIL PANEL ── */
+.detail-panel{
+  background:var(--surface);border:1px solid rgba(0,194,255,0.2);
+  border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:12px;
+}
+.detail-section-title{
+  font-size:11px;font-weight:800;letter-spacing:1.2px;color:var(--accent);
+  text-transform:uppercase;margin-bottom:6px;padding-bottom:6px;
+  border-bottom:1px solid rgba(0,194,255,0.25);
+}
+.detail-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;
+}
+.detail-row:last-child{border-bottom:none}
+.detail-label{color:var(--muted)}
+.detail-val{font-weight:600;color:var(--text)}
+</style>
+</head>
+<body>
+
+<!-- ════ ÉCRAN LOGIN ════ -->
+<div id="screen-login">
+  <div class="login-box">
+    <div class="login-lockup">
+      <img src="icon192.png" alt="MémoTruck" class="login-logo-icon" />
+      <div class="login-name">MémoTruck</div>
+      <div class="login-role">Superadmin</div>
+      <div class="login-tagline">Entreprises, contrats et parcs — au même endroit.</div>
+    </div>
+    <div class="login-card">
+      <div class="sa-field">
+        <label>EMAIL</label>
+        <input type="email" id="login-email" placeholder="superadmin@memotruck.fr" autocomplete="email" />
+      </div>
+      <div class="sa-field">
+        <label>MOT DE PASSE</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <div class="login-error" id="login-error"></div>
+      <button class="btn-login" id="btn-login">Se connecter</button>
+    </div>
+    <div class="login-foot">🔒 Accès réservé aux comptes superadmin</div>
+  </div>
+</div>
+
+<!-- ════ ÉCRAN APP ════ -->
+<div id="screen-app">
+
+  <!-- TOPBAR MOBILE (masquée en desktop) -->
+  <div class="sa-topbar">
+    <button class="sa-hamburger" id="btn-mobile-menu" aria-label="Menu">☰</button>
+    <div class="sa-topbar-title" id="sa-topbar-title">Dashboard</div>
+  </div>
+  <div class="sa-mobile-backdrop" id="sa-mobile-backdrop"></div>
+
+  <!-- SIDEBAR -->
+  <div class="sa-sidebar" id="sa-sidebar">
+    <div class="sa-logo-wrap">
+      <img src="icon192.png" alt="MémoTruck" class="sa-logo-img" />
+      <div class="sa-logo-text">
+        <div class="sa-logo">MémoTruck</div>
+        <div class="sa-logo-sub">SUPERADMIN</div>
+      </div>
+    </div>
+
+    <div class="sa-nav-item active" data-section="dashboard">📊 Dashboard</div>
+    <div class="sa-nav-item" data-section="entreprises">
+      🏢 Entreprises
+      <span class="sa-badge" id="badge-entreprises">0</span>
+    </div>
+    <div class="sa-nav-item" data-section="contrats">
+      📋 Contrats
+      <span class="sa-badge" id="badge-contrats">0</span>
+    </div>
+    <div class="sa-nav-item" data-section="comptabilite">💰 Comptabilité</div>
+    <div class="sa-nav-item" data-section="journal">🕒 Journal d'activité</div>
+    <div class="sa-nav-item" data-section="erreurs">
+      🐛 Erreurs
+      <span class="sa-badge" id="badge-erreurs">0</span>
+    </div>
+    <div class="sa-nav-item" data-section="superadmins">🔐 Comptes superadmin</div>
+    <div class="sa-nav-item" data-section="profils">🚛 Profils véhicules</div>
+
+    <div class="sa-sidebar-footer">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px;" id="sa-user-email"></div>
+      <button class="sa-logout" id="btn-logout">🚪 Déconnexion</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="sa-main" id="sa-main">
+    <div class="sa-loading">Chargement…</div>
+  </div>
+</div>
+
+<!-- ════ MODAL ENTREPRISE ════ -->
+<div class="sa-modal-overlay" id="modal-entreprise">
+  <div class="sa-modal">
+    <div class="sa-modal-header">
+      <h2 id="modal-entreprise-title">Nouvelle entreprise</h2>
+      <button class="sa-modal-close" id="modal-entreprise-close">✕</button>
+    </div>
+
+    <div class="sa-section-sep">INFORMATIONS ENTREPRISE</div>
+    <div class="sa-field">
+      <label>NOM DE L'ENTREPRISE *</label>
+      <input type="text" id="modal-nom" placeholder="Transport Dupont" />
+    </div>
+    <div class="sa-field">
+      <label>PACK / ABONNEMENT *</label>
+      <select id="modal-pack" style="width:100%;height:44px;background:#ffffff;border:1.5px solid var(--sa-border, rgba(255,255,255,0.15));border-radius:10px;padding:0 14px;color:#1a1a1a;font-size:14px;font-weight:600;">
+        <option value="starter">⭐ Starter — jusqu'à 5 véhicules — 129€/mois</option>
+        <option value="pme">🏢 PME — jusqu'à 15 véhicules — 249€/mois</option>
+        <option value="pro">🚀 Pro — jusqu'à 35 véhicules — 349€/mois</option>
+        <option value="entreprise">🏭 Entreprise — illimité — Sur devis</option>
+      </select>
+    </div>
+    <div class="sa-field" id="modal-montant-perso-row" style="display:none;">
+      <label>MONTANT MENSUEL NÉGOCIÉ (€) *</label>
+      <input type="number" id="modal-montant-perso" placeholder="450" min="0" step="1" />
+    </div>
+    <div class="sa-field-row">
+      <div class="sa-field">
+        <label>DÉBUT CONTRAT</label>
+        <input type="date" id="modal-debut" />
+      </div>
+      <div class="sa-field">
+        <label>FIN CONTRAT</label>
+        <input type="date" id="modal-fin" />
+      </div>
+    </div>
+    <div class="sa-field-row">
+      <div class="sa-field">
+        <label>NOM CONTACT</label>
+        <input type="text" id="modal-contact-nom" placeholder="Jean Dupont" />
+      </div>
+      <div class="sa-field">
+        <label>TÉLÉPHONE</label>
+        <input type="text" id="modal-contact-tel" placeholder="06 XX XX XX XX" />
+      </div>
+    </div>
+    <div class="sa-field">
+      <label>EMAIL CONTACT</label>
+      <input type="email" id="modal-contact-email" placeholder="contact@transport.fr" />
+    </div>
+    <div class="sa-field">
+      <label>NOTES</label>
+      <textarea id="modal-notes" rows="2" placeholder="Notes internes…"></textarea>
+    </div>
+
+    <div class="sa-section-sep">VÉHICULES AUTORISÉS</div>
+    <div class="sa-profils-hint">Coche les types de véhicules que cette entreprise pourra ajouter à son parc. <b>Aucune case cochée = aucune restriction</b> (tous les types seront autorisés).</div>
+    <div class="sa-profils-toolbar">
+      <button type="button" class="sa-profils-link" id="profils-select-all">Tout cocher</button>
+      <button type="button" class="sa-profils-link" id="profils-select-none">Tout décocher</button>
+    </div>
+    <div class="sa-profils-wrap" id="modal-profils-grid"></div>
+
+    <div class="sa-section-sep">OPTIONS</div>
+    <label class="sa-option-toggle">
+      <input type="checkbox" id="modal-panel-mecano" />
+      <div class="sa-option-toggle-text">
+        <div class="sa-option-toggle-title-row">
+          <div class="sa-option-toggle-title">🔧 Panel atelier (mécanicien)</div>
+          <div class="sa-option-toggle-price">39€/mois</div>
+        </div>
+        <div class="sa-option-toggle-desc">Autorise cette entreprise à créer des comptes mécanicien pour son atelier.</div>
+      </div>
+    </label>
+
+    <div class="sa-section-sep" id="modal-admin-section">COMPTE ADMIN</div>
+    <div id="modal-admin-fields">
+      <div class="sa-field-row" style="margin-bottom:12px;">
+        <div class="sa-field">
+          <label>PRÉNOM</label>
+          <input type="text" id="modal-admin-prenom" placeholder="Marie" />
+        </div>
+        <div class="sa-field">
+          <label>NOM</label>
+          <input type="text" id="modal-admin-nom" placeholder="Martin" />
+        </div>
+      </div>
+      <div class="sa-field" style="margin-bottom:12px;">
+        <label>EMAIL ADMIN *</label>
+        <input type="email" id="modal-admin-email" placeholder="chef@transport.fr" />
+      </div>
+      <div class="sa-field">
+        <label>MOT DE PASSE TEMPORAIRE *</label>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="modal-admin-password" placeholder="Mot de passe à communiquer au client" style="flex:1;" />
+          <button type="button" class="btn btn-ghost btn-sm" id="modal-admin-password-gen" title="Générer un mot de passe">🎲</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="modal-admin-password-copy" title="Copier">📋</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sa-error" id="modal-entreprise-error"></div>
+    <div class="sa-modal-actions">
+      <button class="btn btn-ghost" id="modal-entreprise-cancel">Annuler</button>
+      <button class="btn btn-primary" id="modal-entreprise-save">✓ Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL ADMIN SUPPLÉMENTAIRE ════ -->
+<div class="sa-modal-overlay" id="modal-admin">
+  <div class="sa-modal">
+    <div class="sa-modal-header">
+      <h2>Ajouter un admin</h2>
+      <button class="sa-modal-close" id="modal-admin-close">✕</button>
+    </div>
+    <div class="sa-field-row">
+      <div class="sa-field">
+        <label>PRÉNOM</label>
+        <input type="text" id="modal-admin2-prenom" />
+      </div>
+      <div class="sa-field">
+        <label>NOM</label>
+        <input type="text" id="modal-admin2-nom" />
+      </div>
+    </div>
+    <div class="sa-field">
+      <label>EMAIL *</label>
+      <input type="email" id="modal-admin2-email" />
+    </div>
+    <div class="sa-field" id="modal-admin2-role-row" style="display:none;">
+      <label>RÔLE</label>
+      <select id="modal-admin2-role" style="width:100%;height:44px;background:#ffffff;border:1.5px solid var(--sa-border, rgba(255,255,255,0.15));border-radius:10px;padding:0 14px;color:#1a1a1a;font-size:14px;font-weight:600;">
+        <option value="exploitation">🏢 Exploitation (bureau)</option>
+        <option value="mecanicien">🔧 Mécanicien (atelier)</option>
+      </select>
+    </div>
+    <div class="sa-field">
+      <label>MOT DE PASSE *</label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="modal-admin2-password" style="flex:1;" />
+        <button type="button" class="btn btn-ghost btn-sm" id="modal-admin2-password-gen" title="Générer un mot de passe">🎲</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="modal-admin2-password-copy" title="Copier">📋</button>
+      </div>
+    </div>
+    <div class="sa-error" id="modal-admin-error"></div>
+    <div class="sa-modal-actions">
+      <button class="btn btn-ghost" id="modal-admin-cancel">Annuler</button>
+      <button class="btn btn-primary" id="modal-admin-save">✓ Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL COMPTE SUPERADMIN ════ -->
+<div class="sa-modal-overlay" id="modal-superadmin">
+  <div class="sa-modal">
+    <div class="sa-modal-header">
+      <h2>Ajouter un compte superadmin</h2>
+      <button class="sa-modal-close" id="modal-superadmin-close">✕</button>
+    </div>
+    <div class="sa-field">
+      <label>EMAIL *</label>
+      <input type="email" id="modal-superadmin-email" placeholder="associe@memotruck.fr" />
+    </div>
+    <div class="sa-field">
+      <label>MOT DE PASSE *</label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="modal-superadmin-password" style="flex:1;" />
+        <button type="button" class="btn btn-ghost btn-sm" id="modal-superadmin-password-gen" title="Générer un mot de passe">🎲</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="modal-superadmin-password-copy" title="Copier">📋</button>
+      </div>
+    </div>
+    <div class="sa-error" id="modal-superadmin-error"></div>
+    <div class="sa-modal-actions">
+      <button class="btn btn-ghost" id="modal-superadmin-cancel">Annuler</button>
+      <button class="btn btn-primary" id="modal-superadmin-save">✓ Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODALE IDENTIFIANTS (affichage persistant après création/reset) ════ -->
+<div class="sa-modal-overlay" id="modal-credentials">
+  <div class="sa-modal" style="width:420px;border:1px solid rgba(34,197,94,0.3);">
+    <div class="sa-modal-header">
+      <h2 style="color:var(--success);">✅ Identifiants</h2>
+      <button class="sa-modal-close" id="modal-credentials-close">✕</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.5;">
+      Notez-les ou copiez-les maintenant — ce mot de passe ne sera plus jamais réaffiché ensuite.
+    </div>
+    <div class="sa-field" id="cred-code-row" style="display:none;">
+      <label>CODE ENTREPRISE</label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="cred-code" readonly style="flex:1;background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;font-weight:700;" />
+        <button class="btn btn-ghost btn-sm" id="cred-copy-code">📋</button>
+      </div>
+    </div>
+    <div class="sa-field">
+      <label>EMAIL</label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="cred-email" readonly style="flex:1;background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;" />
+        <button class="btn btn-ghost btn-sm" id="cred-copy-email">📋</button>
+      </div>
+    </div>
+    <div class="sa-field">
+      <label>MOT DE PASSE</label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="cred-password" readonly style="flex:1;background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;font-weight:700;letter-spacing:0.5px;" />
+        <button class="btn btn-ghost btn-sm" id="cred-copy-password">📋</button>
+      </div>
+    </div>
+    <div class="sa-modal-actions">
+      <button class="btn btn-ghost" id="cred-copy-all">📋 Copier tout</button>
+      <button class="btn btn-primary" id="modal-credentials-done">J'ai noté, fermer</button>
+    </div>
+  </div>
+</div>
+
+<div class="sa-toast" id="sa-toast" style="opacity:0;"></div>
+
+<!-- ════ MODALE SUPPRESSION ENTREPRISE ════ -->
+<div class="sa-modal-overlay" id="modal-delete">
+  <div class="sa-modal" style="border:1px solid var(--danger);">
+    <div class="sa-modal-header">
+      <h2 style="color:var(--danger);">⚠️ Supprimer l'entreprise</h2>
+      <button class="sa-modal-close" id="modal-delete-close">✕</button>
+    </div>
+    <div style="background:rgba(239,83,80,0.08);border:1px solid rgba(239,83,80,0.2);border-radius:10px;padding:14px;font-size:13px;line-height:1.6;color:#e8eaf0;">
+      Cette action est <strong>irréversible</strong>. Elle supprimera définitivement :<br/>
+      • Tous les chauffeurs et leurs comptes<br/>
+      • Tous les véhicules (tracteurs + remorques)<br/>
+      • Toutes les photos et documents<br/>
+      • Tous les admins (chefs de parc)<br/>
+      • Tout l'historique (interventions, consommations)
+    </div>
+    <div class="sa-field">
+      <label>ÉTAPE 1 — Tapez <strong id="modal-delete-nom-ref" style="color:var(--danger);"></strong> pour confirmer</label>
+      <input type="text" id="modal-delete-confirm1" placeholder="Nom de l'entreprise" autocomplete="off" />
+    </div>
+    <div class="sa-field">
+      <label>ÉTAPE 2 — Tapez <strong style="color:var(--danger);">SUPPRIMER DÉFINITIVEMENT</strong></label>
+      <input type="text" id="modal-delete-confirm2" placeholder="SUPPRIMER DÉFINITIVEMENT" autocomplete="off" />
+    </div>
+    <div class="sa-error" id="modal-delete-error"></div>
+    <div class="sa-modal-actions">
+      <button class="btn btn-ghost" id="modal-delete-cancel">Annuler</button>
+      <button class="btn btn-danger" id="modal-delete-save" disabled style="opacity:0.4;">🗑️ Supprimer tout</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL FACTURE (comptabilité) ════ -->
+<div class="sa-modal-overlay" id="modal-facture">
+  <div class="sa-modal">
+    <div class="sa-modal-header">
+      <h2 id="modal-facture-title">Nouvelle facture</h2>
+      <button class="sa-modal-close" id="modal-facture-close">✕</button>
+    </div>
+    <div class="sa-profils-hint">Cette facture reste un <b>miroir manuel</b> de celle émise dans ton outil de facturation électronique (PDP) — la numérotation légale et l'envoi au client se font là-bas.</div>
+    <div class="sa-field">
+      <label>ENTREPRISE *</label>
+      <select id="modal-facture-entreprise" style="width:100%;height:44px;background:#ffffff;border:1.5px solid var(--sa-border, rgba(255,255,255,0.15));border-radius:10px;padding:0 14px;color:#1a1a1a;font-size:14px;font-weight:600;"></select>
+    </div>
+    <div class="sa-field-row">
+      <div class="sa-field">
+        <label>N° FACTURE (PDP)</label>
+        <input type="text" id="modal-facture-numero" placeholder="FA-2026-014" />
+      </div>
+      <div class="sa-field">
+        <label>MONTANT BRUT (€) *</label>
+        <input type="number" id="modal-facture-brut" placeholder="450" min="0" step="0.01" />
+      </div>
+    </div>
+    <div class="sa-field">
+      <label>LIBELLÉ</label>
+      <input type="text" id="modal-facture-libelle" placeholder="Facture mars 2026" />
+    </div>
+    <div class="sa-field-row">
+      <div class="sa-field">
+        <label>DATE D'ÉMISSION</label>
+        <input type="date" id="modal-facture-emission" />
+      </div>
+      <div class="sa-field">
+        <label>DATE D'ÉCHÉANCE</label>
+        <input type="date" id="modal-facture-echeance" />
+      </div>
+    </div>
+    <div class="sa-field">
+      <label>STATUT DE PAIEMENT</label>
+      <select id="modal-facture-statut" style="width:100%;height:44px;background:#ffffff;border:1.5px solid var(--sa-border, rgba(255,255,255,0.15));border-radius:10px;padding:0 14px;color:#1a1a1a;font-size:14px;font-weight:600;">
+        <option value="en_attente">En attente</option>
+        <option value="payee">Payée</option>
+        <option value="impayee">Impayée</option>
+        <option value="annulee">Annulée</option>
+      </select>
+    </div>
+    <label class="sa-option-toggle">
+      <input type="checkbox" id="modal-facture-commission" checked />
+      <div class="sa-option-toggle-text">
+        <div class="sa-option-toggle-title">Commission rapporteur d'affaires</div>
+        <div class="sa-option-toggle-desc">Décoche si ce contrat n'a pas été apporté par ton rapporteur d'affaires.</div>
+      </div>
+    </label>
+    <div class="sa-error" id="modal-facture-error"></div>
+    <div class="sa-modal-actions">
+      <button class="btn btn-ghost" id="modal-facture-cancel">Annuler</button>
+      <button class="btn btn-primary" id="modal-facture-save">✓ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL PARAMÈTRES COMPTABLES ════ -->
+<div class="sa-modal-overlay" id="modal-parametres-compta">
+  <div class="sa-modal">
+    <div class="sa-modal-header">
+      <h2>Paramètres comptables</h2>
+      <button class="sa-modal-close" id="modal-parametres-compta-close">✕</button>
+    </div>
+    <div class="sa-profils-hint">Ces taux s'appliquent aux <b>nouvelles</b> factures. Modifier un taux ne change pas rétroactivement les factures déjà enregistrées.</div>
+    <div class="sa-field-row">
+      <div class="sa-field">
+        <label>CHARGES SOCIALES (%)</label>
+        <input type="number" id="pc-taux-charges" step="0.1" min="0" max="100" />
+      </div>
+      <div class="sa-field">
+        <label>COMMISSION RAPPORTEUR (%)</label>
+        <input type="number" id="pc-taux-commission" step="0.1" min="0" max="100" />
+      </div>
+    </div>
+    <div class="sa-field">
+      <label>NOM DU RAPPORTEUR D'AFFAIRES</label>
+      <input type="text" id="pc-nom-rapporteur" placeholder="Optionnel" />
+    </div>
+    <div class="sa-section-sep">RÉGIME MICRO-ENTREPRISE</div>
+    <div class="sa-field">
+      <label>PLAFOND DE CHIFFRE D'AFFAIRES ANNUEL (€)</label>
+      <input type="number" id="pc-plafond-ca" step="100" min="0" />
+    </div>
+    <div class="sa-profils-hint">Plafond micro-entreprise : <b>77 700€</b> prestations de service (BIC/BNC), <b>188 700€</b> vente de marchandises. Le dépasser fait basculer vers un régime réel.</div>
+    <div class="sa-section-sep">IMPÔT SUR LE REVENU (ESTIMATION)</div>
+    <div class="sa-field">
+      <label>MODE</label>
+      <select id="pc-mode-imposition" style="width:100%;height:44px;background:#ffffff;border:1.5px solid var(--sa-border, rgba(255,255,255,0.15));border-radius:10px;padding:0 14px;color:#1a1a1a;font-size:14px;font-weight:600;">
+        <option value="estimation">Taux estimé (barème progressif)</option>
+        <option value="versement_liberatoire">Versement libératoire</option>
+      </select>
+    </div>
+    <div class="sa-field-row" id="pc-row-vl" style="display:none;">
+      <div class="sa-field">
+        <label>TAUX VERSEMENT LIBÉRATOIRE (%)</label>
+        <input type="number" id="pc-taux-vl" step="0.1" min="0" max="100" />
+      </div>
+    </div>
+    <div id="pc-row-estimation">
+      <div class="sa-field-row">
+        <div class="sa-field">
+          <label>ABATTEMENT FORFAITAIRE (%)</label>
+          <input type="number" id="pc-taux-abattement" step="1" min="0" max="100" />
+        </div>
+        <div class="sa-field">
+          <label>TAUX D'IMPOSITION APRÈS ABATTEMENT (%)</label>
+          <input type="number" id="pc-taux-estime" step="0.1" min="0" max="100" />
+        </div>
+      </div>
+      <div class="sa-profils-hint">Abattement micro-entreprise : <b>71%</b> vente de marchandises, <b>50%</b> prestations de service BIC (informatique, transport...), <b>34%</b> professions libérales BNC. L'impôt est calculé sur le brut <b>après</b> cet abattement.</div>
+    </div>
+    <div class="budget-note">⚠️ L'impôt réel dépend de l'ensemble de tes revenus du foyer — ce taux est une estimation pour piloter ta trésorerie, pas un calcul fiscal officiel.</div>
+    <div class="sa-error" id="modal-parametres-compta-error"></div>
+    <div class="sa-modal-actions">
+      <button class="btn btn-ghost" id="modal-parametres-compta-cancel">Annuler</button>
+      <button class="btn btn-primary" id="modal-parametres-compta-save">✓ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://ztlxxrywxxflqvigwncb.supabase.co";
+
+// ─── Monitoring erreurs client ─────────────────────────────────────────
+// Best-effort : ne doit jamais bloquer ni ralentir l'app si le logging échoue.
+(function () {
+  const MAX_ERRORS = 8;
+  let sent = 0;
+  function report(message, stack) {
+    if (sent >= MAX_ERRORS || !message) return;
+    sent++;
+    try {
+      fetch(`${SUPABASE_URL}/functions/v1/log-client-error`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ app: "superadmin", message: String(message).slice(0, 2000), stack: stack ? String(stack).slice(0, 4000) : null, url: location.href }),
+        keepalive: true,
+      }).catch(() => {});
+    } catch {}
+  }
+  window.addEventListener("error", (e) => report(e.message, e.error && e.error.stack));
+  window.addEventListener("unhandledrejection", (e) => report(e.reason && e.reason.message ? e.reason.message : String(e.reason), e.reason && e.reason.stack));
+})();
+const STORAGE_KEY  = "memotruck_superadmin_session";
+
+// ─── Session ────────────────────────────────────────────────────────────
+let session = null;
+
+function getSession() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"); } catch { return null; }
+}
+function saveSession(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); session = s; }
+function clearSession()  { localStorage.removeItem(STORAGE_KEY); session = null; }
+
+// ─── API calls ──────────────────────────────────────────────────────────
+async function callEdge(fnName, body, jwt = null) {
+  const headers = { "Content-Type": "application/json" };
+  if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/${fnName}`, {
+    method: "POST", headers, body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    const err = new Error(data.error || `Erreur ${res.status}`);
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+
+let _sessionExpiredHandled = false;
+function sessionExpired() {
+  if (_sessionExpiredHandled) return;
+  _sessionExpiredHandled = true;
+  clearSession();
+  document.getElementById("screen-app").style.display = "none";
+  document.getElementById("screen-login").style.display = "flex";
+  document.getElementById("login-error").textContent = "⏱️ Session expirée — reconnectez-vous.";
+}
+
+async function api(action, body = {}) {
+  try {
+    return await callEdge("superadmin-api", { action, ...body }, session.jwt);
+  } catch (err) {
+    if (err.status === 401) sessionExpired();
+    throw err;
+  }
+}
+
+// ─── Toast ──────────────────────────────────────────────────────────────
+function toast(msg) {
+  const el = document.getElementById("sa-toast");
+  el.textContent = msg; el.style.opacity = "1";
+  setTimeout(() => { el.style.opacity = "0"; }, 2500);
+}
+
+// ─── Utils ──────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function formatDate(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return d.toLocaleDateString("fr-FR", { day:"2-digit", month:"2-digit", year:"numeric" });
+}
+function formatDateTime(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return d.toLocaleString("fr-FR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
+}
+
+// ─── Export CSV ───────────────────────────────────────────────────────────
+function todayStamp() {
+  return new Date().toISOString().slice(0, 10);
+}
+function downloadCSV(filename, headers, rows) {
+  const csvEsc = (v) => {
+    const s = String(v ?? "");
+    return /[",;\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const lines = [headers, ...rows].map(row => row.map(csvEsc).join(";"));
+  const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast("⬇️ Export téléchargé");
+}
+function exportEntreprisesCSV(rows) {
+  const headers = ["Nom", "Code", "Pack", "Pack (€/mois)", "Option mécano (€/mois)", "Total (€/mois)", "Statut", "Début contrat", "Fin contrat", "Chauffeurs", "Tracteurs", "Remorques", "Admins", "Contact", "Email contact", "Téléphone contact"];
+  const data = rows.map(e => {
+    const d = montantDetail(e);
+    return [
+      e.nom, e.code_entreprise, PACK_LABEL[e.pack] || e.pack || "", d.base ?? "", d.option || "", d.total ?? "",
+      e.est_active ? "Active" : "Suspendue",
+      e.date_debut_contrat ? formatDate(e.date_debut_contrat) : "",
+      e.date_fin_contrat ? formatDate(e.date_fin_contrat) : "",
+      e.chauffeurs ?? 0, e.tracteurs ?? 0, e.remorques ?? 0, e.admins ?? 0,
+      e.contact_nom || "", e.contact_email || "", e.contact_telephone || "",
+    ];
+  });
+  downloadCSV(`memotruck-entreprises-${todayStamp()}.csv`, headers, data);
+}
+function exportContratsCSV(rows) {
+  const headers = ["Nom", "Statut", "Pack", "Pack (€/mois)", "Option mécano (€/mois)", "Total (€/mois)", "Début contrat", "Fin contrat", "Situation"];
+  const data = rows.map(e => {
+    const diff = e.date_fin_contrat ? daysDiff(e.date_fin_contrat) : null;
+    const situation = diff === null ? "Sans échéance" : diff < 0 ? `Expiré depuis ${Math.abs(diff)}j` : `Dans ${diff}j`;
+    const d = montantDetail(e);
+    return [
+      e.nom, e.est_active ? "Active" : "Suspendue", PACK_LABEL[e.pack] || e.pack || "", d.base ?? "", d.option || "", d.total ?? "",
+      e.date_debut_contrat ? formatDate(e.date_debut_contrat) : "",
+      e.date_fin_contrat ? formatDate(e.date_fin_contrat) : "",
+      situation,
+    ];
+  });
+  downloadCSV(`memotruck-contrats-${todayStamp()}.csv`, headers, data);
+}
+
+// ─── Génération de mot de passe + copie ──────────────────────────────────
+function generatePassword(length = 14) {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
+  const arr = new Uint32Array(length);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, n => chars[n % chars.length]).join("");
+}
+function copyText(text) {
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => toast("📋 Copié")).catch(() => toast("❌ Copie impossible"));
+}
+function attachPasswordGenerator(inputId, genBtnId, copyBtnId) {
+  document.getElementById(genBtnId).addEventListener("click", () => {
+    document.getElementById(inputId).value = generatePassword();
+  });
+  document.getElementById(copyBtnId).addEventListener("click", () => {
+    copyText(document.getElementById(inputId).value);
+  });
+}
+attachPasswordGenerator("modal-admin-password",  "modal-admin-password-gen",  "modal-admin-password-copy");
+attachPasswordGenerator("modal-admin2-password", "modal-admin2-password-gen", "modal-admin2-password-copy");
+attachPasswordGenerator("modal-superadmin-password", "modal-superadmin-password-gen", "modal-superadmin-password-copy");
+
+// ─── Modale identifiants (affichage persistant, ne disparaît pas seul) ───
+function showCredentialsModal({ email, password, code }) {
+  document.getElementById("cred-email").value = email || "";
+  document.getElementById("cred-password").value = password || "";
+  const codeRow = document.getElementById("cred-code-row");
+  if (code) { document.getElementById("cred-code").value = code; codeRow.style.display = "flex"; codeRow.style.flexDirection = "column"; codeRow.style.gap = "6px"; }
+  else { codeRow.style.display = "none"; }
+  document.getElementById("modal-credentials").classList.add("open");
+}
+document.getElementById("modal-credentials-close").addEventListener("click", () => document.getElementById("modal-credentials").classList.remove("open"));
+document.getElementById("modal-credentials-done").addEventListener("click", () => document.getElementById("modal-credentials").classList.remove("open"));
+document.getElementById("cred-copy-email").addEventListener("click", () => copyText(document.getElementById("cred-email").value));
+document.getElementById("cred-copy-password").addEventListener("click", () => copyText(document.getElementById("cred-password").value));
+document.getElementById("cred-copy-code").addEventListener("click", () => copyText(document.getElementById("cred-code").value));
+document.getElementById("cred-copy-all").addEventListener("click", () => {
+  const code = document.getElementById("cred-code").value;
+  const lines = [
+    code ? `Code entreprise : ${code}` : null,
+    `Email : ${document.getElementById("cred-email").value}`,
+    `Mot de passe : ${document.getElementById("cred-password").value}`,
+  ].filter(Boolean);
+  copyText(lines.join("\n"));
+});
+
+// ─── Journal d'activité : libellés ────────────────────────────────────────
+const ACTIVITY_LABELS = {
+  create_entreprise:     { icon: "🏢", label: "Entreprise créée",          cls: "badge-green"  },
+  update_entreprise:     { icon: "✏️", label: "Entreprise modifiée",       cls: "badge-blue"   },
+  suspend_entreprise:    { icon: "⛔", label: "Entreprise suspendue",      cls: "badge-red"    },
+  reactivate_entreprise: { icon: "✓",  label: "Entreprise réactivée",      cls: "badge-green"  },
+  delete_entreprise:     { icon: "🗑️", label: "Entreprise supprimée",      cls: "badge-red"    },
+  create_admin:          { icon: "👤", label: "Admin créé",                cls: "badge-blue"   },
+  reset_admin_password:  { icon: "🔑", label: "Mot de passe réinitialisé", cls: "badge-orange" },
+  reset_chauffeur_password: { icon: "🔑", label: "Mot de passe chauffeur réinitialisé", cls: "badge-orange" },
+  create_superadmin:     { icon: "🔐", label: "Compte superadmin créé",    cls: "badge-blue"   },
+  delete_superadmin:     { icon: "🚫", label: "Compte superadmin supprimé",cls: "badge-red"    },
+  create_profil_vehicule: { icon: "🚛", label: "Profil véhicule créé",    cls: "badge-green"  },
+  update_profil_vehicule: { icon: "✏️", label: "Profil véhicule modifié", cls: "badge-blue"   },
+  delete_profil_vehicule: { icon: "🗑️", label: "Profil véhicule supprimé",cls: "badge-red"    },
+};
+function activityBadge(action) {
+  const a = ACTIVITY_LABELS[action] || { icon: "•", label: action, cls: "badge-blue" };
+  return `<span class="badge ${a.cls}">${a.icon} ${esc(a.label)}</span>`;
+}
+const ACTIVITY_VERB = {
+  create_entreprise:     "a créé",
+  update_entreprise:     "a modifié le contrat de",
+  suspend_entreprise:    "a suspendu",
+  reactivate_entreprise: "a réactivé",
+  delete_entreprise:     "a supprimé",
+  create_admin:          "a ajouté un admin pour",
+  reset_admin_password:  "a réinitialisé le mot de passe d'un admin de",
+  reset_chauffeur_password: "a réinitialisé le mot de passe d'un chauffeur de",
+  create_superadmin:     "a créé un compte superadmin",
+  delete_superadmin:     "a supprimé un compte superadmin",
+  create_profil_vehicule: "a ajouté le profil véhicule",
+  update_profil_vehicule: "a modifié le profil véhicule",
+  delete_profil_vehicule: "a supprimé le profil véhicule",
+};
+const PERSON_PALETTE = ["#00C2FF", "#9085e9", "#3fd39c", "#e0ab2e"];
+const _personColorMap = {};
+function personColor(email) {
+  if (!_personColorMap[email]) {
+    _personColorMap[email] = PERSON_PALETTE[Object.keys(_personColorMap).length % PERSON_PALETTE.length];
+  }
+  return _personColorMap[email];
+}
+function journalDayLabel(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const startOfDay = dt => new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+  const diffDays = Math.round((startOfDay(now) - startOfDay(d)) / 86400000);
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  if (diffDays === 0) return "Aujourd'hui";
+  if (diffDays === 1) return "Hier";
+  if (diffDays > 1 && diffDays < 7) return cap(d.toLocaleDateString("fr-FR", { weekday: "long" }));
+  return cap(d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }));
+}
+function daysDiff(iso) {
+  if (!iso) return null;
+  return Math.floor((new Date(iso) - Date.now()) / 86400000);
+}
+// Limite de véhicules moteurs (tracteurs + engins, les remorques ne comptent
+// pas) par pack — doit rester synchro avec PACKS_LIMITES dans
+// memotruck-web-admin-test/admin.js (source de vérité pour l'application du
+// blocage côté client).
+const PACK_VEHICULE_LIMIT = { starter: 5, pme: 15, pro: 35, entreprise: Infinity };
+
+function packBadge(pack) {
+  const packs = {
+    starter:    { label: "Starter",    color: "badge-blue"  },
+    pme:        { label: "PME",        color: "badge-green" },
+    pro:        { label: "Pro",        color: "badge-blue"  },
+    entreprise: { label: "Entreprise", color: "badge-green" },
+  };
+  const p = packs[pack] || { label: pack || "—", color: "badge-blue" };
+  const max = PACK_VEHICULE_LIMIT[pack];
+  const maxLabel = max === undefined ? "?" : max === Infinity ? "∞" : max;
+  return `<span class="badge ${p.color}">${p.label} <span style="opacity:0.7;font-size:10px;">(${maxLabel})</span></span>`;
+}
+
+// ─── Prix des packs / calculs budget ─────────────────────────────────────
+const PACK_FIXED_PRICE = { starter: 129, pme: 249, pro: 349 };
+const PANEL_MECANO_PRICE = 39;
+
+// Détail du montant mensuel : { base, option, total } — base = null si pack
+// Entreprise sans montant négocié saisi (sur devis). Source de vérité unique,
+// utilisée aussi bien pour l'affichage détaillé que pour le total simple.
+function montantDetail(e) {
+  const base   = e.pack === "entreprise" ? (e.montant_mensuel_personnalise || null) : (PACK_FIXED_PRICE[e.pack] ?? null);
+  const option = e.panel_mecano_actif ? PANEL_MECANO_PRICE : 0;
+  if (base === null) return { base: null, option, total: null };
+  // Évite les artefacts de virgule flottante (ex: 100.15 + 29.99 = 130.14000000000001)
+  // qui apparaîtraient tels quels dans l'export CSV (fmtEUR() arrondit à l'euro
+  // pour l'affichage, mais le CSV utilise la valeur brute).
+  const total = Math.round((base + option) * 100) / 100;
+  return { base, option, total };
+}
+function montantMensuel(e) {
+  return montantDetail(e).total;
+}
+function moisEcoules(dateDebut) {
+  if (!dateDebut) return 0;
+  const d = new Date(dateDebut);
+  const now = new Date();
+  let mois = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
+  if (now.getDate() < d.getDate()) mois--;
+  return Math.max(0, mois);
+}
+const PACK_PILL_CLASS = { starter: "pack-pill-starter", pme: "pack-pill-pme", pro: "pack-pill-pro", entreprise: "pack-pill-entreprise" };
+const PACK_LABEL = { starter: "Starter", pme: "PME", pro: "Pro", entreprise: "Entreprise" };
+
+// ─── Avatar monogramme (coloré par pack) ─────────────────────────────────
+function initials(nom) {
+  return String(nom || "").trim().split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "?";
+}
+function avatarHTML(nom, pack, sm) {
+  const c = PACK_DONUT_COLOR[pack] || "#8492A6";
+  return `<div class="avatar${sm ? ' avatar-sm' : ''}" style="background:${c}22;color:${c};border:1px solid ${c}44;">${esc(initials(nom))}</div>`;
+}
+
+// ─── Profils véhicules autorisés ────────────────────────────────────────
+// Catalogue global (entreprise_id NULL), géré depuis l'écran "🚛 Profils
+// véhicules" (voir renderProfilsVehicules plus bas) — remplace l'ancienne
+// liste VEHICLE_PROFILE_GROUPS codée en dur. Chargé une fois après connexion
+// (voir showApp), utilisé ici pour la grille "profils autorisés" de la fiche
+// entreprise (limite l'accès au catalogue global selon le pack ; les profils
+// perso créés par un exploitant restent hors liste blanche, toujours
+// disponibles pour sa propre entreprise).
+let profilsVehiculesCache = [];
+
+async function loadProfilsVehicules() {
+  try {
+    const { profils } = await api("list_profils_vehicules");
+    profilsVehiculesCache = profils || [];
+  } catch (_) {
+    profilsVehiculesCache = [];
+  }
+}
+
+function profilLabel(id) {
+  const p = profilsVehiculesCache.find(x => x.id === id);
+  return p ? p.label : id;
+}
+
+const CATEGORIE_TITRE = { moteur: "Tracteurs & porteurs", remorque: "Remorques" };
+
+// Regroupe une liste de profils par famille (Bâchée, Frigo, Citerne
+// alimentaire...), triée par ordre alphabétique — sinon tout se mélange dès
+// qu'il y a beaucoup de profils dans une même catégorie.
+function grouperParFamille(profils) {
+  const groupes = {};
+  profils.forEach(p => {
+    const cle = p.famille || CATEGORIE_TITRE[p.categorie] || "Autres";
+    if (!groupes[cle]) groupes[cle] = [];
+    groupes[cle].push(p);
+  });
+  return Object.keys(groupes)
+    .sort((a, b) => a.localeCompare(b, "fr"))
+    .map(famille => ({ title: famille, items: groupes[famille].sort((a,b) => (a.ordre||0) - (b.ordre||0)) }));
+}
+
+function renderProfilsGridHTML() {
+  const actifs = profilsVehiculesCache.filter(p => p.actif);
+  const groupes = grouperParFamille(actifs);
+
+  if (groupes.length === 0) {
+    return `<div style="font-size:12px;color:var(--muted);padding:8px 0;">Catalogue non chargé — réessaie dans un instant.</div>`;
+  }
+
+  return groupes.map(g => `
+    <div class="sa-profils-group">
+      <div class="sa-profils-group-title">${esc(g.title)}</div>
+      <div class="sa-profils-items">
+        ${g.items.map(it => `
+          <label class="sa-profils-item">
+            <input type="checkbox" class="profil-checkbox" value="${it.id}" />
+            ${esc(it.label)}
+          </label>
+        `).join("")}
+      </div>
+    </div>
+  `).join("");
+}
+document.getElementById("profils-select-all").addEventListener("click", () => {
+  document.querySelectorAll(".profil-checkbox").forEach(cb => cb.checked = true);
+});
+document.getElementById("profils-select-none").addEventListener("click", () => {
+  document.querySelectorAll(".profil-checkbox").forEach(cb => cb.checked = false);
+});
+
+function contratBadge(iso) {
+  if (!iso) return `<span class="badge badge-blue">Sans limite</span>`;
+  const diff = daysDiff(iso);
+  if (diff < 0)  return `<span class="badge badge-red">⚠️ Expiré ${Math.abs(diff)}j</span>`;
+  if (diff < 15) return `<span class="badge badge-red">🔴 ${diff}j</span>`;
+  if (diff < 30) return `<span class="badge badge-orange">🟠 ${diff}j</span>`;
+  if (diff < 60) return `<span class="badge badge-yellow">🟡 ${diff}j</span>`;
+  return `<span style="font-size:12px;color:#8892a4;">${formatDate(iso)}</span>`;
+}
+
+// ─── Navigation ─────────────────────────────────────────────────────────
+let currentSection = "dashboard";
+const _saTitles = { dashboard:"Dashboard", entreprises:"Gestion des entreprises", contrats:"Suivi des contrats", comptabilite:"Comptabilité", journal:"Journal d'activité", erreurs:"Erreurs applicatives", superadmins:"Comptes superadmin", profils:"Profils véhicules" };
+function navigateTo(section) {
+  currentSection = section;
+  document.querySelectorAll(".sa-nav-item").forEach(el => {
+    el.classList.toggle("active", el.dataset.section === section);
+  });
+  const t = document.getElementById("sa-topbar-title");
+  if (t) t.textContent = _saTitles[section] || section;
+  closeMobileDrawer();
+  render();
+}
+
+// ─── Drawer mobile (sidebar) ──────────────────────────────────────────────
+function openMobileDrawer() {
+  document.getElementById("sa-sidebar").classList.add("open");
+  document.getElementById("sa-mobile-backdrop").classList.add("show");
+}
+function closeMobileDrawer() {
+  document.getElementById("sa-sidebar").classList.remove("open");
+  document.getElementById("sa-mobile-backdrop").classList.remove("show");
+}
+
+function render() {
+  const main = document.getElementById("sa-main");
+  main.innerHTML = `<div class="sa-loading">Chargement…</div>`;
+  if (currentSection === "dashboard")   renderDashboard();
+  if (currentSection === "entreprises") renderEntreprises();
+  if (currentSection === "contrats")    renderContrats();
+  if (currentSection === "comptabilite") renderComptabilite();
+  if (currentSection === "journal")     renderJournal();
+  if (currentSection === "erreurs")     renderErreurs();
+  if (currentSection === "superadmins") renderSuperadmins();
+  if (currentSection === "profils")     renderProfilsVehicules();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// JOURNAL D'ACTIVITÉ
+// ═══════════════════════════════════════════════════════════════════════
+async function renderJournal() {
+  const main = document.getElementById("sa-main");
+  try {
+    const { logs } = await api("list_activity_log", { limit: 150 });
+
+    const byDay = {};
+    const order = [];
+    logs.forEach(l => {
+      const label = journalDayLabel(l.created_at);
+      if (!byDay[label]) { byDay[label] = []; order.push(label); }
+      byDay[label].push(l);
+    });
+
+    main.innerHTML = `
+      <div class="sa-section-title">Journal d'activité</div>
+      ${logs.length === 0
+        ? `<div class="sa-loading">Aucune activité enregistrée pour l'instant</div>`
+        : order.map(day => `
+          <div class="journal-day">
+            <div class="journal-day-lbl">${esc(day)}</div>
+            <div class="journal-card">
+              ${byDay[day].map(l => {
+                const color = personColor(l.superadmin_email);
+                return `
+                <div class="journal-row">
+                  <span class="journal-icon">${(ACTIVITY_LABELS[l.action] || { icon: "•" }).icon}</span>
+                  <div class="journal-body">
+                    <span class="journal-who" style="background:${color}22;color:${color};">${esc(l.superadmin_email.split("@")[0])}</span>
+                    ${ACTIVITY_VERB[l.action] || esc(l.action)}${l.entreprise_nom ? ` <b>${esc(l.entreprise_nom)}</b>` : ""}${l.details ? ` <span style="color:var(--muted);">(${esc(l.details)})</span>` : ""}
+                  </div>
+                  <span class="journal-time">${new Date(l.created_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</span>
+                </div>`;
+              }).join("")}
+            </div>
+          </div>
+        `).join("")}
+    `;
+  } catch (e) {
+    main.innerHTML = `<div class="sa-loading">❌ ${e.message}</div>`;
+  }
+}
+
+const APP_LABEL = { pwa: "📱 PWA chauffeur", admin: "🖥️ Panel bureau/atelier", superadmin: "🛠️ Panel superadmin" };
+const APP_COLOR = { pwa: "#00C2FF", admin: "#F59E0B", superadmin: "#A78BFA" };
+
+async function renderErreurs() {
+  const main = document.getElementById("sa-main");
+  try {
+    const [{ errors, last24h }, { entreprises }] = await Promise.all([
+      api("list_client_errors", { limit: 150 }),
+      api("list_entreprises"),
+    ]);
+
+    const badgeE = document.getElementById("badge-erreurs");
+    if (last24h > 0) { badgeE.textContent = last24h; badgeE.classList.add("show"); }
+    else badgeE.classList.remove("show");
+
+    const entMap = {};
+    (entreprises || []).forEach(e => { entMap[e.id] = e.nom; });
+
+    const byDay = {};
+    const order = [];
+    errors.forEach(err => {
+      const label = journalDayLabel(err.created_at);
+      if (!byDay[label]) { byDay[label] = []; order.push(label); }
+      byDay[label].push(err);
+    });
+
+    main.innerHTML = `
+      <div class="sa-section-title">Erreurs applicatives <span style="font-size:12px;font-weight:600;color:var(--muted);">— ${last24h} dans les dernières 24h</span></div>
+      ${errors.length === 0
+        ? `<div class="sa-loading">Aucune erreur remontée pour l'instant 👍</div>`
+        : order.map(day => `
+          <div class="journal-day">
+            <div class="journal-day-lbl">${esc(day)}</div>
+            <div class="journal-card">
+              ${byDay[day].map(err => `
+                <div class="journal-row" style="align-items:flex-start;">
+                  <span class="journal-icon" style="color:${APP_COLOR[err.app] || 'var(--muted)'};">🐛</span>
+                  <div class="journal-body">
+                    <span class="journal-who" style="background:${(APP_COLOR[err.app]||'#888')}22;color:${APP_COLOR[err.app]||'var(--muted)'};">${esc(APP_LABEL[err.app] || err.app)}</span>
+                    ${err.entreprise_id ? ` <b>${esc(entMap[err.entreprise_id] || err.entreprise_id)}</b>` : ""}
+                    <div style="margin-top:4px;font-family:var(--mono);font-size:11.5px;color:var(--text);word-break:break-word;">${esc(err.message)}</div>
+                    ${err.url ? `<div style="margin-top:2px;font-size:10.5px;color:var(--muted);word-break:break-all;">${esc(err.url)}</div>` : ""}
+                  </div>
+                  <span class="journal-time">${new Date(err.created_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `).join("")}
+    `;
+  } catch (e) {
+    main.innerHTML = `<div class="sa-loading">❌ ${e.message}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════════════════
+function fmtEUR(n) {
+  return Math.round(n || 0).toLocaleString("fr-FR") + " €";
+}
+// Variante avec centimes (129,99 €) — pour le détail des montants où
+// l'arrondi de fmtEUR() masquerait le prix exact d'une option (29,99€).
+function fmtEURPrecis(n) {
+  if (n == null) return "—";
+  return n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+}
+function relativeTime(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  const now = new Date();
+  const startOfDay = (dt) => new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+  const diffDays = Math.round((startOfDay(now) - startOfDay(d)) / 86400000);
+  if (diffDays === 0) return d.toLocaleTimeString("fr-FR", { hour:"2-digit", minute:"2-digit" });
+  if (diffDays === 1) return "hier";
+  if (diffDays > 1 && diffDays < 7) return d.toLocaleDateString("fr-FR", { weekday: "short" });
+  return formatDate(iso);
+}
+
+function buildMonthBuckets(entreprises) {
+  const months = [];
+  const now = new Date();
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const label = d.toLocaleDateString("fr-FR", { month: "short" }).replace(".", "");
+    months.push({ key: `${d.getFullYear()}-${d.getMonth()}`, label: label.charAt(0).toUpperCase() + label.slice(1), count: 0 });
+  }
+  (entreprises || []).forEach(e => {
+    if (!e.created_at) return;
+    const d = new Date(e.created_at);
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    const bucket = months.find(m => m.key === key);
+    if (bucket) bucket.count++;
+  });
+  return months;
+}
+
+function buildSparklineSVG(months) {
+  const counts = months.map(m => m.count);
+  const max = Math.max(1, ...counts);
+  const n = months.length;
+  const xs = months.map((_, i) => 10 + i * (210 / (n - 1 || 1)));
+  const ys = counts.map(c => 70 - (c / max) * 60);
+  const pts = xs.map((x, i) => `${x.toFixed(1)},${ys[i].toFixed(1)}`);
+  const areaPath = `M${pts[0]} L${pts.slice(1).join(" L")} L${xs[n-1].toFixed(1)},70 L${xs[0].toFixed(1)},70 Z`;
+  const circles = months.map((m, i) => {
+    const isLast = i === n - 1;
+    return isLast
+      ? `<g class="spark-pt" data-m="${esc(m.label)}" data-v="${m.count}"><circle cx="${xs[i]}" cy="${ys[i]}" r="7" fill="transparent"/><circle cx="${xs[i]}" cy="${ys[i]}" r="4.5" fill="var(--surface)" stroke="#00C2FF" stroke-width="2"/></g>`
+      : `<g class="spark-pt" data-m="${esc(m.label)}" data-v="${m.count}"><circle cx="${xs[i]}" cy="${ys[i]}" r="7" fill="transparent"/><circle cx="${xs[i]}" cy="${ys[i]}" r="2.5" fill="#00C2FF" opacity="0.55"/></g>`;
+  }).join("");
+  return `
+    <svg class="spark-svg" viewBox="0 0 230 80" preserveAspectRatio="none">
+      <line x1="10" y1="10" x2="220" y2="10" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <line x1="10" y1="30" x2="220" y2="30" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <line x1="10" y1="50" x2="220" y2="50" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <line x1="10" y1="70" x2="220" y2="70" stroke="rgba(255,255,255,0.09)" stroke-width="1"/>
+      <defs><linearGradient id="sparkFillGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#00C2FF" stop-opacity="0.32"/>
+        <stop offset="100%" stop-color="#00C2FF" stop-opacity="0"/>
+      </linearGradient></defs>
+      <path d="${areaPath}" fill="url(#sparkFillGrad)"/>
+      <polyline points="${pts.join(" ")}" fill="none" stroke="#00C2FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      ${circles}
+    </svg>`;
+}
+
+const PACK_DONUT_COLOR = { starter: "#d95926", pme: "#199e70", pro: "#c98500", entreprise: "#d55181" };
+function buildDonutSVG(counts) {
+  const order = ["starter", "pme", "pro", "entreprise"];
+  const total = order.reduce((s, k) => s + (counts[k] || 0), 0) || 1;
+  const r = 45, C = 2 * Math.PI * r;
+  let offset = 0;
+  const segs = order.map(k => {
+    const n = counts[k] || 0;
+    const len = (n / total) * C;
+    const drawn = Math.max(0, len - (n > 0 ? 3 : 0));
+    const seg = `<circle class="donut-seg" cx="56" cy="56" r="${r}" fill="none" stroke="${PACK_DONUT_COLOR[k]}" stroke-width="14" stroke-dasharray="${drawn.toFixed(2)} ${(C - drawn).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" stroke-linecap="round"><title>${PACK_LABEL[k]} — ${n} (${Math.round(n/total*100)}%)</title></circle>`;
+    offset += len;
+    return seg;
+  }).join("");
+  return `
+    <svg class="donut-svg" width="100" height="100" viewBox="0 0 112 112">
+      <g transform="rotate(-90 56 56)">${segs}</g>
+      <text x="56" y="52" text-anchor="middle" class="donut-center-val" fill="var(--text)">${total}</text>
+      <text x="56" y="66" text-anchor="middle" class="donut-center-lbl" fill="var(--muted)">SOCIÉTÉS</text>
+    </svg>`;
+}
+
+function buildWatchlist(entreprises) {
+  const items = [];
+  (entreprises || []).forEach(e => {
+    const diffFin = e.date_fin_contrat ? daysDiff(e.date_fin_contrat) : null;
+    if (!e.est_active) {
+      const days = Math.max(0, Math.floor((Date.now() - new Date(e.updated_at || e.created_at)) / 86400000));
+      items.push({ nom: e.nom, chip: `⛔ suspendue ${days}j`, cls: "watch-chip-danger", prio: 1 });
+    } else if (diffFin !== null && diffFin < 0) {
+      items.push({ nom: e.nom, chip: `⚠️ contrat expiré ${Math.abs(diffFin)}j`, cls: "watch-chip-danger", prio: 2 });
+    } else if ((e.admins || 0) === 0) {
+      items.push({ nom: e.nom, chip: `👤 sans admin actif`, cls: "watch-chip-warning", prio: 3 });
+    } else if (diffFin !== null && diffFin < 15) {
+      items.push({ nom: e.nom, chip: `🕒 contrat ${diffFin}j`, cls: "watch-chip-warning", prio: 4 });
+    }
+  });
+  items.sort((a, b) => a.prio - b.prio);
+  return items.slice(0, 6);
+}
+
+async function renderDashboard() {
+  const main = document.getElementById("sa-main");
+  try {
+    const [{ nbEntreprises, nbActives, nbSuspendues, nbChauf, nbTract, nbRemor, nbEngins, contratsAlerte },
+           { entreprises },
+           { logs }] = await Promise.all([
+      api("list_stats"),
+      api("list_entreprises"),
+      api("list_activity_log", { limit: 6 }),
+    ]);
+
+    // Met à jour le badge contrats
+    const badgeC = document.getElementById("badge-contrats");
+    if (contratsAlerte.length > 0) { badgeC.textContent = contratsAlerte.length; badgeC.classList.add("show"); }
+    else badgeC.classList.remove("show");
+
+    // ── Budget / MRR ──
+    const rows = entreprises.map(e => {
+      const d = montantDetail(e);
+      const mois = moisEcoules(e.date_debut_contrat);
+      return { ...e, montant: d.total, optionMontant: d.option, facture: d.total ? d.total * mois : 0 };
+    }).sort((a, b) => (b.montant || 0) - (a.montant || 0));
+
+    const activeRows = rows.filter(r => r.est_active);
+    const mrr = activeRows.reduce((s, r) => s + (r.montant || 0), 0);
+    const totalFacture = rows.reduce((s, r) => s + (r.facture || 0), 0);
+    const nbActifsAvecMontant = activeRows.filter(r => r.montant).length;
+    const avgContract = nbActifsAvecMontant ? Math.round(mrr / nbActifsAvecMontant) : 0;
+    const nbSurDevisSansMontant = rows.filter(r => r.pack === "entreprise" && !r.montant).length;
+    // Détail options (panel atelier mécano), pour un suivi budget plus précis
+    // que le seul total fusionné pack + options.
+    const optionsMRR       = activeRows.reduce((s, r) => s + (r.optionMontant || 0), 0);
+    const nbOptionsActives = activeRows.filter(r => r.optionMontant > 0).length;
+
+    const now = new Date();
+    const newThisMonth = entreprises.filter(e => {
+      if (!e.created_at) return false;
+      const d = new Date(e.created_at);
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    });
+    const newMRR = newThisMonth.reduce((s, e) => s + (montantMensuel(e) || 0), 0);
+
+    // ── Croissance ──
+    const months = buildMonthBuckets(entreprises);
+    const growthThisMonth = months[months.length - 1].count;
+
+    // ── Répartition packs ──
+    const packCounts = { starter: 0, pme: 0, pro: 0, entreprise: 0 };
+    entreprises.forEach(e => { if (packCounts[e.pack] !== undefined) packCounts[e.pack]++; });
+    const packTotal = entreprises.length || 1;
+
+    // ── Watchlist ──
+    const watchlist = buildWatchlist(entreprises);
+
+    // ── Flottes proches de la limite du pack ──
+    // Véhicules moteurs = tracteurs + engins (mêmes règles que côté panel
+    // admin — les remorques ne comptent pas, voir PACKS_LIMITES là-bas).
+    const fleetAlerts = entreprises
+      .map(e => {
+        const limite = PACK_VEHICULE_LIMIT[e.pack] ?? 5;
+        const nb = (e.tracteurs || 0) + (e.engins || 0);
+        return { id: e.id, nom: e.nom, pack: e.pack, limite, nb, ratio: limite === Infinity ? 0 : nb / limite };
+      })
+      .filter(e => e.limite !== Infinity && e.ratio >= 0.8)
+      .sort((a, b) => b.ratio - a.ratio);
+
+    // ── Budget table (top 8) ──
+    const budgetTop = rows.slice(0, 8);
+    const budgetRest = rows.length - budgetTop.length;
+
+    main.innerHTML = `
+      <div class="sa-section-title">Dashboard</div>
+
+      <div class="dash-toprow">
+        <div class="dash-search">
+          🔍 <input type="text" id="dash-search-input" placeholder="Rechercher une entreprise, un code, un contact…" />
+        </div>
+        <button class="btn btn-primary" id="dash-btn-new">+ Nouvelle entreprise</button>
+      </div>
+
+      <div class="dash-hero-row">
+        <div class="dash-hero-mrr">
+          <div class="lbl">Revenu récurrent mensuel</div>
+          <div class="val">${fmtEUR(mrr)}</div>
+          <div class="sub">${entreprises.length} entreprise(s)${newThisMonth.length ? ` · dont ${newThisMonth.length} nouvelle(s) ce mois (+${fmtEUR(newMRR)})` : ""}${nbSurDevisSansMontant ? ` · ${nbSurDevisSansMontant} sur devis (montant non saisi)` : ""}</div>
+        </div>
+        <div class="sa-stat"><div class="sa-stat-val" style="color:var(--success);">${nbActives} / ${nbEntreprises}</div><div class="sa-stat-lbl">ENTREPRISES ACTIVES</div></div>
+        <div class="sa-stat"><div class="sa-stat-val">${nbChauf}</div><div class="sa-stat-lbl">CHAUFFEURS</div></div>
+        <div class="sa-stat"><div class="sa-stat-val">${nbTract} <span style="color:var(--muted);font-size:15px;">+ ${nbRemor}</span></div><div class="sa-stat-lbl">TRACTEURS + REMORQUES</div><div style="font-size:11px;color:var(--muted-2);margin-top:2px;">${nbEngins} engin(s) BTP</div></div>
+      </div>
+
+      <div class="dash-midrow">
+        <div class="dash-card">
+          <div class="spark-top">
+            <div>
+              <div class="dash-card-title">Nouvelles entreprises</div>
+              <div class="spark-caption">6 derniers mois</div>
+            </div>
+            <div class="spark-val"><span class="plus">+${growthThisMonth}</span> ce mois-ci</div>
+          </div>
+          <div class="spark-wrap">
+            ${buildSparklineSVG(months)}
+            <div class="spark-tip" id="sparkTip"></div>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card-title">Répartition par pack</div>
+          <div class="donut-body">
+            ${buildDonutSVG(packCounts)}
+            <div class="donut-legend">
+              ${["starter","pme","pro","entreprise"].map(k => `
+                <div class="donut-row">
+                  <span class="donut-dot" style="background:${PACK_DONUT_COLOR[k]}"></span>
+                  <span class="donut-name">${PACK_LABEL[k]}</span>
+                  <span class="donut-pct">${packCounts[k] ? Math.round(packCounts[k]/packTotal*100) : 0}%</span>
+                  <span class="donut-count">${packCounts[k]}</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card-title">À surveiller <span class="n">${watchlist.length}</span></div>
+          <div>
+            ${watchlist.length
+              ? watchlist.map(w => `<div class="watch-row"><span class="watch-name">${esc(w.nom)}</span><span class="watch-chip ${w.cls}">${w.chip}</span></div>`).join("")
+              : `<div class="watch-empty">Rien à signaler 👍</div>`}
+          </div>
+        </div>
+      </div>
+
+      ${fleetAlerts.length ? `
+      <div class="dash-card">
+        <div class="dash-card-title">🚛 Flottes proches de la limite du pack <span class="n">${fleetAlerts.length}</span></div>
+        <div>
+          ${fleetAlerts.map(f => `
+            <div class="sa-alert-row" data-fleet-edit="${f.id}">
+              <span class="sa-alert-nom">${esc(f.nom)} <span style="color:var(--muted);font-weight:600;">— ${PACK_LABEL[f.pack] || f.pack}</span></span>
+              <span class="badge ${f.ratio >= 1 ? 'badge-red' : 'badge-orange'}">${f.nb}/${f.limite} véhicules${f.ratio >= 1 ? ' — Limite atteinte' : ''}</span>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+      ` : ""}
+
+      <div class="dash-botrow">
+        <div class="dash-card">
+          <div class="dash-card-title">Contrats à surveiller <span class="n">${contratsAlerte.length}</span></div>
+          <div>
+            ${contratsAlerte.length
+              ? contratsAlerte.map(e => {
+                  const diff = daysDiff(e.date_fin_contrat);
+                  return `<div class="sa-alert-row" onclick="navigateTo('contrats')">
+                    <span class="sa-alert-nom">${esc(e.nom)}</span>
+                    <span class="sa-alert-date ${diff < 0 ? 'expired' : ''}">${diff < 0 ? 'Expiré ' + Math.abs(diff) + 'j' : 'Dans ' + diff + 'j'}</span>
+                  </div>`;
+                }).join("")
+              : `<div class="watch-empty">Aucun contrat n'expire dans les 30 prochains jours</div>`}
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card-title">Activité récente</div>
+          <div>
+            ${logs.length
+              ? logs.map(l => `
+                <div class="dash-feed-row">
+                  <span class="dash-feed-icon">${(ACTIVITY_LABELS[l.action] || {icon:"•"}).icon}</span>
+                  <div class="dash-feed-body"><b>${esc(l.superadmin_email)}</b> — ${esc((ACTIVITY_LABELS[l.action]||{label:l.action}).label)}${l.entreprise_nom ? ` — <b>${esc(l.entreprise_nom)}</b>` : ""}</div>
+                  <span class="dash-feed-meta">${relativeTime(l.created_at)}</span>
+                </div>
+              `).join("")
+              : `<div class="watch-empty">Aucune activité enregistrée</div>`}
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-card">
+        <div class="dash-card-title">💰 Suivi budget — contrats signés</div>
+        <div class="budget-kpis">
+          <div class="budget-kpi"><div class="val">${fmtEUR(totalFacture)}</div><div class="lbl">Facturé depuis le lancement (estim.)</div></div>
+          <div class="budget-kpi"><div class="val">${fmtEUR(mrr)}</div><div class="lbl">Actif ce mois-ci</div></div>
+          <div class="budget-kpi"><div class="val">${fmtEUR(avgContract)}</div><div class="lbl">Valeur moyenne / contrat</div></div>
+          <div class="budget-kpi"><div class="val">${fmtEURPrecis(optionsMRR)}</div><div class="lbl">🔧 Dont options — ${nbOptionsActives} actives</div></div>
+        </div>
+        <div class="budget-table-wrap">
+          <table class="budget">
+            <thead>
+              <tr><th>Entreprise</th><th>Pack</th><th>Début contrat</th><th style="text-align:right;">Montant / mois</th><th>Statut</th><th style="text-align:right;">Facturé (cumulé)</th></tr>
+            </thead>
+            <tbody>
+              ${budgetTop.map(r => `
+                <tr>
+                  <td><strong>${esc(r.nom)}</strong></td>
+                  <td><span class="pack-pill ${PACK_PILL_CLASS[r.pack] || ''}">${PACK_LABEL[r.pack] || r.pack || '—'}</span></td>
+                  <td>${formatDate(r.date_debut_contrat)}</td>
+                  <td class="num">${r.montant ? fmtEUR(r.montant) : '—'}${r.optionMontant > 0 ? `<div style="font-size:9.5px;color:var(--accent);font-weight:700;">dont 🔧 ${fmtEURPrecis(r.optionMontant)}</div>` : ''}</td>
+                  <td><span class="status-pill ${r.est_active ? 'status-pill-active' : 'status-pill-suspended'}">${r.est_active ? 'Active' : 'Suspendue'}</span></td>
+                  <td class="num">${fmtEUR(r.facture)}</td>
+                </tr>
+              `).join("")}
+              ${budgetRest > 0 ? `<tr class="more" onclick="navigateTo('contrats')"><td colspan="6">+ ${budgetRest} autre(s) entreprise(s) — voir Contrats →</td></tr>` : ""}
+              <tr class="total">
+                <td colspan="3">TOTAL — ${entreprises.length} entreprise(s)</td>
+                <td class="num">${fmtEUR(mrr)}</td>
+                <td></td>
+                <td class="num">${fmtEUR(totalFacture)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="budget-note">
+          « Facturé (cumulé) » = mois écoulés depuis le début du contrat × montant mensuel actuel — estimation brute qui ne tient pas compte des changements de pack ni des périodes de suspension. Le pack Entreprise (sur devis) nécessite de saisir un montant mensuel dans la fiche entreprise, sinon il n'est pas compté.
+        </div>
+      </div>
+    `;
+
+    document.getElementById("dash-btn-new").addEventListener("click", () => ouvrirModalEntreprise(null));
+    document.querySelectorAll("[data-fleet-edit]").forEach(row => {
+      row.style.cursor = "pointer";
+      row.title = "Modifier le pack de cette entreprise";
+      row.addEventListener("click", () => {
+        const e = entreprises.find(x => x.id === row.dataset.fleetEdit);
+        if (e) ouvrirModalEntreprise(e);
+      });
+    });
+    const searchInput = document.getElementById("dash-search-input");
+    const runDashSearch = () => {
+      _entreprisesSearchTerm = searchInput.value.trim();
+      navigateTo("entreprises");
+    };
+    searchInput.addEventListener("keydown", (e) => { if (e.key === "Enter") runDashSearch(); });
+
+    const tip = document.getElementById("sparkTip");
+    const wrap = document.querySelector(".spark-wrap");
+    document.querySelectorAll(".spark-pt").forEach(pt => {
+      pt.addEventListener("mouseenter", () => {
+        const c = pt.querySelector("circle");
+        const rect = c.getBoundingClientRect();
+        const wrapRect = wrap.getBoundingClientRect();
+        tip.textContent = `${pt.dataset.m} — ${pt.dataset.v} nouvelle(s)`;
+        tip.style.left = (rect.left - wrapRect.left + rect.width / 2) + "px";
+        tip.style.top = (rect.top - wrapRect.top) + "px";
+        tip.style.opacity = "1";
+      });
+      pt.addEventListener("mouseleave", () => { tip.style.opacity = "0"; });
+    });
+
+  } catch (e) {
+    main.innerHTML = `<div class="sa-loading">❌ ${e.message}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// ENTREPRISES
+// ═══════════════════════════════════════════════════════════════════════
+let _entreprises = [];
+let _entreprisesSearchTerm = "";
+let _entSelected = new Set();
+
+function updateBulkBar() {
+  const bar = document.getElementById("bulk-bar");
+  if (!bar) return;
+  const selected = _entreprises.filter(e => _entSelected.has(e.id));
+  if (selected.length === 0) { bar.innerHTML = ""; return; }
+  const activeSel = selected.filter(e => e.est_active);
+  const suspSel = selected.filter(e => !e.est_active);
+  bar.innerHTML = `
+    <div class="dash-toprow" style="background:var(--card);border:1px solid var(--border-strong);border-radius:var(--radius-sm);padding:10px 14px;">
+      <div style="font-size:12px;font-weight:700;flex:1;">${selected.length} sélectionnée(s)</div>
+      ${activeSel.length ? `<button class="btn btn-danger btn-sm" id="bulk-suspend">⛔ Suspendre (${activeSel.length})</button>` : ""}
+      ${suspSel.length ? `<button class="btn btn-success btn-sm" id="bulk-reactivate">✓ Réactiver (${suspSel.length})</button>` : ""}
+      <button class="btn btn-ghost btn-sm" id="bulk-clear">✕ Annuler la sélection</button>
+    </div>
+  `;
+  document.getElementById("bulk-clear").addEventListener("click", () => {
+    _entSelected.clear();
+    document.querySelectorAll(".ent-checkbox").forEach(cb => cb.checked = false);
+    updateBulkBar();
+  });
+  const doBulkToggle = async (list, active) => {
+    if (!confirm(`${active ? "Réactiver" : "Suspendre"} ${list.length} entreprise(s) ?\n${list.map(e => e.nom).join(", ")}`)) return;
+    try {
+      await Promise.all(list.map(e => api("toggle_entreprise", { entreprise_id: e.id, est_active: active })));
+      toast(active ? "✅ Entreprises réactivées" : "⛔ Entreprises suspendues");
+      _entSelected.clear();
+      renderEntreprises();
+    } catch (err) { toast("❌ " + err.message); }
+  };
+  document.getElementById("bulk-suspend")?.addEventListener("click", () => doBulkToggle(activeSel, false));
+  document.getElementById("bulk-reactivate")?.addEventListener("click", () => doBulkToggle(suspSel, true));
+}
+
+function filterEntreprises(entreprises, term) {
+  if (!term) return entreprises;
+  const t = term.toLowerCase();
+  return entreprises.filter(e =>
+    (e.nom || "").toLowerCase().includes(t) ||
+    (e.code_entreprise || "").toLowerCase().includes(t) ||
+    (e.contact_nom || "").toLowerCase().includes(t) ||
+    (e.contact_email || "").toLowerCase().includes(t)
+  );
+}
+
+async function renderEntreprises() {
+  const main = document.getElementById("sa-main");
+  try {
+    const { entreprises } = await api("list_entreprises");
+    _entreprises = entreprises;
+
+    const suspended = entreprises.filter(e => !e.est_active).length;
+    const badge = document.getElementById("badge-entreprises");
+    if (suspended > 0) { badge.textContent = suspended; badge.classList.add("show"); }
+    else badge.classList.remove("show");
+
+    const filtered = filterEntreprises(entreprises, _entreprisesSearchTerm);
+
+    main.innerHTML = `
+      <div class="sa-section-title">Entreprises (${filtered.length}${_entreprisesSearchTerm ? ` / ${entreprises.length}` : ""})</div>
+      <div class="dash-toprow">
+        <div class="dash-search">
+          🔍 <input type="text" id="entreprises-search-input" placeholder="Rechercher une entreprise, un code, un contact… (Entrée pour filtrer)" value="${esc(_entreprisesSearchTerm)}" />
+        </div>
+        ${_entreprisesSearchTerm ? `<button class="btn btn-ghost" id="btn-clear-search">✕ Effacer</button>` : ""}
+        <button class="btn btn-ghost" id="btn-export-entreprises">⬇️ Export CSV</button>
+        <button class="btn btn-primary" id="btn-new-entreprise">+ Nouvelle entreprise</button>
+      </div>
+      <div id="bulk-bar"></div>
+      <div class="ent-table-wrap">
+        ${filtered.length === 0
+          ? `<div style="text-align:center;color:var(--muted);padding:24px;">Aucune entreprise ne correspond à « ${esc(_entreprisesSearchTerm)} »</div>`
+          : filtered.map(e => `
+            <div class="ent-row">
+              <input type="checkbox" class="ent-checkbox" data-id="${e.id}" ${_entSelected.has(e.id) ? 'checked' : ''} />
+              ${avatarHTML(e.nom, e.pack)}
+              <div style="flex:1;min-width:160px;">
+                <div class="ent-name">${esc(e.nom)}</div>
+                <div class="ent-sub">${e.contact_nom ? esc(e.contact_nom) : esc(e.code_entreprise)}</div>
+              </div>
+              <div class="ent-col"><span class="pack-pill ${PACK_PILL_CLASS[e.pack] || ''}">${esc(PACK_LABEL[e.pack] || e.pack || '—')}</span></div>
+              <div class="ent-col"><span class="status-pill ${e.est_active ? 'status-pill-active' : 'status-pill-suspended'}">${e.est_active ? 'Active' : 'Suspendue'}</span></div>
+              <div class="ent-col">${contratBadge(e.date_fin_contrat)}</div>
+              <div class="ent-col-num"><div class="ent-num-val">${e.chauffeurs}</div><div class="ent-num-lbl">Chauf.</div></div>
+              <div class="ent-col-num"><div class="ent-num-val">${e.tracteurs}</div><div class="ent-num-lbl">Tract.</div></div>
+              <div class="ent-col-num"><div class="ent-num-val">${e.admins}</div><div class="ent-num-lbl">Admins</div></div>
+              <div class="ent-actions">
+                <button class="btn btn-ghost btn-sm btn-icon" data-detail="${e.id}" title="Détail">👁️</button>
+                <button class="btn btn-ghost btn-sm btn-icon" data-edit="${e.id}" title="Modifier">✏️</button>
+                ${e.est_active
+                  ? `<button class="btn btn-danger btn-sm" data-toggle="${e.id}" data-active="false">⛔ Suspendre</button>`
+                  : `<button class="btn btn-success btn-sm" data-toggle="${e.id}" data-active="true">✓ Réactiver</button>`}
+                <button class="btn btn-sm btn-icon" data-delete="${e.id}" data-nom="${esc(e.nom)}" title="Supprimer" style="background:rgba(239,83,80,0.08);color:var(--danger);border:1px solid rgba(239,83,80,0.2);">🗑️</button>
+              </div>
+            </div>
+          `).join("")}
+      </div>
+      <div id="detail-zone"></div>
+    `;
+
+    document.getElementById("btn-new-entreprise").addEventListener("click", () => ouvrirModalEntreprise(null));
+    document.getElementById("btn-export-entreprises").addEventListener("click", () => exportEntreprisesCSV(filtered));
+    const searchInput = document.getElementById("entreprises-search-input");
+    searchInput.addEventListener("input", () => { _entreprisesSearchTerm = searchInput.value; });
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { _entreprisesSearchTerm = searchInput.value.trim(); renderEntreprises(); }
+    });
+    if (_entreprisesSearchTerm) searchInput.focus();
+    document.getElementById("btn-clear-search")?.addEventListener("click", () => { _entreprisesSearchTerm = ""; renderEntreprises(); });
+
+    document.querySelectorAll(".ent-checkbox").forEach(cb => {
+      cb.addEventListener("change", () => {
+        if (cb.checked) _entSelected.add(cb.dataset.id); else _entSelected.delete(cb.dataset.id);
+        updateBulkBar();
+      });
+    });
+    updateBulkBar();
+
+    // Détail
+    document.querySelectorAll("[data-detail]").forEach(btn => {
+      btn.addEventListener("click", () => afficherDetailEntreprise(btn.dataset.detail));
+    });
+    // Édition
+    document.querySelectorAll("[data-edit]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const e = _entreprises.find(x => x.id === btn.dataset.edit);
+        if (e) ouvrirModalEntreprise(e);
+      });
+    });
+    // Toggle
+    document.querySelectorAll("[data-toggle]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const active = btn.dataset.active === "true";
+        const e = _entreprises.find(x => x.id === btn.dataset.toggle);
+        if (!e) return;
+        const label = active ? "réactiver" : "suspendre";
+        if (!confirm(`Voulez-vous ${label} "${e.nom}" ?\n${!active ? "Les chauffeurs et admins ne pourront plus se connecter." : ""}`)) return;
+        try {
+          await api("toggle_entreprise", { entreprise_id: btn.dataset.toggle, est_active: active });
+          toast(active ? "✅ Entreprise réactivée" : "⛔ Entreprise suspendue");
+          renderEntreprises();
+        } catch (err) { toast("❌ " + err.message); }
+      });
+    });
+
+    // Suppression
+    document.querySelectorAll("[data-delete]").forEach(btn => {
+      btn.addEventListener("click", () => ouvrirModalSuppression(btn.dataset.delete, btn.dataset.nom));
+    });
+
+  } catch (e) {
+    main.innerHTML = `<div class="sa-loading">❌ ${e.message}</div>`;
+  }
+}
+
+function renderChauffeursRows(list) {
+  return list.map(c => `
+    <div class="detail-row">
+      <span class="detail-label">${esc(c.prenom)} ${esc(c.nom)} ${!c.est_valide ? `<span class="badge badge-orange" style="margin-left:6px;">En attente</span>` : ""}</span>
+      <span class="detail-val" style="font-size:11px;display:flex;align-items:center;gap:8px;">
+        ${esc(c.email)}
+        <button class="btn btn-ghost btn-sm" data-reset-chauffeur="${c.id}" data-reset-email="${esc(c.email)}" title="Réinitialiser le mot de passe">🔑</button>
+      </span>
+    </div>
+  `).join("") || `<div style="font-size:12px;color:var(--muted);">Aucun chauffeur</div>`;
+}
+
+function bindChauffeurResetButtons(container) {
+  container.querySelectorAll("[data-reset-chauffeur]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const chauffeurId = btn.dataset.resetChauffeur;
+      const email       = btn.dataset.resetEmail;
+      if (!confirm(`Générer un nouveau mot de passe pour ${email} ?\nL'ancien ne fonctionnera plus.`)) return;
+      const password = generatePassword();
+      try {
+        await api("reset_chauffeur_password", { chauffeur_id: chauffeurId, password });
+        toast("✅ Mot de passe réinitialisé");
+        showCredentialsModal({ email, password });
+      } catch (err) { toast("❌ " + err.message); }
+    });
+  });
+}
+
+async function afficherDetailEntreprise(id) {
+  const e = _entreprises.find(x => x.id === id);
+  if (!e) return;
+  const detail = montantDetail(e);
+  const zone = document.getElementById("detail-zone");
+  zone.innerHTML = `<div class="sa-loading">Chargement admins…</div>`;
+
+  try {
+    const [{ admins }, { chauffeurs }, usage] = await Promise.all([
+      api("list_admins", { entreprise_id: id }),
+      api("list_chauffeurs", { entreprise_id: id }),
+      e.panel_mecano_actif ? api("entreprise_usage", { entreprise_id: id }).catch(() => null) : Promise.resolve(null),
+    ]);
+    zone.innerHTML = `
+      <div class="detail-panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:14px;font-weight:800;">${esc(e.nom)}</div>
+          <span class="badge badge-blue">${esc(e.code_entreprise)}</span>
+        </div>
+
+        <div>
+          <div class="detail-section-title">CONTRAT</div>
+          <div class="detail-row"><span class="detail-label">Pack</span><span class="detail-val">${packBadge(e.pack)}</span></div>
+          <div class="detail-row"><span class="detail-label">Début</span><span class="detail-val">${formatDate(e.date_debut_contrat)}</span></div>
+          <div class="detail-row"><span class="detail-label">Fin</span><span class="detail-val">${contratBadge(e.date_fin_contrat)}</span></div>
+        </div>
+
+        <div>
+          <div class="detail-section-title">FACTURATION</div>
+          <div class="detail-row"><span class="detail-label">${e.pack === "entreprise" ? "Montant négocié" : "Pack " + (PACK_LABEL[e.pack] || e.pack)}</span><span class="detail-val">${detail.base != null ? fmtEURPrecis(detail.base) + " / mois" : "Sur devis — montant non saisi"}</span></div>
+          ${detail.option > 0 ? `<div class="detail-row"><span class="detail-label">🔧 Option panel atelier</span><span class="detail-val">+ ${fmtEURPrecis(detail.option)} / mois</span></div>` : ""}
+          <div class="detail-row" style="border-top:1px solid var(--border);margin-top:2px;padding-top:8px;"><span class="detail-label" style="font-weight:800;color:var(--text);">Total mensuel</span><span class="detail-val" style="font-weight:800;color:var(--accent);">${detail.total != null ? fmtEURPrecis(detail.total) + " / mois" : "—"}</span></div>
+        </div>
+
+        <div>
+          <div class="detail-section-title">CONTACT</div>
+          <div class="detail-row"><span class="detail-label">Nom</span><span class="detail-val">${esc(e.contact_nom) || "—"}</span></div>
+          <div class="detail-row"><span class="detail-label">Email</span><span class="detail-val">${esc(e.contact_email) || "—"}</span></div>
+          <div class="detail-row"><span class="detail-label">Tél</span><span class="detail-val">${esc(e.contact_telephone) || "—"}</span></div>
+        </div>
+
+        <div>
+          <div class="detail-section-title">VÉHICULES AUTORISÉS (${(e.profils_autorises||[]).length})</div>
+          <div class="sa-profils-badges">
+            ${(e.profils_autorises||[]).length
+              ? e.profils_autorises.map(id => `<span class="sa-profils-badge">${esc(profilLabel(id))}</span>`).join("")
+              : `<span style="font-size:12px;color:var(--muted);">Aucun — l'entreprise ne peut ajouter aucun véhicule</span>`}
+          </div>
+        </div>
+
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <div class="detail-section-title" style="margin:0;">ADMINS (${admins.length})</div>
+            <button class="btn btn-primary btn-sm" id="btn-add-admin" data-entreprise="${id}" data-panel-mecano="${!!e.panel_mecano_actif}">+ Admin</button>
+          </div>
+          ${admins.map(a => `
+            <div class="detail-row">
+              <span class="detail-label">${esc(a.prenom)} ${esc(a.nom)} ${a.role === "mecanicien" ? `<span class="badge badge-blue" style="margin-left:6px;">🔧 Mécanicien</span>` : ""}</span>
+              <span class="detail-val" style="font-size:11px;display:flex;align-items:center;gap:8px;">
+                ${esc(a.email)}
+                <button class="btn btn-ghost btn-sm" data-reset-admin="${a.id}" data-reset-email="${esc(a.email)}" title="Réinitialiser le mot de passe">🔑</button>
+              </span>
+            </div>
+          `).join("") || `<div style="font-size:12px;color:var(--muted);">Aucun admin</div>`}
+        </div>
+
+        <div>
+          <div class="detail-section-title">CHAUFFEURS (${chauffeurs.length})</div>
+          ${chauffeurs.length > 6 ? `
+          <div class="dash-search" style="margin-bottom:8px;">
+            🔍 <input type="text" id="chauffeurs-search-input" placeholder="Rechercher un chauffeur…" />
+          </div>` : ""}
+          <div id="chauffeurs-list" style="max-height:280px;overflow-y:auto;">
+            ${renderChauffeursRows(chauffeurs)}
+          </div>
+        </div>
+
+        ${usage ? `
+        <div>
+          <div class="detail-section-title">🔧 USAGE ATELIER</div>
+          <div class="detail-row"><span class="detail-label">Tickets ce mois</span><span class="detail-val">${usage.ticketsCeMois}</span></div>
+          <div class="detail-row"><span class="detail-label">Tickets en cours</span><span class="detail-val">${usage.ticketsEnCours > 0 ? `<span class="badge badge-orange">${usage.ticketsEnCours}</span>` : "0"}</span></div>
+          <div class="detail-row"><span class="detail-label">Dernier ticket</span><span class="detail-val">${usage.dernierTicketAt ? formatDateTime(usage.dernierTicketAt) : "—"}</span></div>
+        </div>
+        ` : ""}
+
+        ${e.notes ? `<div><div class="detail-section-title">NOTES</div><div style="font-size:12px;color:var(--muted);">${esc(e.notes)}</div></div>` : ""}
+      </div>
+    `;
+
+    document.getElementById("btn-add-admin")?.addEventListener("click", (ev) => {
+      ouvrirModalAdmin(ev.currentTarget.dataset.entreprise, ev.currentTarget.dataset.panelMecano === "true");
+    });
+
+    zone.querySelectorAll("[data-reset-admin]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const adminId = btn.dataset.resetAdmin;
+        const email   = btn.dataset.resetEmail;
+        if (!confirm(`Générer un nouveau mot de passe pour ${email} ?\nL'ancien ne fonctionnera plus.`)) return;
+        const password = generatePassword();
+        try {
+          await api("reset_admin_password", { admin_id: adminId, password });
+          toast("✅ Mot de passe réinitialisé");
+          showCredentialsModal({ email, password });
+        } catch (err) { toast("❌ " + err.message); }
+      });
+    });
+
+    bindChauffeurResetButtons(zone);
+
+    const chauffeursSearchInput = document.getElementById("chauffeurs-search-input");
+    chauffeursSearchInput?.addEventListener("input", () => {
+      const term = chauffeursSearchInput.value.trim().toLowerCase();
+      const filtered = term
+        ? chauffeurs.filter(c =>
+            `${c.prenom} ${c.nom}`.toLowerCase().includes(term) ||
+            (c.email || "").toLowerCase().includes(term))
+        : chauffeurs;
+      const list = document.getElementById("chauffeurs-list");
+      list.innerHTML = renderChauffeursRows(filtered);
+      bindChauffeurResetButtons(list);
+    });
+
+  } catch (err) {
+    zone.innerHTML = `<div style="color:var(--danger);">❌ ${err.message}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// CONTRATS
+// ═══════════════════════════════════════════════════════════════════════
+function contratTriageRow(e) {
+  const diff = e.date_fin_contrat ? daysDiff(e.date_fin_contrat) : null;
+  const dates = e.date_fin_contrat
+    ? (diff < 0 ? `expiré depuis ${Math.abs(diff)}j` : `échéance dans ${diff}j`)
+    : (e.date_debut_contrat ? `depuis le ${formatDate(e.date_debut_contrat)}` : "—");
+  return `
+    <div class="triage-row">
+      ${avatarHTML(e.nom, e.pack, true)}
+      <div class="triage-name">${esc(e.nom)}</div>
+      <div class="triage-dates">${dates}</div>
+      ${contratBadge(e.date_fin_contrat)}
+      <button class="btn btn-ghost btn-sm" data-edit-contrat="${e.id}">✏️ Modifier</button>
+      ${e.est_active
+        ? `<button class="btn btn-danger btn-sm" data-toggle="${e.id}" data-active="false">⛔ Suspendre</button>`
+        : `<button class="btn btn-success btn-sm" data-toggle="${e.id}" data-active="true">✓ Réactiver</button>`}
+    </div>`;
+}
+
+async function renderContrats() {
+  const main = document.getElementById("sa-main");
+  try {
+    const { entreprises } = await api("list_entreprises");
+
+    const enAlerte = entreprises.filter(e => e.date_fin_contrat && daysDiff(e.date_fin_contrat) < 30);
+    const badgeC = document.getElementById("badge-contrats");
+    if (enAlerte.length > 0) { badgeC.textContent = enAlerte.length; badgeC.classList.add("show"); }
+    else badgeC.classList.remove("show");
+
+    const withDate = entreprises.filter(e => e.date_fin_contrat);
+    const groups = [
+      { label: "Expirés", color: "var(--danger)", items: withDate.filter(e => daysDiff(e.date_fin_contrat) < 0) },
+      { label: "Cette semaine (< 15j)", color: "var(--danger)", items: withDate.filter(e => { const d = daysDiff(e.date_fin_contrat); return d >= 0 && d < 15; }) },
+      { label: "Ce mois (< 30j)", color: "var(--warning)", items: withDate.filter(e => { const d = daysDiff(e.date_fin_contrat); return d >= 15 && d < 30; }) },
+      { label: "Au-delà", color: "var(--muted-2)", items: withDate.filter(e => daysDiff(e.date_fin_contrat) >= 30) },
+      { label: "Sans échéance définie", color: "var(--muted-2)", items: entreprises.filter(e => !e.date_fin_contrat) },
+    ];
+    // Trie chaque groupe par échéance croissante (les plus urgents en premier)
+    groups.forEach(g => g.items.sort((a, b) => {
+      if (!a.date_fin_contrat) return 1;
+      if (!b.date_fin_contrat) return -1;
+      return new Date(a.date_fin_contrat) - new Date(b.date_fin_contrat);
+    }));
+
+    main.innerHTML = `
+      <div class="sa-section-title">Suivi des contrats</div>
+      <div class="dash-toprow" style="justify-content:flex-end;">
+        <button class="btn btn-ghost" id="btn-export-contrats">⬇️ Export CSV</button>
+      </div>
+      ${groups.filter(g => g.items.length).map(g => `
+        <div class="triage-group">
+          <div class="triage-head"><span class="dot" style="background:${g.color};"></span><h3>${g.label}</h3><span class="n">${g.items.length}</span></div>
+          <div class="triage-card">
+            ${g.items.map(contratTriageRow).join("")}
+          </div>
+        </div>
+      `).join("") || `<div class="sa-loading">Aucune entreprise</div>`}
+    `;
+
+    document.getElementById("btn-export-contrats").addEventListener("click", () => exportContratsCSV(entreprises));
+    document.querySelectorAll("[data-edit-contrat]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const e = entreprises.find(x => x.id === btn.dataset.editContrat);
+        if (e) ouvrirModalEntreprise(e);
+      });
+    });
+    document.querySelectorAll("[data-toggle]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const active = btn.dataset.active === "true";
+        const e = entreprises.find(x => x.id === btn.dataset.toggle);
+        if (!e || !confirm(`${active ? "Réactiver" : "Suspendre"} "${e.nom}" ?`)) return;
+        try {
+          await api("toggle_entreprise", { entreprise_id: btn.dataset.toggle, est_active: active });
+          toast(active ? "✅ Réactivée" : "⛔ Suspendue");
+          renderContrats();
+        } catch (err) { toast("❌ " + err.message); }
+      });
+    });
+
+  } catch (e) {
+    main.innerHTML = `<div class="sa-loading">❌ ${e.message}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// MODAL ENTREPRISE (création + édition)
+// ═══════════════════════════════════════════════════════════════════════
+let _editingEntrepriseId = null;
+
+function ouvrirModalEntreprise(entreprise) {
+  _editingEntrepriseId = entreprise?.id || null;
+  const isEdit = !!entreprise;
+
+  document.getElementById("modal-entreprise-title").textContent = isEdit ? "Modifier l'entreprise" : "Nouvelle entreprise";
+  document.getElementById("modal-entreprise-save").textContent  = isEdit ? "✓ Enregistrer" : "✓ Créer";
+  document.getElementById("modal-admin-section").style.display  = isEdit ? "none" : "block";
+  document.getElementById("modal-admin-fields").style.display   = isEdit ? "none" : "flex";
+  document.getElementById("modal-admin-fields").style.flexDirection = "column";
+  document.getElementById("modal-admin-fields").style.gap = "12px";
+
+  document.getElementById("modal-nom").value            = entreprise?.nom || "";
+  document.getElementById("modal-pack").value           = entreprise?.pack || "starter";
+  document.getElementById("modal-montant-perso").value  = entreprise?.montant_mensuel_personnalise || "";
+  toggleMontantPersoField();
+  document.getElementById("modal-debut").value          = entreprise?.date_debut_contrat || "";
+  document.getElementById("modal-fin").value            = entreprise?.date_fin_contrat || "";
+  document.getElementById("modal-contact-nom").value    = entreprise?.contact_nom || "";
+  document.getElementById("modal-contact-email").value  = entreprise?.contact_email || "";
+  document.getElementById("modal-contact-tel").value    = entreprise?.contact_telephone || "";
+  document.getElementById("modal-notes").value          = entreprise?.notes || "";
+  document.getElementById("modal-profils-grid").innerHTML = renderProfilsGridHTML();
+  const autorises = entreprise?.profils_autorises || [];
+  document.querySelectorAll(".profil-checkbox").forEach(cb => { cb.checked = autorises.includes(cb.value); });
+  document.getElementById("modal-panel-mecano").checked = !!entreprise?.panel_mecano_actif;
+  document.getElementById("modal-admin-prenom").value   = "";
+  document.getElementById("modal-admin-nom").value      = "";
+  document.getElementById("modal-admin-email").value    = "";
+  document.getElementById("modal-admin-password").value = isEdit ? "" : generatePassword();
+  document.getElementById("modal-entreprise-error").textContent = "";
+
+  document.getElementById("modal-entreprise").classList.add("open");
+}
+
+function toggleMontantPersoField() {
+  const isEntreprise = document.getElementById("modal-pack").value === "entreprise";
+  document.getElementById("modal-montant-perso-row").style.display = isEntreprise ? "flex" : "none";
+}
+document.getElementById("modal-pack").addEventListener("change", toggleMontantPersoField);
+
+document.getElementById("modal-entreprise-close").addEventListener("click",  () => document.getElementById("modal-entreprise").classList.remove("open"));
+document.getElementById("modal-entreprise-cancel").addEventListener("click", () => document.getElementById("modal-entreprise").classList.remove("open"));
+
+document.getElementById("modal-entreprise-save").addEventListener("click", async () => {
+  const errEl = document.getElementById("modal-entreprise-error");
+  errEl.textContent = "";
+  const btn = document.getElementById("modal-entreprise-save");
+  btn.disabled = true; btn.textContent = "…";
+
+  const payload = {
+    nom:                 document.getElementById("modal-nom").value.trim(),
+    pack:                document.getElementById("modal-pack").value,
+    date_debut_contrat:  document.getElementById("modal-debut").value || null,
+    date_fin_contrat:    document.getElementById("modal-fin").value || null,
+    contact_nom:         document.getElementById("modal-contact-nom").value.trim() || null,
+    contact_email:       document.getElementById("modal-contact-email").value.trim() || null,
+    contact_telephone:   document.getElementById("modal-contact-tel").value.trim() || null,
+    notes:               document.getElementById("modal-notes").value.trim() || null,
+    profils_autorises:   Array.from(document.querySelectorAll(".profil-checkbox:checked")).map(cb => cb.value),
+    montant_mensuel_personnalise: document.getElementById("modal-montant-perso").value || null,
+    panel_mecano_actif:  document.getElementById("modal-panel-mecano").checked,
+  };
+
+  try {
+    if (_editingEntrepriseId) {
+      await api("update_entreprise", { entreprise_id: _editingEntrepriseId, ...payload });
+      toast("✅ Entreprise mise à jour");
+    } else {
+      payload.admin_prenom   = document.getElementById("modal-admin-prenom").value.trim();
+      payload.admin_nom      = document.getElementById("modal-admin-nom").value.trim();
+      payload.admin_email    = document.getElementById("modal-admin-email").value.trim();
+      payload.admin_password = document.getElementById("modal-admin-password").value;
+      const res = await api("create_entreprise", payload);
+      toast(`✅ Entreprise créée — Code : ${res.code_entreprise}`);
+      document.getElementById("modal-entreprise").classList.remove("open");
+      render();
+      showCredentialsModal({ email: payload.admin_email, password: payload.admin_password, code: res.code_entreprise });
+      return;
+    }
+    document.getElementById("modal-entreprise").classList.remove("open");
+    render();
+  } catch (err) {
+    errEl.textContent = "❌ " + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = _editingEntrepriseId ? "✓ Enregistrer" : "✓ Créer";
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// MODAL ADMIN SUPPLÉMENTAIRE
+// ═══════════════════════════════════════════════════════════════════════
+let _adminEntrepriseId = null;
+
+function ouvrirModalAdmin(entrepriseId, panelMecanoActif) {
+  _adminEntrepriseId = entrepriseId;
+  document.getElementById("modal-admin2-prenom").value   = "";
+  document.getElementById("modal-admin2-nom").value      = "";
+  document.getElementById("modal-admin2-email").value    = "";
+  document.getElementById("modal-admin2-password").value = generatePassword();
+  document.getElementById("modal-admin2-role").value     = "exploitation";
+  document.getElementById("modal-admin2-role-row").style.display = panelMecanoActif ? "block" : "none";
+  document.getElementById("modal-admin-error").textContent = "";
+  document.getElementById("modal-admin").classList.add("open");
+}
+
+document.getElementById("modal-admin-close").addEventListener("click",  () => document.getElementById("modal-admin").classList.remove("open"));
+document.getElementById("modal-admin-cancel").addEventListener("click", () => document.getElementById("modal-admin").classList.remove("open"));
+
+document.getElementById("modal-admin-save").addEventListener("click", async () => {
+  const errEl = document.getElementById("modal-admin-error");
+  const btn   = document.getElementById("modal-admin-save");
+  errEl.textContent = ""; btn.disabled = true; btn.textContent = "…";
+  try {
+    const email    = document.getElementById("modal-admin2-email").value.trim();
+    const password = document.getElementById("modal-admin2-password").value;
+    const roleRowVisible = document.getElementById("modal-admin2-role-row").style.display !== "none";
+    await api("create_admin", {
+      entreprise_id: _adminEntrepriseId,
+      prenom:   document.getElementById("modal-admin2-prenom").value.trim(),
+      nom:      document.getElementById("modal-admin2-nom").value.trim(),
+      email,
+      password,
+      role: roleRowVisible ? document.getElementById("modal-admin2-role").value : "exploitation",
+    });
+    toast("✅ Admin créé");
+    document.getElementById("modal-admin").classList.remove("open");
+    if (currentSection === "entreprises") render();
+    showCredentialsModal({ email, password });
+  } catch (err) {
+    errEl.textContent = "❌ " + err.message;
+  } finally {
+    btn.disabled = false; btn.textContent = "✓ Créer";
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// COMPTES SUPERADMIN
+// ═══════════════════════════════════════════════════════════════════════
+function ouvrirModalSuperadmin() {
+  document.getElementById("modal-superadmin-email").value    = "";
+  document.getElementById("modal-superadmin-password").value = generatePassword();
+  document.getElementById("modal-superadmin-error").textContent = "";
+  document.getElementById("modal-superadmin").classList.add("open");
+}
+
+document.getElementById("modal-superadmin-close").addEventListener("click",  () => document.getElementById("modal-superadmin").classList.remove("open"));
+document.getElementById("modal-superadmin-cancel").addEventListener("click", () => document.getElementById("modal-superadmin").classList.remove("open"));
+
+document.getElementById("modal-superadmin-save").addEventListener("click", async () => {
+  const errEl = document.getElementById("modal-superadmin-error");
+  const btn   = document.getElementById("modal-superadmin-save");
+  errEl.textContent = ""; btn.disabled = true; btn.textContent = "…";
+  try {
+    const email    = document.getElementById("modal-superadmin-email").value.trim();
+    const password = document.getElementById("modal-superadmin-password").value;
+    if (!email) { errEl.textContent = "❌ Email requis"; return; }
+    await api("create_superadmin", { email, password });
+    toast("✅ Compte superadmin créé");
+    document.getElementById("modal-superadmin").classList.remove("open");
+    renderSuperadmins();
+    showCredentialsModal({ email, password });
+  } catch (err) {
+    errEl.textContent = "❌ " + err.message;
+  } finally {
+    btn.disabled = false; btn.textContent = "✓ Créer";
+  }
+});
+
+async function renderSuperadmins() {
+  const main = document.getElementById("sa-main");
+  try {
+    const { superadmins } = await api("list_superadmins");
+    main.innerHTML = `
+      <div class="sa-section-title">Comptes superadmin (${superadmins.length})</div>
+      <div class="dash-toprow" style="justify-content:flex-end;">
+        <button class="btn btn-primary" id="btn-new-superadmin">+ Ajouter un compte</button>
+      </div>
+      <div class="ent-table-wrap">
+        ${superadmins.map(s => `
+          <div class="ent-row">
+            <div class="avatar" style="background:rgba(0,194,255,0.13);color:var(--accent);border:1px solid rgba(0,194,255,0.3);">${esc(initials(s.email.split("@")[0]))}</div>
+            <div style="flex:1;min-width:160px;">
+              <div class="ent-name">${esc(s.email)} ${s.id === session.superadmin_id ? '<span class="badge badge-blue" style="margin-left:6px;">Vous</span>' : ''}</div>
+              <div class="ent-sub">Créé le ${formatDate(s.created_at)}</div>
+            </div>
+            <div class="ent-actions">
+              ${s.id === session.superadmin_id ? '' : `<button class="btn btn-sm" data-delete-superadmin="${s.id}" data-email="${esc(s.email)}" style="background:rgba(239,83,80,0.08);color:var(--danger);border:1px solid rgba(239,83,80,0.2);">🗑️ Supprimer</button>`}
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+    document.getElementById("btn-new-superadmin").addEventListener("click", ouvrirModalSuperadmin);
+    document.querySelectorAll("[data-delete-superadmin]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.deleteSuperadmin;
+        const email = btn.dataset.email;
+        if (!confirm(`Supprimer définitivement le compte superadmin "${email}" ?\nCette personne ne pourra plus se connecter.`)) return;
+        try {
+          await api("delete_superadmin", { superadmin_id: id });
+          toast("✅ Compte supprimé");
+          renderSuperadmins();
+        } catch (err) { toast("❌ " + err.message); }
+      });
+    });
+  } catch (e) {
+    main.innerHTML = `<div class="sa-loading">❌ ${e.message}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// PROFILS VÉHICULES (catalogue global — entreprise_id NULL)
+// Vocabulaire fixe des types de cartes : chaque entrée a une logique de
+// rendu dédiée dans la PWA/le panel bureau, ce ne sont PAS des cases libres.
+// ═══════════════════════════════════════════════════════════════════════
+const PV_DOCS = {
+  moteur:   [ { id:"ct", label:"Contrôle technique" }, { id:"assurance", label:"Assurance" }, { id:"limiteur", label:"Limiteur de vitesse" }, { id:"chrono", label:"Chronotachygraphe" }, { id:"frigo", label:"Entretien groupe frigo" }, { id:"nettoyage", label:"Nettoyage intérieur" } ],
+  // Le hayon n'est plus un doc de profil : c'est une option cochée
+  // directement sur le véhicule, indépendante du profil (panel bureau).
+  remorque: [ { id:"ct", label:"Contrôle technique" }, { id:"assurance", label:"Assurance" }, { id:"frigo", label:"Entretien groupe frigo" }, { id:"nettoyage", label:"Nettoyage intérieur" }, { id:"graissage", label:"Graissage articulations" } ]
+};
+
+async function renderProfilsVehicules() {
+  const main = document.getElementById("sa-main");
+  try {
+    const { profils } = await api("list_profils_vehicules");
+    profilsVehiculesCache = profils || [];
+
+    const groupes = grouperParFamille(profils);
+
+    main.innerHTML = `
+      <div class="sa-section-title">Profils véhicules — catalogue global (${profils.length})</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;max-width:640px;">
+        Catalogue partagé par les 3 applis. Chaque entreprise y accède selon la liste blanche de son pack (fiche entreprise), en plus de ses propres profils perso créés depuis son panel bureau.
+      </div>
+      <div class="dash-toprow" style="justify-content:flex-end;">
+        <button class="btn btn-primary" id="btn-new-profil">+ Ajouter un profil</button>
+      </div>
+      ${groupes.map(g => `
+        <div class="sa-section-title" style="font-size:14px;margin-top:20px;">${esc(g.title)}</div>
+        <div class="ent-table-wrap">
+          ${g.items.length === 0 ? `<div style="padding:14px;color:var(--muted);font-size:13px;">Aucun profil</div>` : g.items.map(p => `
+            <div class="ent-row" style="${p.actif ? "" : "opacity:0.5;"}">
+              <div style="flex:1;min-width:200px;">
+                <div class="ent-name">${esc(p.label)} ${p.actif ? "" : '<span class="badge" style="margin-left:6px;">Désactivé</span>'}</div>
+                <div class="ent-sub">${p.categorie === "moteur" ? `${p.essieux_avant ?? "?"} essieu(x) avant / ${p.essieux_arriere ?? "?"} arrière` : `${p.nb_essieux ?? "?"} essieu(x)${p.nb_compartiments ? ` · ${p.nb_compartiments} compartiments` : ""}`} — ${(p.docs||[]).join(", ") || "aucune carte"}</div>
+              </div>
+              <div class="ent-actions">
+                <button class="btn btn-sm" data-edit-profil="${p.id}">✏️ Modifier</button>
+                <button class="btn btn-sm" data-toggle-profil="${p.id}" data-actif="${p.actif}">${p.actif ? "⏸️ Désactiver" : "▶️ Réactiver"}</button>
+                <button class="btn btn-sm" data-delete-profil="${p.id}" data-label="${esc(p.label)}" style="background:rgba(239,83,80,0.08);color:var(--danger);border:1px solid rgba(239,83,80,0.2);">🗑️</button>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `).join("")}
+    `;
+
+    document.getElementById("btn-new-profil").addEventListener("click", () => _ouvrirModalProfil(null));
+    document.querySelectorAll("[data-edit-profil]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const p = profilsVehiculesCache.find(x => x.id === btn.dataset.editProfil);
+        _ouvrirModalProfil(p);
+      });
+    });
+    document.querySelectorAll("[data-toggle-profil]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const actif = btn.dataset.actif === "true";
+        try {
+          await api("update_profil_vehicule", { id: btn.dataset.toggleProfil, actif: !actif });
+          toast(actif ? "⏸️ Profil désactivé" : "▶️ Profil réactivé");
+          await loadProfilsVehicules();
+          renderProfilsVehicules();
+        } catch (err) { toast("❌ " + err.message); }
+      });
+    });
+    document.querySelectorAll("[data-delete-profil]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        if (!confirm(`Supprimer définitivement le profil "${btn.dataset.label}" ?\nLes véhicules déjà créés avec ce profil garderont leurs données, mais n'afficheront plus les bonnes cartes.`)) return;
+        try {
+          await api("delete_profil_vehicule", { id: btn.dataset.deleteProfil });
+          toast("🗑️ Profil supprimé");
+          await loadProfilsVehicules();
+          renderProfilsVehicules();
+        } catch (err) { toast("❌ " + err.message); }
+      });
+    });
+  } catch (e) {
+    main.innerHTML = `<div class="sa-loading">❌ ${e.message}</div>`;
+  }
+}
+
+function _ouvrirModalProfil(existing) {
+  const isEdit = !!existing;
+  const overlay = document.createElement("div");
+  overlay.className = "sa-modal-overlay open";
+  overlay.innerHTML = `
+    <div class="sa-modal">
+      <div class="sa-modal-header">
+        <h2>${isEdit ? "Modifier le profil" : "Nouveau profil véhicule"}</h2>
+        <button class="sa-modal-close" id="pv-close">✕</button>
+      </div>
+      <div class="sa-field">
+        <label>CATÉGORIE *</label>
+        <select id="pv-categorie" ${isEdit ? "disabled" : ""}>
+          <option value="moteur" ${existing?.categorie === "moteur" ? "selected" : ""}>Tracteur / Porteur</option>
+          <option value="remorque" ${!existing || existing?.categorie === "remorque" ? "selected" : ""}>Remorque</option>
+        </select>
+      </div>
+      <div class="sa-field">
+        <label>NOM DU PROFIL *</label>
+        <input type="text" id="pv-label" placeholder="ex: Benne céréalière 2 essieux" value="${esc(existing?.label || "")}" />
+      </div>
+      <div class="sa-field">
+        <label>FAMILLE *</label>
+        <input type="text" id="pv-famille" list="pv-famille-suggestions" placeholder="ex: Benne, Frigo, Citerne alimentaire..." value="${esc(existing?.famille || "")}" />
+        <datalist id="pv-famille-suggestions">
+          ${[...new Set(profilsVehiculesCache.map(p => p.famille).filter(Boolean))].sort((a,b) => a.localeCompare(b,"fr")).map(f => `<option value="${esc(f)}"></option>`).join("")}
+        </datalist>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Sert à regrouper les profils dans les listes (ex: tous les "Frigo" ensemble).</div>
+      </div>
+      <div class="sa-field" id="pv-champs-moteur" style="display:flex;gap:10px;">
+        <div style="flex:1;">
+          <label style="font-size:11px;color:var(--muted);">ESSIEUX AVANT</label>
+          <input type="number" id="pv-essieux-avant" min="1" value="${existing?.essieux_avant ?? 1}" />
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:11px;color:var(--muted);">ESSIEUX ARRIÈRE</label>
+          <input type="number" id="pv-essieux-arriere" min="1" value="${existing?.essieux_arriere ?? 1}" />
+        </div>
+      </div>
+      <div class="sa-field" id="pv-champs-remorque" style="display:flex;gap:10px;">
+        <div style="flex:1;">
+          <label style="font-size:11px;color:var(--muted);">NOMBRE D'ESSIEUX</label>
+          <input type="number" id="pv-nb-essieux" min="1" value="${existing?.nb_essieux ?? 2}" />
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:11px;color:var(--muted);">COMPARTIMENTS (citerne — optionnel)</label>
+          <input type="number" id="pv-nb-compartiments" min="0" placeholder="—" value="${existing?.nb_compartiments ?? ""}" />
+        </div>
+      </div>
+      <div class="sa-field">
+        <label>CARTES À AFFICHER</label>
+        <div id="pv-docs-moteur" class="sa-profils-items"></div>
+        <div id="pv-docs-remorque" class="sa-profils-items"></div>
+      </div>
+      <div class="sa-error" id="pv-error"></div>
+      <div class="sa-modal-actions">
+        <button class="btn btn-ghost" id="pv-cancel">Annuler</button>
+        <button class="btn btn-primary" id="pv-save">${isEdit ? "✓ Enregistrer" : "✓ Créer"}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  function docsChecksHTML(cat) {
+    const checked = existing?.docs || [];
+    return PV_DOCS[cat].map(d => `
+      <label class="sa-profils-item">
+        <input type="checkbox" class="pv-doc-check" value="${d.id}" ${checked.includes(d.id) ? "checked" : ""} />
+        ${esc(d.label)}
+      </label>
+    `).join("");
+  }
+
+  const selectCat = overlay.querySelector("#pv-categorie");
+  const toggleChamps = () => {
+    const isMoteur = selectCat.value === "moteur";
+    overlay.querySelector("#pv-champs-moteur").style.display   = isMoteur ? "flex" : "none";
+    overlay.querySelector("#pv-champs-remorque").style.display = isMoteur ? "none" : "flex";
+    overlay.querySelector("#pv-docs-moteur").style.display     = isMoteur ? "grid" : "none";
+    overlay.querySelector("#pv-docs-remorque").style.display   = isMoteur ? "none" : "grid";
+  };
+  overlay.querySelector("#pv-docs-moteur").innerHTML   = docsChecksHTML("moteur");
+  overlay.querySelector("#pv-docs-remorque").innerHTML = docsChecksHTML("remorque");
+  selectCat.addEventListener("change", toggleChamps);
+  toggleChamps();
+
+  const close = () => overlay.remove();
+  overlay.querySelector("#pv-close").addEventListener("click", close);
+  overlay.querySelector("#pv-cancel").addEventListener("click", close);
+
+  overlay.querySelector("#pv-save").addEventListener("click", async () => {
+    const errEl = overlay.querySelector("#pv-error");
+    errEl.textContent = "";
+    const categorie = selectCat.value;
+    const label = overlay.querySelector("#pv-label").value.trim();
+    const famille = overlay.querySelector("#pv-famille").value.trim();
+    if (!label) { errEl.textContent = "Nom du profil requis"; return; }
+    if (!famille) { errEl.textContent = "Famille requise (pour bien ranger le profil dans les listes)"; return; }
+
+    const docsContainer = categorie === "moteur" ? overlay.querySelector("#pv-docs-moteur") : overlay.querySelector("#pv-docs-remorque");
+    const docs = Array.from(docsContainer.querySelectorAll(".pv-doc-check:checked")).map(c => c.value);
+
+    const payload = { label, famille, docs };
+    if (categorie === "moteur") {
+      payload.essieux_avant = Number(overlay.querySelector("#pv-essieux-avant").value) || 1;
+      payload.essieux_arriere = Number(overlay.querySelector("#pv-essieux-arriere").value) || 1;
+      payload.peut_tracter_remorque = true;
+    } else {
+      payload.nb_essieux = Number(overlay.querySelector("#pv-nb-essieux").value) || 1;
+      const compartiments = overlay.querySelector("#pv-nb-compartiments").value;
+      payload.nb_compartiments = compartiments ? Number(compartiments) : null;
+    }
+
+    const btn = overlay.querySelector("#pv-save");
+    btn.disabled = true; btn.textContent = "…";
+    try {
+      if (isEdit) {
+        await api("update_profil_vehicule", { id: existing.id, ...payload });
+        toast("✅ Profil mis à jour");
+      } else {
+        await api("create_profil_vehicule", { categorie, ...payload });
+        toast(`✅ Profil "${label}" créé`);
+      }
+      close();
+      await loadProfilsVehicules();
+      renderProfilsVehicules();
+    } catch (err) {
+      errEl.textContent = "❌ " + err.message;
+      btn.disabled = false; btn.textContent = isEdit ? "✓ Enregistrer" : "✓ Créer";
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// SUPPRESSION ENTREPRISE
+// ═══════════════════════════════════════════════════════════════════════
+let _deleteEntrepriseId  = null;
+let _deleteEntrepriseNom = null;
+
+function ouvrirModalSuppression(id, nom) {
+  _deleteEntrepriseId  = id;
+  _deleteEntrepriseNom = nom;
+  document.getElementById("modal-delete-nom-ref").textContent   = nom;
+  document.getElementById("modal-delete-confirm1").value         = "";
+  document.getElementById("modal-delete-confirm2").value         = "";
+  document.getElementById("modal-delete-error").textContent      = "";
+  document.getElementById("modal-delete-save").disabled          = true;
+  document.getElementById("modal-delete-save").style.opacity     = "0.4";
+  document.getElementById("modal-delete").classList.add("open");
+}
+
+// Valide les deux champs en temps réel pour activer le bouton
+["modal-delete-confirm1", "modal-delete-confirm2"].forEach(id => {
+  document.getElementById(id).addEventListener("input", () => {
+    const v1 = document.getElementById("modal-delete-confirm1").value.trim();
+    const v2 = document.getElementById("modal-delete-confirm2").value.trim();
+    const ok  = v1 === _deleteEntrepriseNom && v2 === "SUPPRIMER DÉFINITIVEMENT";
+    const btn = document.getElementById("modal-delete-save");
+    btn.disabled     = !ok;
+    btn.style.opacity = ok ? "1" : "0.4";
+  });
+});
+
+document.getElementById("modal-delete-close").addEventListener("click",  () => document.getElementById("modal-delete").classList.remove("open"));
+document.getElementById("modal-delete-cancel").addEventListener("click", () => document.getElementById("modal-delete").classList.remove("open"));
+
+document.getElementById("modal-delete-save").addEventListener("click", async () => {
+  const errEl = document.getElementById("modal-delete-error");
+  const btn   = document.getElementById("modal-delete-save");
+  errEl.textContent = ""; btn.disabled = true; btn.textContent = "Suppression…";
+
+  try {
+    const result = await api("delete_entreprise", { entreprise_id: _deleteEntrepriseId });
+    document.getElementById("modal-delete").classList.remove("open");
+    toast(`✅ Entreprise "${_deleteEntrepriseNom}" supprimée définitivement`);
+    if (result.storageErrors > 0) toast(`⚠️ ${result.storageErrors} fichier(s) Storage non supprimé(s)`);
+    render();
+  } catch (err) {
+    errEl.textContent = "❌ " + err.message;
+    btn.disabled = false; btn.textContent = "🗑️ Supprimer tout";
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════════════════════════════
+document.getElementById("btn-login").addEventListener("click", async () => {
+  const email    = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
+  const errEl    = document.getElementById("login-error");
+  const btn      = document.getElementById("btn-login");
+  errEl.textContent = ""; btn.disabled = true; btn.textContent = "…";
+
+  try {
+    const data = await callEdge("superadmin-login", { email, password });
+    saveSession(data);
+    _sessionExpiredHandled = false;
+    document.getElementById("sa-user-email").textContent = data.email;
+    showApp();
+  } catch (err) {
+    errEl.textContent = "❌ " + err.message;
+  } finally {
+    btn.disabled = false; btn.textContent = "Se connecter";
+  }
+});
+
+document.getElementById("login-password").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("btn-login").click();
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// COMPTABILITÉ
+// ═══════════════════════════════════════════════════════════════════════
+const STATUT_FACTURE_LABEL = { en_attente: "En attente", payee: "Payée", impayee: "Impayée", annulee: "Annulée" };
+const STATUT_FACTURE_BADGE = { en_attente: "badge-blue", payee: "badge-green", impayee: "badge-red", annulee: "badge-yellow" };
+let _comptaAnnee = new Date().getFullYear();
+
+function isFactureEnRetard(f) {
+  return f.statut === "en_attente" && f.date_echeance && f.date_echeance < new Date().toISOString().slice(0, 10);
+}
+
+async function renderComptabilite() {
+  const main = document.getElementById("sa-main");
+  try {
+    const [{ factures }, { entreprises }, { parametres }] = await Promise.all([
+      api("list_factures"),
+      api("list_entreprises"),
+      api("get_parametres_comptables"),
+    ]);
+
+    const annees = Array.from(new Set(factures.map(f => f.date_emission.slice(0, 4)))).sort().reverse();
+    if (!annees.includes(String(_comptaAnnee))) _comptaAnnee = annees[0] ? Number(annees[0]) : new Date().getFullYear();
+    const facturesAnnee = factures.filter(f => f.date_emission.slice(0, 4) === String(_comptaAnnee));
+
+    const payees = facturesAnnee.filter(f => f.statut === "payee");
+    const enAttente = facturesAnnee.filter(f => f.statut === "en_attente");
+    const sum = (arr, key) => arr.reduce((s, f) => s + Number(f[key] || 0), 0);
+
+    const brut       = sum(payees, "montant_brut");
+    const charges    = sum(payees, "montant_charges_sociales");
+    const commission = sum(payees, "montant_commission");
+    const impot      = sum(payees, "montant_impot");
+    const net        = sum(payees, "montant_net");
+    const brutEnAttente = sum(enAttente, "montant_brut");
+    const enRetard = facturesAnnee.filter(isFactureEnRetard);
+
+    const currentYear = new Date().getFullYear();
+    const caAnneeCourante = factures
+      .filter(f => f.statut === "payee" && f.date_paiement && f.date_paiement.slice(0, 4) === String(currentYear))
+      .reduce((s, f) => s + Number(f.montant_brut || 0), 0);
+    const plafond = Number(parametres.plafond_ca_annuel) || 0;
+    const pctPlafond = plafond ? Math.round(caAnneeCourante / plafond * 100) : 0;
+    const plafondColor = pctPlafond >= 90 ? "var(--danger)" : pctPlafond >= 70 ? "var(--warning)" : "var(--success)";
+
+    const parEntreprise = {};
+    payees.forEach(f => {
+      const key = f.entreprise_id || f.entreprise_nom;
+      if (!parEntreprise[key]) parEntreprise[key] = { nom: f.entreprise_nom, brut: 0, net: 0, nb: 0 };
+      parEntreprise[key].brut += Number(f.montant_brut);
+      parEntreprise[key].net  += Number(f.montant_net);
+      parEntreprise[key].nb++;
+    });
+    const rowsEntreprise = Object.values(parEntreprise).sort((a, b) => b.brut - a.brut);
+
+    const MOIS_LABEL = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+    const parMois = Array.from({ length: 12 }, () => ({ brut: 0, charges: 0, commission: 0, impot: 0, net: 0, nb: 0 }));
+    payees.forEach(f => {
+      const m = Number((f.date_paiement || f.date_emission).slice(5, 7)) - 1;
+      if (m < 0 || m > 11) return;
+      parMois[m].brut       += Number(f.montant_brut);
+      parMois[m].charges    += Number(f.montant_charges_sociales);
+      parMois[m].commission += Number(f.montant_commission);
+      parMois[m].impot      += Number(f.montant_impot);
+      parMois[m].net        += Number(f.montant_net);
+      parMois[m].nb++;
+    });
+
+    main.innerHTML = `
+      <div class="sa-section-title">Comptabilité</div>
+      <div class="dash-toprow" style="justify-content:space-between;flex-wrap:wrap;">
+        <select id="compta-annee-select" style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text);font-size:13px;font-weight:700;">
+          ${(annees.length ? annees : [String(_comptaAnnee)]).map(a => `<option value="${a}" ${Number(a) === _comptaAnnee ? "selected" : ""}>${a}</option>`).join("")}
+        </select>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost" id="btn-export-factures">⬇️ Export CSV</button>
+          <button class="btn btn-ghost" id="btn-parametres-compta">⚙️ Paramètres</button>
+          <button class="btn btn-primary" id="btn-nouvelle-facture">+ Facture</button>
+        </div>
+      </div>
+
+      ${plafond ? `
+      <div class="dash-card" style="margin-bottom:16px;">
+        <div class="dash-card-title">🚧 Plafond micro-entreprise ${currentYear}</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;height:10px;border-radius:6px;background:var(--card);overflow:hidden;">
+            <div style="width:${Math.min(pctPlafond, 100)}%;height:100%;background:${plafondColor};"></div>
+          </div>
+          <div style="font-size:13px;font-weight:800;white-space:nowrap;">${fmtEUR(caAnneeCourante)} / ${fmtEUR(plafond)} (${pctPlafond}%)</div>
+        </div>
+        ${pctPlafond >= 90
+          ? `<div class="budget-note" style="color:var(--danger);">⚠️ Tu approches ou dépasses le plafond du régime micro-entreprise. Au-delà, bascule vers un régime réel (TVA, comptabilité différente) — à anticiper avec un comptable.</div>`
+          : `<div class="budget-note">Basé sur les factures effectivement encaissées en ${currentYear}, tous contrats confondus.</div>`}
+      </div>` : ""}
+
+      <div class="dash-card">
+        <div class="dash-card-title">💰 Bilan ${_comptaAnnee} <span class="n">(factures payées)</span></div>
+        <div class="budget-kpis">
+          <div class="budget-kpi"><div class="val">${fmtEUR(brut)}</div><div class="lbl">Brut encaissé</div></div>
+          <div class="budget-kpi"><div class="val" style="color:var(--danger);">-${fmtEUR(charges)}</div><div class="lbl">Charges sociales</div></div>
+          <div class="budget-kpi"><div class="val" style="color:var(--warning);">-${fmtEUR(commission)}</div><div class="lbl">Commission rapporteur</div></div>
+          <div class="budget-kpi"><div class="val" style="color:var(--warning);">-${fmtEUR(impot)}</div><div class="lbl">Impôt estimé</div></div>
+        </div>
+        <div class="budget-kpis" style="grid-template-columns:1fr 1fr;">
+          <div class="budget-kpi" style="border-color:rgba(34,197,94,0.3);"><div class="val" style="color:var(--success);font-size:22px;">${fmtEUR(net)}</div><div class="lbl">Net réel pour toi</div></div>
+          <div class="budget-kpi"><div class="val" style="color:var(--accent);">${fmtEUR(brutEnAttente)}</div><div class="lbl">En attente (${enAttente.length})${enRetard.length ? ` · <span style="color:var(--danger);">${enRetard.length} en retard</span>` : ""}</div></div>
+        </div>
+        <div class="budget-note">Basé sur les factures au statut <b>Payée</b> pour ${_comptaAnnee}. Charges sociales / impôt sont des estimations calculées avec les taux réglés dans « Paramètres » au moment de chaque facture.</div>
+      </div>
+
+      <div class="sa-table-wrap" style="margin-top:16px;">
+        <div class="sa-table-header">
+          <h3>Historique mensuel ${_comptaAnnee}</h3>
+          <div class="sa-table-header-right"><button class="btn btn-ghost btn-sm" id="btn-export-historique-mensuel">⬇️ Export CSV</button></div>
+        </div>
+        <table>
+          <thead><tr><th>Mois</th><th>Factures</th><th style="text-align:right;">Brut</th><th style="text-align:right;">Charges</th><th style="text-align:right;">Commission</th><th style="text-align:right;">Impôt</th><th style="text-align:right;">Net</th></tr></thead>
+          <tbody>
+            ${parMois.map((m, i) => `<tr${m.nb === 0 ? ' style="color:var(--muted);"' : ''}>
+              <td>${MOIS_LABEL[i]}</td>
+              <td>${m.nb || "—"}</td>
+              <td style="text-align:right;">${m.brut ? fmtEUR(m.brut) : "—"}</td>
+              <td style="text-align:right;">${m.charges ? fmtEUR(m.charges) : "—"}</td>
+              <td style="text-align:right;">${m.commission ? fmtEUR(m.commission) : "—"}</td>
+              <td style="text-align:right;">${m.impot ? fmtEUR(m.impot) : "—"}</td>
+              <td style="text-align:right;font-weight:700;${m.net ? 'color:var(--success);' : ''}">${m.net ? fmtEUR(m.net) : "—"}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>
+
+      ${rowsEntreprise.length ? `
+      <div class="sa-table-wrap" style="margin-top:16px;">
+        <div class="sa-table-header"><h3>Par entreprise / contrat</h3></div>
+        <table>
+          <thead><tr><th>Entreprise</th><th>Factures payées</th><th style="text-align:right;">Brut</th><th style="text-align:right;">Net</th></tr></thead>
+          <tbody>
+            ${rowsEntreprise.map(r => `<tr><td>${esc(r.nom)}</td><td>${r.nb}</td><td style="text-align:right;">${fmtEUR(r.brut)}</td><td style="text-align:right;font-weight:800;color:var(--success);">${fmtEUR(r.net)}</td></tr>`).join("")}
+          </tbody>
+        </table>
+      </div>` : ""}
+
+      <div class="sa-table-wrap" style="margin-top:16px;">
+        <div class="sa-table-header"><h3>Factures ${_comptaAnnee}</h3></div>
+        ${facturesAnnee.length ? `
+        <table>
+          <thead><tr><th>Entreprise</th><th>N° facture</th><th>Émission</th><th>Échéance</th><th style="text-align:right;">Brut</th><th style="text-align:right;">Commission</th><th style="text-align:right;">Net</th><th>Statut</th><th></th></tr></thead>
+          <tbody>${facturesAnnee.map(factureRowHTML).join("")}</tbody>
+        </table>` : `<div class="sa-loading" style="padding:30px;">Aucune facture pour ${_comptaAnnee}</div>`}
+      </div>
+    `;
+
+    document.getElementById("compta-annee-select").addEventListener("change", (e) => { _comptaAnnee = Number(e.target.value); renderComptabilite(); });
+    document.getElementById("btn-export-factures").addEventListener("click", () => exportFacturesCSV(facturesAnnee));
+    document.getElementById("btn-export-historique-mensuel").addEventListener("click", () => exportHistoriqueMensuelCSV(parMois, MOIS_LABEL, _comptaAnnee));
+    document.getElementById("btn-parametres-compta").addEventListener("click", () => ouvrirModalParametresComptables(parametres));
+    document.getElementById("btn-nouvelle-facture").addEventListener("click", () => ouvrirModalFacture(null, entreprises));
+    document.querySelectorAll("[data-edit-facture]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const f = factures.find(x => x.id === btn.dataset.editFacture);
+        if (f) ouvrirModalFacture(f, entreprises);
+      });
+    });
+    document.querySelectorAll("[data-marquer-payee]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        try {
+          await api("update_facture", { id: btn.dataset.marquerPayee, statut: "payee" });
+          toast("✅ Marquée payée");
+          renderComptabilite();
+        } catch (err) { toast("❌ " + err.message); }
+      });
+    });
+    document.querySelectorAll("[data-delete-facture]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        if (!confirm("Retirer cette facture du suivi comptabilité ? (elle reste bien sûr dans ton outil de facturation électronique)")) return;
+        try {
+          await api("delete_facture", { id: btn.dataset.deleteFacture });
+          toast("🗑️ Supprimée");
+          renderComptabilite();
+        } catch (err) { toast("❌ " + err.message); }
+      });
+    });
+    document.querySelectorAll("[data-verser-commission]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        try {
+          await api("update_facture", { id: btn.dataset.verserCommission, commission_versee: true });
+          toast("✅ Commission marquée versée");
+          renderComptabilite();
+        } catch (err) { toast("❌ " + err.message); }
+      });
+    });
+
+  } catch (e) {
+    main.innerHTML = `<div class="sa-loading">❌ ${e.message}</div>`;
+  }
+}
+
+function factureRowHTML(f) {
+  const enRetard = isFactureEnRetard(f);
+  const badge = enRetard ? "badge-red" : (STATUT_FACTURE_BADGE[f.statut] || "badge-blue");
+  const label = enRetard ? "En retard" : (STATUT_FACTURE_LABEL[f.statut] || f.statut);
+  const commissionCell = !f.a_commission_rapporteur ? `<span style="color:var(--muted);">—</span>` : `
+    <div>${fmtEUR(f.montant_commission)}</div>
+    ${f.commission_versee
+      ? `<div style="font-size:10px;color:var(--success);">✓ versée${f.date_versement_commission ? " " + formatDate(f.date_versement_commission) : ""}</div>`
+      : f.statut === "payee"
+        ? `<button class="btn btn-ghost btn-sm" data-verser-commission="${f.id}" style="margin-top:2px;">💸 Verser</button>`
+        : `<div style="font-size:10px;color:var(--muted);">après paiement</div>`}
+  `;
+  return `<tr>
+    <td>${esc(f.entreprise_nom)}</td>
+    <td>${esc(f.numero_facture || "—")}${f.libelle ? `<div style="font-size:10.5px;color:var(--muted);">${esc(f.libelle)}</div>` : ""}</td>
+    <td>${formatDate(f.date_emission)}</td>
+    <td style="${enRetard ? "color:var(--danger);font-weight:700;" : ""}">${f.date_echeance ? formatDate(f.date_echeance) : "—"}</td>
+    <td style="text-align:right;">${fmtEUR(f.montant_brut)}</td>
+    <td style="text-align:right;">${commissionCell}</td>
+    <td style="text-align:right;font-weight:700;color:var(--success);">${f.statut === "payee" ? fmtEUR(f.montant_net) : "—"}</td>
+    <td><span class="badge ${badge}">${label}</span></td>
+    <td>
+      <div style="display:flex;gap:4px;justify-content:flex-end;">
+        ${f.statut === "en_attente" ? `<button class="btn btn-success btn-sm" data-marquer-payee="${f.id}" title="Marquer payée">✓ Payée</button>` : ""}
+        <button class="btn btn-ghost btn-sm btn-icon" data-edit-facture="${f.id}" title="Modifier">✏️</button>
+        <button class="btn btn-danger btn-sm btn-icon" data-delete-facture="${f.id}" title="Retirer">🗑️</button>
+      </div>
+    </td>
+  </tr>`;
+}
+
+function exportFacturesCSV(rows) {
+  const headers = ["Entreprise", "N° facture", "Libellé", "Émission", "Échéance", "Date paiement", "Statut", "Brut", "Charges sociales", "Commission rapporteur", "Commission versée", "Date versement commission", "Impôt estimé", "Net"];
+  const data = rows.map(f => [
+    f.entreprise_nom, f.numero_facture || "", f.libelle || "",
+    formatDate(f.date_emission), f.date_echeance ? formatDate(f.date_echeance) : "", f.date_paiement ? formatDate(f.date_paiement) : "",
+    isFactureEnRetard(f) ? "En retard" : (STATUT_FACTURE_LABEL[f.statut] || f.statut),
+    f.montant_brut, f.montant_charges_sociales, f.montant_commission,
+    f.a_commission_rapporteur ? (f.commission_versee ? "Oui" : "Non") : "N/A",
+    f.date_versement_commission ? formatDate(f.date_versement_commission) : "",
+    f.montant_impot, f.montant_net,
+  ]);
+  downloadCSV(`memotruck-comptabilite-${todayStamp()}.csv`, headers, data);
+}
+
+function exportHistoriqueMensuelCSV(parMois, moisLabel, annee) {
+  const headers = ["Mois", "Factures payées", "Brut", "Charges sociales", "Commission rapporteur", "Impôt estimé", "Net"];
+  const data = parMois.map((m, i) => [moisLabel[i], m.nb, m.brut, m.charges, m.commission, m.impot, m.net]);
+  downloadCSV(`memotruck-comptabilite-historique-mensuel-${annee}.csv`, headers, data);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// MODAL FACTURE
+// ═══════════════════════════════════════════════════════════════════════
+let _editingFactureId = null;
+
+function ouvrirModalFacture(facture, entreprises) {
+  _editingFactureId = facture?.id || null;
+  document.getElementById("modal-facture-title").textContent = facture ? "Modifier la facture" : "Nouvelle facture";
+
+  const sel = document.getElementById("modal-facture-entreprise");
+  sel.innerHTML = entreprises.map(e => `<option value="${e.id}">${esc(e.nom)}</option>`).join("");
+  if (facture) sel.value = facture.entreprise_id || "";
+  else if (entreprises.length) sel.value = entreprises[0].id;
+
+  const prefillBrut = () => {
+    if (facture) return;
+    const ent = entreprises.find(e => e.id === sel.value);
+    document.getElementById("modal-facture-brut").value = (ent && montantMensuel(ent)) || "";
+  };
+  sel.onchange = prefillBrut;
+
+  document.getElementById("modal-facture-numero").value   = facture?.numero_facture || "";
+  document.getElementById("modal-facture-libelle").value  = facture?.libelle || "";
+  document.getElementById("modal-facture-emission").value = facture?.date_emission || new Date().toISOString().slice(0, 10);
+  document.getElementById("modal-facture-echeance").value = facture?.date_echeance || "";
+  document.getElementById("modal-facture-statut").value   = facture?.statut || "en_attente";
+  document.getElementById("modal-facture-commission").checked = facture ? facture.a_commission_rapporteur : true;
+  document.getElementById("modal-facture-brut").value = facture ? facture.montant_brut : "";
+  if (!facture) prefillBrut();
+  document.getElementById("modal-facture-error").textContent = "";
+
+  document.getElementById("modal-facture").classList.add("open");
+}
+
+document.getElementById("modal-facture-close").addEventListener("click",  () => document.getElementById("modal-facture").classList.remove("open"));
+document.getElementById("modal-facture-cancel").addEventListener("click", () => document.getElementById("modal-facture").classList.remove("open"));
+
+document.getElementById("modal-facture-save").addEventListener("click", async () => {
+  const errEl = document.getElementById("modal-facture-error");
+  errEl.textContent = "";
+  const btn = document.getElementById("modal-facture-save");
+  btn.disabled = true; btn.textContent = "…";
+
+  const payload = {
+    entreprise_id:  document.getElementById("modal-facture-entreprise").value,
+    numero_facture: document.getElementById("modal-facture-numero").value.trim() || null,
+    libelle:        document.getElementById("modal-facture-libelle").value.trim() || null,
+    montant_brut:   document.getElementById("modal-facture-brut").value,
+    date_emission:  document.getElementById("modal-facture-emission").value || null,
+    date_echeance:  document.getElementById("modal-facture-echeance").value || null,
+    statut:         document.getElementById("modal-facture-statut").value,
+    a_commission_rapporteur: document.getElementById("modal-facture-commission").checked,
+  };
+
+  try {
+    if (!payload.entreprise_id) throw new Error("Sélectionne une entreprise");
+    if (_editingFactureId) {
+      await api("update_facture", { id: _editingFactureId, ...payload });
+      toast("✅ Facture mise à jour");
+    } else {
+      await api("create_facture", payload);
+      toast("✅ Facture enregistrée");
+    }
+    document.getElementById("modal-facture").classList.remove("open");
+    renderComptabilite();
+  } catch (err) {
+    errEl.textContent = "❌ " + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "✓ Enregistrer";
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// MODAL PARAMÈTRES COMPTABLES
+// ═══════════════════════════════════════════════════════════════════════
+function toggleModeImpositionRows() {
+  const isVL = document.getElementById("pc-mode-imposition").value === "versement_liberatoire";
+  document.getElementById("pc-row-vl").style.display          = isVL ? "flex" : "none";
+  document.getElementById("pc-row-estimation").style.display  = isVL ? "none" : "block";
+}
+document.getElementById("pc-mode-imposition").addEventListener("change", toggleModeImpositionRows);
+
+function ouvrirModalParametresComptables(parametres) {
+  document.getElementById("pc-taux-charges").value     = parametres.taux_charges_sociales;
+  document.getElementById("pc-taux-commission").value  = parametres.taux_commission_rapporteur;
+  document.getElementById("pc-nom-rapporteur").value   = parametres.nom_rapporteur || "";
+  document.getElementById("pc-mode-imposition").value  = parametres.mode_imposition;
+  document.getElementById("pc-taux-vl").value          = parametres.taux_versement_liberatoire;
+  document.getElementById("pc-taux-abattement").value  = parametres.taux_abattement_forfaitaire;
+  document.getElementById("pc-taux-estime").value      = parametres.taux_impot_estime;
+  document.getElementById("pc-plafond-ca").value       = parametres.plafond_ca_annuel;
+  toggleModeImpositionRows();
+  document.getElementById("modal-parametres-compta-error").textContent = "";
+  document.getElementById("modal-parametres-compta").classList.add("open");
+}
+
+document.getElementById("modal-parametres-compta-close").addEventListener("click",  () => document.getElementById("modal-parametres-compta").classList.remove("open"));
+document.getElementById("modal-parametres-compta-cancel").addEventListener("click", () => document.getElementById("modal-parametres-compta").classList.remove("open"));
+
+document.getElementById("modal-parametres-compta-save").addEventListener("click", async () => {
+  const errEl = document.getElementById("modal-parametres-compta-error");
+  errEl.textContent = "";
+  const btn = document.getElementById("modal-parametres-compta-save");
+  btn.disabled = true; btn.textContent = "…";
+  try {
+    await api("update_parametres_comptables", {
+      taux_charges_sociales:       document.getElementById("pc-taux-charges").value,
+      taux_commission_rapporteur:  document.getElementById("pc-taux-commission").value,
+      nom_rapporteur:              document.getElementById("pc-nom-rapporteur").value.trim() || null,
+      mode_imposition:             document.getElementById("pc-mode-imposition").value,
+      taux_versement_liberatoire:  document.getElementById("pc-taux-vl").value,
+      taux_abattement_forfaitaire: document.getElementById("pc-taux-abattement").value,
+      taux_impot_estime:           document.getElementById("pc-taux-estime").value,
+      plafond_ca_annuel:           document.getElementById("pc-plafond-ca").value,
+    });
+    toast("✅ Paramètres enregistrés");
+    document.getElementById("modal-parametres-compta").classList.remove("open");
+    renderComptabilite();
+  } catch (err) {
+    errEl.textContent = "❌ " + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "✓ Enregistrer";
+  }
+});
+
+// ─── Logout ─────────────────────────────────────────────────────────────
+document.getElementById("btn-logout").addEventListener("click", () => {
+  if (!confirm("Se déconnecter ?")) return;
+  clearSession();
+  document.getElementById("screen-app").style.display  = "none";
+  document.getElementById("screen-login").style.display = "flex";
+});
+
+// ─── Nav ────────────────────────────────────────────────────────────────
+document.querySelectorAll(".sa-nav-item[data-section]").forEach(el => {
+  el.addEventListener("click", () => navigateTo(el.dataset.section));
+});
+document.getElementById("btn-mobile-menu").addEventListener("click", openMobileDrawer);
+document.getElementById("sa-mobile-backdrop").addEventListener("click", closeMobileDrawer);
+
+// ─── Affichage app ──────────────────────────────────────────────────────
+function showApp() {
+  document.getElementById("screen-login").style.display = "none";
+  document.getElementById("screen-app").style.display   = "flex";
+  loadProfilsVehicules();
+  navigateTo("dashboard");
+}
+
+// ─── Init ────────────────────────────────────────────────────────────────
+const saved = getSession();
+if (saved?.jwt) { session = saved; document.getElementById("sa-user-email").textContent = saved.email || ""; showApp(); }
+</script>
+</body>
+</html>
