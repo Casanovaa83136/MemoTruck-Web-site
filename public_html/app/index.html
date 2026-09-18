@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="theme-color" content="#0F1923" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MémoTruckIOS" />
+<meta name="mobile-web-app-capable" content="yes" />
+<title>MémoTruck — Gestion Véhicule</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ═══════════════ SPLASH SCREEN ═══════════════ -->
+  <div id="splash-screen">
+    <img src="icons/splash-truck.png" alt="MémoTruck" class="splash-icon" />
+    <div class="splash-subtitle">GESTION VEHICULE</div>
+    <div class="splash-loader"><div class="splash-loader-bar"></div></div>
+  </div>
+
+  <!-- ═══════════════ LOGIN SCREEN ═══════════════ -->
+  <div id="screen-login" class="screen hidden">
+    <div class="login-screen">
+      <div class="login-gradient-bg"></div>
+      <div class="login-content">
+        <div class="login-header fade-in">
+          <img src="icons/splash-truck.png" alt="MémoTruck" class="icon" />
+          <div class="title">MémoTruck</div>
+          <div class="subtitle">ESPACE CHAUFFEUR</div>
+        </div>
+
+        <!-- ── Mode CONNEXION (affiché par défaut) ── -->
+        <div class="login-card slide-up" id="login-panel-connexion">
+          <h2>Connexion</h2>
+          <div class="login-sub">Saisis ton adresse email</div>
+
+          <div class="field">
+            <div class="field-input-wrap">
+              <span class="field-icon">✉️</span>
+              <input type="email" id="input-email" placeholder="Email" autocomplete="email" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-input-wrap">
+              <span class="field-icon">🔒</span>
+              <input type="password" id="input-password" placeholder="Mot de passe" autocomplete="current-password" />
+            </div>
+          </div>
+          <div class="login-sub" style="margin:-8px 0 16px;font-size:12px;">Première connexion depuis la mise à jour ? Choisis un mot de passe, il sera le tien à partir de maintenant.</div>
+
+          <button class="btn-primary" id="btn-login">
+            <span id="login-btn-text">SE CONNECTER</span>
+          </button>
+
+          <div class="login-switch-link">
+            Pas encore de compte ?
+            <button type="button" id="btn-switch-to-signup">Créer un compte</button>
+          </div>
+        </div>
+
+        <!-- ── Mode INSCRIPTION (caché par défaut) ── -->
+        <div class="login-card slide-up hidden" id="login-panel-inscription">
+          <h2>Inscription</h2>
+          <div class="login-sub">Crée ton compte chauffeur</div>
+
+          <div class="field">
+            <div class="field-input-wrap">
+              <span class="field-icon">✉️</span>
+              <input type="email" id="input-signup-email" placeholder="Email" autocomplete="email" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-input-wrap">
+              <span class="field-icon">👤</span>
+              <input type="text" id="input-signup-prenom" placeholder="Prénom" autocomplete="given-name" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-input-wrap">
+              <span class="field-icon">👤</span>
+              <input type="text" id="input-signup-nom" placeholder="Nom" autocomplete="family-name" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-input-wrap">
+              <span class="field-icon">🏢</span>
+              <input type="text" id="input-signup-code" placeholder="Code entreprise (ex: MEMO-TEST-001)" autocomplete="off" autocapitalize="characters" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-input-wrap">
+              <span class="field-icon">🔒</span>
+              <input type="password" id="input-signup-password" placeholder="Mot de passe (8 caractères min.)" autocomplete="new-password" />
+            </div>
+          </div>
+
+          <button class="btn-primary" id="btn-signup">
+            <span id="signup-btn-text">S'INSCRIRE</span>
+          </button>
+
+          <div class="login-switch-link">
+            Déjà un compte ?
+            <button type="button" id="btn-switch-to-login">Se connecter</button>
+          </div>
+        </div>
+
+        <!-- ── Mode INSCRIPTION ENVOYÉE (attente de validation admin) ── -->
+        <div class="login-card slide-up hidden" id="login-panel-attente">
+          <div class="login-attente-icone">⏳</div>
+          <h2>Inscription envoyée</h2>
+          <div class="login-sub">
+            Ton compte est en attente de validation par ton exploitant. Une fois qu'il te confirme que c'est bon, reviens ici et connecte-toi normalement.
+          </div>
+          <button class="btn-primary" id="btn-attente-retour-connexion">Retour à la connexion</button>
+        </div>
+
+        <div class="login-footer">© 2026 · MémoTruck</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ DASHBOARD ═══════════════ -->
+  <div id="screen-dashboard" class="screen hidden">
+    <div class="dashboard-header">
+
+      <!-- Hero : % watermark massif + infos chauffeur -->
+      <div class="dh9-hero">
+        <div class="dh9-watermark" id="sante-percent-watermark">85%</div>
+        <div class="dh9-content">
+          <div class="dh9-brand">MÉMO TRUCK <span class="dh9-entreprise" id="dh9-entreprise"></span></div>
+          <div class="dh9-name">Tableau de bord</div>
+          <div class="dh9-sub" id="welcome-text">👋 <span id="welcome-prenom">chauffeur</span></div>
+          <div class="dh9-sante-row">
+            <div class="dh9-sante-num" id="sante-percent">100%</div>
+            <div class="dh9-sante-right">
+              <div class="dh9-sante-lbl">SANTÉ VÉHICULE</div>
+              <!-- Pastilles d'alerte existantes -->
+              <div class="sante-alertes-row hidden" id="sante-alertes-row"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Jauge SVG cachée — conservée pour que le JS fonctionne -->
+        <div class="sante-gauge" id="sante-gauge" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;overflow:hidden;">
+          <svg class="sante-gauge-svg" viewBox="0 0 100 66">
+            <path class="zone zone-danger"  d="M 8 54 A 42 42 0 0 1 50 12"></path>
+            <path class="zone zone-warning" d="M 50 12 A 42 42 0 0 1 83.98 29.31"></path>
+            <path class="zone zone-success" d="M 83.98 29.31 A 42 42 0 0 1 92 54"></path>
+            <g id="sante-gauge-needle">
+              <line class="needle-line" id="sante-gauge-needle-line" x1="50" y1="54" x2="50" y2="18"></line>
+              <circle class="needle-pivot" id="sante-gauge-pivot" cx="50" cy="54" r="4"></circle>
+            </g>
+          </svg>
+          <div class="sante-gauge-text">
+            <div class="value" id="sante-percent-hidden">100%</div>
+            <div class="label">santé</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plaques -->
+      <div class="plaque-badges-row">
+        <div class="plaque-badge" id="badge-plaqueT-wrap">
+          <div class="label">🚚 TRACTEUR</div>
+          <div class="value" id="badge-plaqueT">—</div>
+          <div class="type" id="badge-plaqueT-type"></div>
+          <div class="hint">APPUYER POUR CHANGER</div>
+        </div>
+        <div class="plaque-badge" id="badge-plaqueR-wrap">
+          <div class="label">🚛 REMORQUE</div>
+          <div class="value" id="badge-plaqueR">Solo</div>
+          <div class="type" id="badge-plaqueR-type"></div>
+          <div class="hint">APPUYER POUR CHANGER</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-body">
+      <!-- Photo camion -->
+      <div class="camion-photo-box" id="camion-photo-box">
+        <div class="camion-photo-placeholder">
+          <span class="icon">📷</span>
+          <div class="main-text">Ajouter une photo du véhicule</div>
+          <div class="sub-text">Appuyez pour sélectionner</div>
+        </div>
+      </div>
+      <input type="file" id="camion-photo-input" accept="image/*" class="hidden" />
+
+      <div style="height:16px"></div>
+
+      <!-- Alertes & Échéances -->
+      <div class="section-header">
+        <span class="icon">⚠️</span>
+        <span class="title">Alertes & Échéances</span>
+      </div>
+      <div style="height:12px"></div>
+
+      <!-- Carte Véhicules -->
+      <div class="section-block" id="carte-vehicules"></div>
+      <!-- Carte Données personnelles -->
+      <div class="section-block" id="carte-donnees-perso"></div>
+      <!-- Carte Gazole -->
+      <div class="section-block gap-24" id="carte-gazole"></div>
+
+      <!-- Cartes personnalisées -->
+      <div class="section-header">
+        <span class="icon">🗂️</span>
+        <span class="title">Cartes personnalisées</span>
+      </div>
+      <div style="height:8px"></div>
+      <button class="action-btn" id="btn-creer-carte" style="background:color-mix(in srgb, var(--color-accent) 15%, transparent); border-color:color-mix(in srgb, var(--color-accent) 50%, transparent); color:var(--color-accent); margin-bottom:16px;">
+        ➕ Créer une nouvelle carte
+      </button>
+      <div id="cartes-perso-groupes"></div>
+
+      <div style="height:24px"></div>
+
+      <!-- Consommation -->
+      <div class="section-block gap-24">
+        <div class="section-header" style="position:relative;" title="Saisies en attente de synchronisation">
+          <span class="icon">⛽</span>
+          <span class="title">Consommation</span>
+          <span id="offline-queue-badge"></span>
+        </div>
+        <div id="carte-conso-mois"></div>
+      </div>
+
+      <!-- Pneumatiques -->
+      <div class="section-block">
+        <div class="section-header">
+          <span class="icon">🛞</span>
+          <span class="title">Suivi Pneumatiques</span>
+        </div>
+        <div class="section-legend">Jauge calculée à partir des km réels saisis en Consommation</div>
+        <div id="carte-pneus-tracteur"></div>
+        <div style="height:12px"></div>
+        <div id="carte-pneus-remorque"></div>
+      </div>
+
+      <!-- Citerne — Compartiments (citernes alimentaires) -->
+      <div class="section-block gap-24" id="section-citerne" style="display:none;">
+        <div class="section-header">
+          <span class="icon">🛢️</span>
+          <span class="title">Citerne — Compartiments</span>
+        </div>
+        <div class="section-legend">Mémorise le produit et le volume par compartiment — réinitialise à la vidange</div>
+        <div id="carte-citerne"></div>
+      </div>
+
+      <div style="height:28px"></div>
+
+      <!-- Boutons action -->
+      <button class="action-btn" id="btn-go-intervention" style="background:rgba(0,230,118,0.15); border-color:rgba(0,230,118,0.5); color:#00E676;">
+        <span class="btn-icon" id="icon-intervention">🔧</span>Intervention
+      </button>
+      <button class="action-btn" id="btn-go-aide" style="background:rgba(179,157,219,0.15); border-color:rgba(179,157,219,0.5); color:#B39DDB;">
+        <span class="btn-icon" id="icon-aide">❓</span>Aide & fonctionnement
+      </button>
+      <button class="action-btn" id="btn-go-parametres" style="background:rgba(120,144,156,0.15); border-color:rgba(120,144,156,0.5); color:#B0BEC5;">
+        <span class="btn-icon" id="icon-parametres">⚙️</span>Paramètres
+      </button>
+
+      <div class="atil-footer" id="footer-dashboard"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ INTERVENTION ═══════════════ -->
+  <div id="screen-intervention" class="screen hidden">
+    <div class="topbar">
+      <button class="topbar-back" data-back="dashboard">←</button>
+      <span class="topbar-title">Nouvelle Intervention</span>
+    </div>
+    <div style="padding:16px;">
+      <div style="font-weight:700; font-size:14px; margin-bottom:4px;">Catégorie</div>
+      <div class="chips-row" id="intervention-type-chips">
+        <button class="chip selected" data-type="Entretien" style="color:#00E676;">Entretien</button>
+        <button class="chip" data-type="Panne" style="color:#FFB300;">Panne</button>
+        <button class="chip" data-type="Crevaison" style="color:#FF5252;">Crevaison</button>
+        <button class="chip" data-type="Accident" style="color:#FF5252;">Accident</button>
+      </div>
+
+      <div class="modal-field">
+        <label>Véhicule concerné</label>
+        <select class="field-select" id="intervention-vehicule" style="width:100%;height:50px;background:var(--color-surface);border:1.5px solid var(--color-divider);border-radius:12px;padding:0 14px;color:var(--color-text-primary);font-size:14px;">
+        </select>
+      </div>
+
+      <div class="modal-field">
+        <label>Date</label>
+        <input type="date" id="intervention-date" />
+      </div>
+
+      <div class="modal-field hidden" id="intervention-pneu-field">
+        <label>Localisation du pneu</label>
+        <select class="field-select" id="intervention-pneu" style="width:100%;height:50px;background:var(--color-surface);border:1.5px solid var(--color-divider);border-radius:12px;padding:0 14px;color:var(--color-text-primary);font-size:14px;">
+          <option>Pneu Avant</option>
+          <option>Pneu Arrière</option>
+          <option>1er Essieu Remorque</option>
+          <option>2ème Essieu Remorque</option>
+          <option>3ème Essieu Remorque</option>
+        </select>
+      </div>
+
+      <div class="modal-field">
+        <label>Détails / Notes</label>
+        <textarea class="modal-textarea" id="intervention-details" placeholder="Détails..."></textarea>
+      </div>
+
+      <div class="modal-field hidden" id="intervention-localisation-auto-field">
+        <label>Localisation</label>
+        <div class="loc-auto-badge" id="intervention-localisation-auto">📍 Capture de la position…</div>
+      </div>
+
+      <div class="modal-field">
+        <label>Photos (optionnel)</label>
+        <div class="photo-picker-row" id="intervention-photo-row">
+          <button type="button" class="photo-picker-add" id="btn-add-photo-intervention">+</button>
+        </div>
+        <!-- capture="environment" force le lancement direct de l'appareil photo (sinon
+             Android/Chrome ouvre le sélecteur de photos système, qui ne propose que
+             la galerie — aucune option caméra, même avec accept="image/*" seul). Même
+             mécanisme (bottom sheet caméra/galerie) que le sélecteur de documents. -->
+        <input type="file" id="intervention-photo-input-camera" accept="image/*" capture="environment" class="hidden" />
+        <input type="file" id="intervention-photo-input-galerie" accept="image/*" class="hidden" />
+      </div>
+
+      <div class="modal-field hidden" id="intervention-atelier-field">
+        <div class="atelier-toggle-card" id="atelier-toggle-card">
+          <input type="checkbox" id="intervention-signaler-atelier" class="atelier-toggle-checkbox" />
+          <span class="atelier-toggle-icon">🔧</span>
+          <div class="atelier-toggle-text">
+            <div class="atelier-toggle-title">Signaler à l'atelier</div>
+            <div class="atelier-toggle-sub">Dès l'enregistrement de l'intervention</div>
+          </div>
+          <span class="atelier-toggle-check">✓</span>
+        </div>
+        <div class="urgence-row hidden" id="intervention-urgence-row">
+          <button type="button" class="urgence-chip selected" data-urgence="routine">🟢 Routine</button>
+          <button type="button" class="urgence-chip" data-urgence="urgent">🔴 Urgent</button>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btn-save-intervention" style="margin-top:8px;">💾 ENREGISTRER</button>
+      <button class="action-btn" id="btn-go-historique" style="margin-top:12px; background:color-mix(in srgb, var(--color-accent) 15%, transparent); border-color:color-mix(in srgb, var(--color-accent) 50%, transparent); color:var(--color-accent);">
+        📋 Voir l'historique des interventions
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ HISTORIQUE ═══════════════ -->
+  <div id="screen-historique" class="screen hidden">
+    <div class="topbar">
+      <button class="topbar-back" data-back="dashboard">←</button>
+      <span class="topbar-title">Historique</span>
+    </div>
+    <div class="list-container">
+      <div class="historique-search-row">
+        <span class="icon">🔍</span>
+        <input type="text" id="historique-search" placeholder="Rechercher…" />
+      </div>
+      <div class="historique-chips-row" id="historique-filter-chips">
+        <button type="button" class="historique-chip selected" data-filtre="tous">Tous</button>
+        <button type="button" class="historique-chip" data-filtre="Entretien">Entretien</button>
+        <button type="button" class="historique-chip" data-filtre="Panne">Panne</button>
+        <button type="button" class="historique-chip" data-filtre="Crevaison">Crevaison</button>
+        <button type="button" class="historique-chip" data-filtre="Accident">Accident</button>
+        <button type="button" class="historique-chip" data-filtre="ce_mois">Ce mois-ci</button>
+      </div>
+      <div id="historique-list"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ CONSOMMATION ═══════════════ -->
+  <div id="screen-consommation" class="screen hidden">
+    <div class="topbar">
+      <button class="topbar-back" data-back="dashboard">←</button>
+      <span class="topbar-title">Suivi Consommation</span>
+    </div>
+    <div class="list-container" id="consommation-list" style="padding-bottom:90px;"></div>
+    <button class="fab-secondary" id="btn-fab-pas-roule">🚫 Pas roulé</button>
+    <button class="fab" id="btn-fab-conso">+</button>
+  </div>
+
+  <!-- ═══════════════ AIDE ═══════════════ -->
+  <div id="screen-aide" class="screen hidden">
+    <div class="topbar">
+      <button class="topbar-back" data-back="dashboard">←</button>
+      <span class="topbar-title">Aide & Fonctionnement</span>
+    </div>
+    <div class="list-container" id="aide-content"></div>
+  </div>
+
+  <!-- ═══════════════ PARAMÈTRES ═══════════════ -->
+  <div id="screen-parametres" class="screen hidden">
+    <div class="topbar">
+      <button class="topbar-back" data-back="dashboard">←</button>
+      <span class="topbar-title">Paramètres</span>
+    </div>
+    <div style="padding:16px;">
+      <div style="height:12px"></div>
+      <div class="section-header">
+        <span class="icon">🎨</span>
+        <span class="title">Apparence</span>
+      </div>
+      <div style="height:12px"></div>
+      <div class="faq-card" id="theme-accordion-card">
+        <div class="faq-question-row" id="theme-accordion-toggle">
+          <div class="faq-question-text"><span id="theme-current-label"></span></div>
+          <span class="chevron" id="theme-accordion-chevron">⌄</span>
+        </div>
+        <div class="faq-answer" id="theme-options-wrap">
+          <div id="theme-options"></div>
+        </div>
+      </div>
+
+      <div style="height:28px"></div>
+      <div class="section-header">
+        <span class="icon">💬</span>
+        <span class="title">Contact &amp; Support</span>
+      </div>
+      <div style="height:12px"></div>
+      <div class="contact-card" id="btn-whatsapp">
+        <div class="contact-icon-box">💬</div>
+        <div class="contact-info">
+          <div class="contact-title">Contacter le support</div>
+          <div class="contact-sub">Une question, un souci ? Écris-nous sur WhatsApp</div>
+        </div>
+        <span style="color:var(--color-text-secondary);">›</span>
+      </div>
+
+      <div style="height:28px"></div>
+      <div class="section-header">
+        <span class="icon">🚀</span>
+        <span class="title">À propos</span>
+      </div>
+      <div style="height:12px"></div>
+      <div class="contact-card" id="btn-changelog">
+        <div class="contact-icon-box">📋</div>
+        <div class="contact-info">
+          <div class="contact-title">Nouveautés</div>
+          <div class="contact-sub">Voir l'historique des mises à jour de l'appli</div>
+        </div>
+        <span style="color:var(--color-text-secondary);">›</span>
+      </div>
+
+      <div style="height:28px"></div>
+      <div class="section-header">
+        <span class="icon">👋</span>
+        <span class="title">Compte</span>
+      </div>
+      <div style="height:12px"></div>
+      <button class="action-btn" id="btn-logout" style="background:rgba(255,82,82,0.15); border-color:rgba(255,82,82,0.5); color:var(--color-danger);">
+        🚪 Déconnexion
+      </button>
+
+      <div class="atil-footer" id="footer-parametres"></div>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+  function _showDebugBanner(text, bg, fg) {
+    const existing = document.querySelectorAll(".atil-debug-banner");
+    if (existing.length >= 3) return; // évite d'empiler indéfiniment en cas d'erreurs répétées
+    const el = document.createElement("div");
+    el.style.cssText = `position:fixed;left:0;right:0;background:${bg};color:${fg};padding:10px;z-index:9999;font-size:12px;word-break:break-all;`;
+    el.textContent = text;
+    el.style.top = (existing.length * 40) + "px";
+    el.className = "atil-debug-banner";
+    document.body.appendChild(el);
+  }
+  window.addEventListener("error", (e) => {
+    _showDebugBanner((e.message || "erreur inconnue") + " — " + (e.filename || "") + ":" + (e.lineno || ""), "red", "white");
+  });
+  window.addEventListener("unhandledrejection", (e) => {
+    _showDebugBanner("PROMISE: " + (e.reason?.message || String(e.reason) || "erreur promise"), "orange", "black");
+  });
+</script>
+<script type="module" src="js/app.js"></script>
+<script type="module">
+  import { initUpdateManager } from "./js/update-manager.js";
+  window.addEventListener("load", initUpdateManager);
+</script>
+</body>
+</html>
